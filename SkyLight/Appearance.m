@@ -1,5 +1,4 @@
-// called in Appearance.prefPane, saves/loads the setting from defaults
-// Hedge's code will run under Dock and read it!
+// auto light/dark appearance
 
 #define SWITCH_DOMAIN @"moraea"
 #define SWITCH_KEY @"switches"
@@ -9,6 +8,8 @@ NSUserDefaults* moraeaDefaults()
 	return [NSUserDefaults.alloc initWithSuiteName:SWITCH_DOMAIN].autorelease;
 }
 
+// called in Appearance.prefPane, writes default
+
 void SLSSetAppearanceThemeSwitchesAutomatically(BOOL edi)
 {
 	trace(@"SLSSetAppearanceThemeSwitchesAutomatically %d",edi);
@@ -16,6 +17,7 @@ void SLSSetAppearanceThemeSwitchesAutomatically(BOOL edi)
 	[moraeaDefaults() setBool:edi forKey:SWITCH_KEY];
 }
 
+// called below, reads default
 
 BOOL SLSGetAppearanceThemeSwitchesAutomatically()
 {
@@ -26,10 +28,11 @@ BOOL SLSGetAppearanceThemeSwitchesAutomatically()
 	return result;
 }
 
+// ASentientHedgehog's reimplementation of switching
 
 void appearanceSetup()
 {
-	if([NSProcessInfo.processInfo.arguments[0] isEqualToString:@"/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock"])
+	if([process isEqualToString:@"/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock"])
 	{
 		NSDate* fire=[NSDate dateWithTimeIntervalSinceNow:5]; // time until timer start
 		NSTimeInterval repeat=10; // checking interval
