@@ -1,4 +1,4 @@
-// black videos
+// black videos with Mojave QC
 
 int CAImageQueueInsertImageWithRotation(void* rdi_queue,int esi,void* rdx,int ecx,int r8d,void* r9_function,double xmm0,void* stack)
 {

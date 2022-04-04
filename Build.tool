@@ -110,7 +110,14 @@ write 0xe9c5feffff'
 
 build Build/SkyLight.patched $binaries/Current*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
 build Build/CoreDisplay.patched $binaries/Current*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
-build $binaries/10.14.6*/QuartzCore $binaries/Current*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common
+if test -n "$USE_CAT_QC"
+then
+	touch Build/Wrapped/note_used_cat_qc.txt
+	build $binaries/10.15.7*/QuartzCore $binaries/Current*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
+else
+	touch Build/Wrapped/note_used_mojave_qc.txt
+	build $binaries/10.14.6*/QuartzCore $binaries/Current*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common
+fi
 
 build $binaries/10.15.7*/IOSurface $binaries/Current*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
 

@@ -8,7 +8,12 @@ NSString* process;
 #import "Catalyst.m"
 #import "Misc.m"
 #import "Siri.m"
+
+#ifdef CAT
+#import "Glyphs.m"
+#else
 #import "Videos.m"
+#endif
 
 __attribute__((constructor))
 void load()
@@ -22,4 +27,8 @@ void load()
 	animationsSetup();
 	catalystSetup();
 	miscSetup();
+	
+#ifdef CAT
+	glyphsSetup();
+#endif
 }
