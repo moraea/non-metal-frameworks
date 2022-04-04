@@ -8,7 +8,13 @@ mkdir Build
 
 cd Build
 
-git clone https://github.com/moraea/non-metal-common
-non-metal-common/Build.tool
+if test -n "$MORAEA_LOCAL_DEPENDENCIES"
+then
+	cp -R ../../non-metal-common .
+	cp -R ../../non-metal-binaries .
+else
+	git clone https://github.com/moraea/non-metal-common
+	git clone https://github.com/moraea/non-metal-binaries
+fi
 
-git clone https://github.com/moraea/non-metal-binaries
+non-metal-common/Build.tool
