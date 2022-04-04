@@ -1,8 +1,6 @@
 // called in Appearance.prefPane, saves/loads the setting from defaults
 // Hedge's code will run under Dock and read it!
 
-// TODO: put that in
-
 #define SWITCH_DOMAIN @"moraea"
 #define SWITCH_KEY @"switches"
 
@@ -37,10 +35,6 @@ void appearanceSetup()
 		NSTimeInterval repeat=10; // checking interval
 		NSTimer* timer=[NSTimer.alloc initWithFireDate:fire interval:repeat repeats:true block:^(NSTimer* timer)
 		{
-			//define SLSSetAppearanceThemeLegacy as boolean, get value of SLSGetAppearanceThemeSwitchesAutomatically
-			void SLSSetAppearanceThemeLegacy(BOOL);
-			BOOL SLSGetAppearanceThemeSwitchesAutomatically();
-		
 			if(!SLSGetAppearanceThemeSwitchesAutomatically()){
 				return;
 			}
