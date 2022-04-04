@@ -58,7 +58,7 @@ BOOL isWindowServer;
 	hiddSetup();
 	menuBarSetup();
 	occlusionSetup();
-	
+	appearanceSetup();
 	pluginsSetup();
 	
 #if MAJOR == 11
