@@ -61,6 +61,9 @@ void SLSWindowBackdropRelease(char* rdi_backdrop);
 void SLSWindowBackdropActivate(char* rdi_backdrop);
 void SLSWindowBackdropDeactivate(char* rdi_backdrop);
 
+void SLSSetAppearanceThemeLegacy(BOOL);
+BOOL SLSGetAppearanceThemeSwitchesAutomatically();
+
 extern const NSString* kSLSBuiltInDevicesKey;
 extern const NSString* kSLSMouseDevicesKey;
 extern const NSString* kSLSGestureScrollDevicesKey;
