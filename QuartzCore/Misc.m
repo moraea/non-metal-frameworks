@@ -14,6 +14,27 @@ void fixCAContextImpl()
 	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
 }
 
+#ifndef CAT
+
+@interface CALayer(Shim)
+@end
+
+@implementation CALayer(Shim)
+
+-(void)setUnsafeUnretainedDelegate:(id)rdx
+{
+	[self setDelegate:rdx];
+}
+
+-(id)unsafeUnretainedDelegate
+{
+	return [self delegate];
+}
+
+@end
+
+#endif
+
 void miscSetup()
 {
 	fixCAContextImpl();
