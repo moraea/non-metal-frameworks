@@ -8,10 +8,19 @@ BOOL rimBeta()
 {
 	dispatch_once(&rimBetaOnce,^()
 	{
-		rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"ASB_RimBeta"];
+		if([[NSUserDefaults.standardUserDefaults stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"])
+		{
+			rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBeta"];
+			//rimBetaValue=true;
+		} else {
+			rimBetaValue=false;
+		}
+		
+		trace(@"ASB_RimBeta %d",rimBetaValue);
 	});
 	
 	return rimBetaValue;
+	
 }
 
 double rimOverrideValue;
@@ -20,7 +29,15 @@ double rimOverride()
 {
 	dispatch_once(&rimOverrideOnce,^()
 	{
-		rimOverrideValue=[NSUserDefaults.standardUserDefaults doubleForKey:@"ASB_RimOverride"];
+		//rimOverrideValue=[NSUserDefaults.standardUserDefaults doubleForKey:@"ASB_RimOverride"];
+		if(rimBetaValue&&[@[@"/System/Library/PrivateFrameworks/PaperKit.framework/Contents/LinkedNotesUIService.app/Contents/MacOS/LinkedNotesUIService",@"/System/Library/PreferencePanes/DesktopScreenEffectsPref.prefPane/Contents/Resources/DesktopPictures.prefPane/Contents/XPCServices/com.apple.preference.desktopscreeneffect.desktop.remoteservice.xpc/Contents/MacOS/com.apple.preference.desktopscreeneffect.desktop.remoteservice",@"/System/Library/PreferencePanes/DesktopScreenEffectsPref.prefPane/Contents/Resources/ScreenEffects.prefPane/Contents/XPCServices/com.apple.preference.desktopscreeneffect.screeneffects.remoteservice.xpc/Contents/MacOS/com.apple.preference.desktopscreeneffect.screeneffects.remoteservice",@"/System/Library/PrivateFrameworks/AOSUI.framework/Versions/A/XPCServices/AccountProfileRemoteViewService.xpc/Contents/MacOS/AccountProfileRemoteViewService",@"/System/Library/CoreServices/Siri.app/Contents/XPCServices/SiriNCService.xpc/Contents/MacOS/SiriNCService",@"/System/Library/PrivateFrameworks/LocalAuthenticationUI.framework/Versions/A/XPCServices/LocalAuthenticationRemoteService.xpc/Contents/MacOS/LocalAuthenticationRemoteService",@"/Applications/Blackmagic Disk Speed Test.app/Contents/MacOS/DiskSpeedTest",@"/System/iOSSupport/System/Library/PrivateFrameworks/WorkflowUI.framework/PlugIns/WidgetConfigurationExtension.appex/Contents/MacOS/WidgetConfigurationExtension"] containsObject:NSProcessInfo.processInfo.arguments[0]])
+		{
+			trace(@"blacklisted from fake rim");
+			
+			rimOverrideValue=-1;
+		}
+		
+		trace(@"ASB_RimOverride %lf",rimOverrideValue);
 	});
 	
 	return rimOverrideValue;
@@ -70,8 +87,12 @@ void removeFakeRim(unsigned int windowID)
 
 void SLSWindowSetShadowProperties(unsigned int edi_windowID,NSDictionary* rsi_properties)
 {
+	// trace(@"SLSWindowSetShadowProperties in %d %@",edi_windowID,rsi_properties);
+	
 	if(!rimBeta()||!hasShadow(rsi_properties))
 	{
+		// trace(@"SLSWindowSetShadowProperties passthrough");
+		
 		if(rimBeta())
 		{
 			removeFakeRim(edi_windowID);
@@ -81,11 +102,17 @@ void SLSWindowSetShadowProperties(unsigned int edi_windowID,NSDictionary* rsi_pr
 		return;
 	}
 	
+	// trace(@"SLSWindowSetShadowProperties override");
+	
 	NSMutableDictionary* newProperties=rsi_properties.mutableCopy;
 	
-	// hide rim
-	newProperties[@"com.apple.WindowShadowRimDensityActive"]=@0;
-	newProperties[@"com.apple.WindowShadowRimDensityInactive"]=@0;
+	if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_DeleteRim"] == 1)
+	{
+		// hide rim
+		newProperties[@"com.apple.WindowShadowRimDensityActive"]=@0;
+		newProperties[@"com.apple.WindowShadowRimDensityInactive"]=@0;
+		//rimBetaValue=true;
+	}
 	
 	SLSWindowSetShadowPropertie$(edi_windowID,newProperties);
 	
