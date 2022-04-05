@@ -11,7 +11,7 @@ BOOL rimBeta()
 		if([[NSUserDefaults.standardUserDefaults stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"])
 		{
 			rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBeta"];
-			//rimBetaValue=true;
+			rimBetaValue=true;
 		} else {
 			rimBetaValue=false;
 		}
