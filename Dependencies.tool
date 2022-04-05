@@ -17,4 +17,6 @@ else
 	git clone https://github.com/moraea/non-metal-binaries
 fi
 
+chflags hidden non-metal-common non-metal-binaries
+
 non-metal-common/Build.tool

@@ -93,7 +93,15 @@ symbol ___SLSRemoveRemoteContextNotificationHandler_block_invoke
 return 0x0
 
 symbol __ZL26debug_connection_permittedv
-return 0x1'
+return 0x1
+
+# Fabio rim tweak
+# https://github.com/ASentientBot/monterey/issues/3
+set 0xf4430
+write 0xff
+set 0xf48b7
+write 0xff
+'
 
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
 
