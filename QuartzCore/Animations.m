@@ -1,6 +1,8 @@
 // Control Center fade out
 // TODO: check necessary
 
+#if MAJOR>=12
+
 @interface CAPresentationModifierGroup(Shim)
 @end
 
@@ -12,6 +14,8 @@
 }
 
 @end
+
+#endif
 
 // system-wide animations (e.g. Finder desktop stacks)
 

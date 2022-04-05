@@ -5,19 +5,13 @@ cd "$(dirname "$0")"
 
 PATH+=:"$PWD/Build/non-metal-common/Build"
 
-# TODO: add back support for 11
-major=12
-
-rm -rf Build/Wrapped
-mkdir Build/Wrapped
-
 function build
 {
 	oldIn="$1"
 	newIn="$2"
 	mainInstall="$3"
 
-	prefixOut="Build/Wrapped/$4"
+	prefixOut="Build/$major/$4"
 	mkdir -p "$prefixOut"
 	
 	name="$(basename "$mainInstall")"
@@ -108,18 +102,30 @@ Binpatcher Build/CoreDisplay.patched Build/CoreDisplay.patched '
 set 0x7e53f
 write 0xe9c5feffff'
 
-build Build/SkyLight.patched $binaries/Current*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
-build Build/CoreDisplay.patched $binaries/Current*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
-if test -n "$USE_CAT_QC"
-then
-	touch Build/Wrapped/note_used_cat_qc.txt
-	build $binaries/10.15.7*/QuartzCore $binaries/Current*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
-else
-	touch Build/Wrapped/note_used_mojave_qc.txt
-	build $binaries/10.14.6*/QuartzCore $binaries/Current*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common
-fi
+function runWithTargetVersion
+{
+	major=$1
+	echo begin $major
 
-build $binaries/10.15.7*/IOSurface $binaries/Current*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
+	rm -rf Build/$major
+	mkdir Build/$major
 
-build $binaries/10.14.6*/IOSurface $binaries/Current*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
-build $binaries/10.13.6*/IOAccelerator $binaries/Current*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
+	build Build/SkyLight.patched $binaries/$major.*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
+	build Build/CoreDisplay.patched $binaries/$major.*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
+	if test -n "$USE_CAT_QC"
+	then
+		touch Build/$major/note_used_cat_qc.txt
+		build $binaries/10.15.7*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
+	else
+		touch Build/$major/note_used_mojave_qc.txt
+		build $binaries/10.14.6*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common
+	fi
+
+	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
+
+	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
+	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
+}
+
+runWithTargetVersion 11
+runWithTargetVersion 12
