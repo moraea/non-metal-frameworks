@@ -1,6 +1,6 @@
 // window borders
 
-const double RIM_DEFAULT=0.3;
+const double RIM_DEFAULT=0.2;
 
 BOOL rimBetaValue;
 dispatch_once_t rimBetaOnce;
@@ -8,20 +8,12 @@ BOOL rimBeta()
 {
 	dispatch_once(&rimBetaOnce,^()
 	{
-		if([[NSUserDefaults.standardUserDefaults stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"])
-		{
-			rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBeta"];
-			//rimBetaValue=true;
-		} else {
-			rimBetaValue=false;
-		}
-		
-		trace(@"ASB_RimBeta %d",rimBetaValue);
+		rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBeta"];
 	});
 	
 	return rimBetaValue;
-	
 }
+
 
 double rimOverrideValue;
 dispatch_once_t rimOverrideOnce;
@@ -74,7 +66,7 @@ void addFakeRim(unsigned int windowID)
 	
 	CALayer* layer=wrapperForWindow(windowID).context.layer;
 	layer.borderWidth=1;
-	CGColorRef color=CGColorCreateGenericRGB(lightness,lightness,lightness,1.0);
+	CGColorRef color=CGColorCreateGenericRGB(1.0,1.0,1.0,lightness);
 	layer.borderColor=color;
 	CFRelease(color);
 }
@@ -89,15 +81,24 @@ void SLSWindowSetShadowProperties(unsigned int edi_windowID,NSDictionary* rsi_pr
 {
 	// trace(@"SLSWindowSetShadowProperties in %d %@",edi_windowID,rsi_properties);
 	
-	if(!rimBeta()||!hasShadow(rsi_properties))
+	if([[NSUserDefaults.standardUserDefaults stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"])
 	{
-		// trace(@"SLSWindowSetShadowProperties passthrough");
-		
-		if(rimBeta())
+		if(!rimBeta()||!hasShadow(rsi_properties))
 		{
-			removeFakeRim(edi_windowID);
-		}
+			// trace(@"SLSWindowSetShadowProperties passthrough");
 		
+			if(rimBeta())
+			{
+				removeFakeRim(edi_windowID);
+			}
+		
+			SLSWindowSetShadowPropertie$(edi_windowID,rsi_properties);
+			return;
+		}
+	}
+	else
+	{
+		removeFakeRim(edi_windowID);
 		SLSWindowSetShadowPropertie$(edi_windowID,rsi_properties);
 		return;
 	}
