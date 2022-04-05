@@ -1,6 +1,6 @@
 // window borders
 
-const double RIM_DEFAULT=0.2;
+const double RIM_DEFAULT=0.3;
 
 BOOL rimBetaValue;
 dispatch_once_t rimBetaOnce;
