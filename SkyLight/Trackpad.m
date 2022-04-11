@@ -2,7 +2,7 @@
 
 void trackpadSetup()
 {
-	if([process isEqualToString:@"/System/Library/PreferencePanes/Trackpad.prefPane/Contents/MacOS/Trackpad"])
+	if([process isEqualToString:@"/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock"])
 	{
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"AppleEnableSwipeNavigateWithScrollsDidChangeNotification" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
