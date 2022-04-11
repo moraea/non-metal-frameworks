@@ -29,7 +29,7 @@ BOOL isWindowServer;
 #import "Todo.m"
 #import "WindowFlags.m"
 #import "Zoom.m"
-
+#import "Trackpad.m"
 #import "Plugins.m"
 
 @interface Setup:NSObject
@@ -60,6 +60,7 @@ BOOL isWindowServer;
 	occlusionSetup();
 	appearanceSetup();
 	pluginsSetup();
+	trackpadSetup();
 	
 #if MAJOR == 11
 	photosSetup();
