@@ -14,7 +14,7 @@ BOOL keyboardBeta()
 	{
 		keyboardBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_BacklightHack"];
 		
-		trace(@"backlight: NonMetal_BacklightHack %d",keyboardBetaValue);
+		trace(@"backlight: Moraea_BacklightHack %d",keyboardBetaValue);
 	});
 	
 	return keyboardBetaValue;
