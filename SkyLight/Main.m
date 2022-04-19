@@ -12,6 +12,7 @@ BOOL isWindowServer;
 
 #import "Appearance.m"
 #import "Backlight.m"
+#import "Cycle.m"
 #import "Defenestrator.m"
 #import "DisplayLink.m"
 #import "Dock.m"
@@ -53,6 +54,7 @@ BOOL isWindowServer;
 	tracePrint=false;
 	swizzleLog=false;
 	
+	cycleSetup();
 	defenestratorSetup();
 	glyphsSetup();
 	hiddSetup();
