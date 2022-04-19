@@ -6,7 +6,7 @@ BOOL styleIsDark()
 	
 	dispatch_once(&styleIsDarkOnce,^()
 	{
-		styleIsDarkValue=[NSUserDefaults.standardUserDefaults boolForKey:@"ASB_DarkMenuBar"];
+		styleIsDarkValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_DarkMenuBar"];
 	});
 	
 	return styleIsDarkValue;
@@ -241,7 +241,7 @@ void menuBarSetup()
 		return;
 	}
 	
-	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:@"NonMetal_MenuBarOverride"];
+	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:@"Moraea_MenuBarOverride"];
 	if(!pref)
 	{
 		return;

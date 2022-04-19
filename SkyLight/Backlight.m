@@ -12,7 +12,7 @@ BOOL keyboardBeta()
 {
 	dispatch_once(&keyboardBetaOnce,^()
 	{
-		keyboardBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"NonMetal_BacklightHack"];
+		keyboardBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_BacklightHack"];
 		
 		trace(@"backlight: NonMetal_BacklightHack %d",keyboardBetaValue);
 	});
