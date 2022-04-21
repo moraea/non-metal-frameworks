@@ -29,7 +29,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other code contributions, insights, and testing
 	- **TODO: Hedgy, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientBot](https://asentientbot.github.io)
-    - **TODO**
+    - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, several app and WindowServer crashes)
+	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
+	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
+	- Cycle Through Windows reimplementation
+	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
 	- TeraScale 2 insights
