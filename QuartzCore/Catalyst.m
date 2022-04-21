@@ -41,6 +41,11 @@ void setDelegateWasRetained(NSObject* delegate,BOOL flag)
 {
 	// trace(@"CALayer setDelegateWasRetained %d",flag);
 	
+	if(!delegate)
+	{
+		return;
+	}
+	
 	objc_setAssociatedObject(delegate,&KEY_RETAINED_DELEGATE,[NSNumber numberWithBool:flag],OBJC_ASSOCIATION_RETAIN);
 }
 void releaseLayerDelegateIfNecessary(CALayer* layer)
