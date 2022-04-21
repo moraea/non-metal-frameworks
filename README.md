@@ -53,10 +53,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- many other macOS insights and testing
 - [parrotgeek1](https://parrotgeek.com)
     - numerous macOS and graphics insights regarding Tesla, TeraScale 2, SIP, OpenGL and more
+- [Flagers](https://github.com/flagersgit)
+    - numerous macOS insights, explanations, and help
 - IronApple
     - OpenCL downgrade testing
 - [dhinakg](https://github.com/dhinakg)
-- [Flagers](https://github.com/flagersgit)
 - [Syncretic](https://forums.macrumors.com/members/syncretic.1173816/)
 - [Acidanthera](https://github.com/acidanthera)
 - [Julian Fairfax](https://julianfairfax.gitlab.io)
