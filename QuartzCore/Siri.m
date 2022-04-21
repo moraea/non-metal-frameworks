@@ -1,5 +1,4 @@
 // SiriNCService not appearing
-// TODO: no longer working with 10.14.6 QC, fix
 
 @interface CAFenceHandle(Shim)<NSSecureCoding>
 @end

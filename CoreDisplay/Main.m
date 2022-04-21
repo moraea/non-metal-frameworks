@@ -33,6 +33,7 @@ NSDictionary* CoreDisplay_DisplayCreateInfoDictionary(int edi)
 	
 	NSString* type=[[UTType _typeOfCurrentDevice] identifier];
 	NSString* path=[NSString stringWithFormat:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/%@.icns",type];
+	
 	trace(@"thic: adding %@",path);
 	mutable[@"display-icon"]=path;
 	mutable[@"display-resolution-preview-icon"]=path;
