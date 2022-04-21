@@ -4,28 +4,28 @@ The core of the non-Metal patches: wrappers for downgraded frameworks, consistin
 ## build
 Run `Dependencies.tool` to fetch dependencies from GitHub, or set `MORAEA_LOCAL_DEPENDENCIES=1` to use local versions. Run `Build.tool` to generate binaries in the `Build` subfolder. Set `USE_CAT_QC` to use Catalina's QuartzCore; otherwise Mojave's will be used (unstable).
 
-Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Legacy-Patcher/), which includes these fixes.
+Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Legacy-Patcher/), which includes stable versions of these fixes.
 
 ## credits
 - [EduCovas](https://github.com/educovas)
-    - QuartzCore downgrade (fixes numerous graphical bugs and improves performance)
+    - QuartzCore downgrade idea and shims (fixes numerous graphical bugs and improves performance)
 	- refresh rate shims (fixes Catalyst scrolling and WebKit freezing)
 	- swipe between pages workaround discovery
-	- window rim improvements
+	- window rim improvement code
 	- auto appearance switching reimplementation
 	- Safari extensions help
 	- display backlight insights
 	- countless other code contributions, insights, and testing
 	- **TODO: Edu, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
-    - QuartzCore downgrade suggestion
+    - QuartzCore downgrade idea
 	- swipe between pages workaround code
-	- window rim improvements
+	- window rim improvement code
 	- auto appearance switching reimplementation
-	- keyboard backlight workaround
+	- keyboard backlight workaround code
 	- TeraScale 2 insights
 	- OpenCL downgrade
-	- Night Shift prefpane fix
+	- Night Shift prefpane fix code
 	- countless other code contributions, insights, and testing
 	- **TODO: Hedgy, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientBot](https://asentientbot.github.io)
@@ -100,7 +100,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 Previous history is available in the [old repository](https://github.com/ASentientBot/monterey).
 
 ## todo
-- **Hedgy/Edu, please add to this list - Amy***
+- **Hedgy/Edu, please add to this list - Amy**
 - fix Catalyst crashes with Mojave QC
 - fix upside-down Catalyst UI elements with Mojave QC
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
