@@ -73,7 +73,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ### 2022-4-21
 - fix Catalyst app instability with Mojave QuartzCore
 - disable Night Shift patch by default since OCLP handles that
-- fix upside-down Catalyst UI elements with Mojave QC
+- fix upside-down Catalyst UI elements with Mojave QuartzCore
 
 ### 2022-4-20
 - fix Siri regression with Stubber 2
@@ -112,13 +112,13 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- fix stuttering/out-of-order frames when seeking in videos with Mojave QC
+- fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
 - fix unresponsive password dialogs with downgraded QuartzCore
 - fix unresponsive Catalyst buttons
 - investigate rare binaries not seeing re-exported symbols (Dropbox-specific workaround: [SkyLight plugin](https://github.com/ASentientBot/monterey/releases/download/2021-12-17/throw.this.in.the.SkyLight.plugins.folder.to.fix.Dropbox.in.a.really.non.ideal.way.zip))
-- investigate slow compositing in all browsers (at least partially fixed with Mojave QC)
+- investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
 - improve status bar item resizing, replicant handling
 - investigate Maps crash
