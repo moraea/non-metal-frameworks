@@ -13,12 +13,30 @@ BOOL fake_addCommitHandler(CATransaction* self,SEL sel,void* rdx_block,int ecx_p
 	return true;
 }
 
-// TODO: upside-down
+#ifndef CAT
+
+// fix upside-down AppKit layers in UIKit apps
+
+int* getLayerFlags(CALayer* layer)
+{
+	char* layerC=*(char**)(((char*)layer)+0x10);
+	return (int*)(layerC+0x4);
+}
+
+void (*real_setLayer)(NSObject*,SEL,CALayer*);
+void fake_setLayer(NSObject* self,SEL sel,CALayer* layer)
+{
+	NSDictionary* options=[self options];
+	if(((NSNumber*)options[kCAContextReversesContentsAreFlippedInCatalystEnvironment]).boolValue)
+	{
+		*getLayerFlags(layer)|=0x400000;
+	}
+	
+	real_setLayer(self,sel,layer);
+}
 
 // fix crashes due to CALayer.delegate being released prematurely
 // TODO: confirm there is no memory leak
-
-#ifndef CAT
 
 @interface CALayer(Shim)
 @end
@@ -33,14 +51,10 @@ BOOL delegateWasRetained(NSObject* delegate)
 	
 	NSNumber* value=objc_getAssociatedObject(delegate,&KEY_RETAINED_DELEGATE);
 	
-	// trace(@"CALayer delegateWasRetained %@",value);
-	
 	return value.boolValue;
 }
 void setDelegateWasRetained(NSObject* delegate,BOOL flag)
 {
-	// trace(@"CALayer setDelegateWasRetained %d",flag);
-	
 	if(!delegate)
 	{
 		return;
@@ -75,16 +89,16 @@ void releaseLayerDelegateIfNecessary(CALayer* layer)
 
 @end
 
-void (*real_setDelegate)(NSObject*,SEL,NSObject*);
-void fake_setDelegate(NSObject* self,SEL sel,NSObject* delegate)
+void (*real_setDelegate)(CALayer*,SEL,NSObject*);
+void fake_setDelegate(CALayer* self,SEL sel,NSObject* delegate)
 {
 	releaseLayerDelegateIfNecessary(self);
 	
 	real_setDelegate(self,sel,delegate);
 }
 
-void (*real_dealloc)(NSObject*,SEL);
-void fake_dealloc(NSObject* self,SEL sel)
+void (*real_dealloc)(CALayer*,SEL);
+void fake_dealloc(CALayer* self,SEL sel)
 {
 	releaseLayerDelegateIfNecessary(self);
 	
@@ -100,5 +114,10 @@ void catalystSetup()
 #ifndef CAT
 	swizzleImp(@"CALayer",@"setDelegate:",true,(IMP)fake_setDelegate,(IMP*)&real_setDelegate);
 	swizzleImp(@"CALayer",@"dealloc",true,(IMP)fake_dealloc,(IMP*)&real_dealloc);
+	
+	if(_CFMZEnabled())
+	{
+		swizzleImp(@"CAContextImpl",@"setLayer:",true,(IMP)fake_setLayer,(IMP*)&real_setLayer);
+	}
 #endif
 }

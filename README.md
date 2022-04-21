@@ -73,6 +73,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ### 2022-4-21
 - fix Catalyst app instability with Mojave QuartzCore
 - disable Night Shift patch by default since OCLP handles that
+- fix upside-down Catalyst UI elements with Mojave QC
 
 ### 2022-4-20
 - fix Siri regression with Stubber 2
@@ -109,8 +110,6 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 Previous history is available in the [old repository](https://github.com/ASentientBot/monterey).
 
 ## todo
-- **Hedgy/Edu, please add to this list - Amy**
-- fix upside-down Catalyst UI elements with Mojave QC
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
 - fix unresponsive password dialogs with downgraded QuartzCore
