@@ -113,7 +113,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 - investigate Maps crash
 - fix Photo Booth (workaround: use Big Sur version)
 - fix Books (workaround: use Big Sur version)
-- automatically color menu bar text (workaround: `defaults write -g ASB_DarkMenuBar -bool true`)
+- automatically color menu bar text (workaround: `defaults write -g Moraea_DarkMenuBar -bool true`)
 - fix full-screen transition
 - fix Migration Assistant
 - fix "Move to Display"
