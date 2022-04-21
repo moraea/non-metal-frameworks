@@ -70,6 +70,10 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-4-21
+- fix Catalyst app instability with Mojave QuartzCore
+- disable Night Shift patch by default since OCLP handles that
+
 ### 2022-4-20
 - fix Siri regression with Stubber 2
 
