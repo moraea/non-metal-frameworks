@@ -20,7 +20,6 @@ BOOL isWindowServer;
 #import "Grey.m"
 #import "Hidd.m"
 #import "MenuBar.m"
-#import "NightShift.m"
 #import "Occlusion.m"
 #import "Photos.m"
 #import "Rim.m"
@@ -32,6 +31,10 @@ BOOL isWindowServer;
 #import "Zoom.m"
 #import "Trackpad.m"
 #import "Plugins.m"
+
+#ifdef SENTIENT_PATCHER
+#import "NightShift.m"
+#endif
 
 @interface Setup:NSObject
 @end
