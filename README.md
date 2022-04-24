@@ -70,6 +70,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-4-23
+- disable Cycle Through Windows implementation on Big Sur
+
 ### 2022-4-21
 - fix Catalyst app instability with Mojave QuartzCore
 - disable Night Shift patch by default since OCLP handles that
@@ -112,6 +115,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
+- check if Cycle Through Windows fix is breaking anything on Monterey (VirtualBox?)
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
