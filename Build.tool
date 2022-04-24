@@ -100,8 +100,7 @@ return 0x1
 set 0xf4430
 write 0xff
 set 0xf48b7
-write 0xff
-'
+write 0xff'
 
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
 

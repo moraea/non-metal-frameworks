@@ -21,7 +21,6 @@ BOOL isWindowServer;
 #import "Hidd.m"
 #import "MenuBar.m"
 #import "Occlusion.m"
-#import "Photos.m"
 #import "Rim.m"
 #import "Scroll.m"
 #import "Session.m"
@@ -31,6 +30,12 @@ BOOL isWindowServer;
 #import "Zoom.m"
 #import "Trackpad.m"
 #import "Plugins.m"
+
+#if MAJOR==11
+#import "Photos.m"
+#else
+#import "Cycle.m"
+#endif
 
 #ifdef SENTIENT_PATCHER
 #import "NightShift.m"
@@ -57,7 +62,6 @@ BOOL isWindowServer;
 	tracePrint=false;
 	swizzleLog=false;
 	
-	cycleSetup();
 	defenestratorSetup();
 	glyphsSetup();
 	hiddSetup();
@@ -67,8 +71,10 @@ BOOL isWindowServer;
 	pluginsSetup();
 	trackpadSetup();
 	
-#if MAJOR == 11
+#if MAJOR==11
 	photosSetup();
+#else
+	cycleSetup();
 #endif
 }
 
