@@ -70,6 +70,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-4-23
+- disable Cycle Through Windows implementation on Big Sur
+
 ### 2022-4-21
 - fix Catalyst app instability with Mojave QuartzCore
 - disable Night Shift patch by default since OCLP handles that
