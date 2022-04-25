@@ -59,6 +59,8 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
     - numerous macOS and graphics insights regarding Tesla, TeraScale 2, SIP, OpenGL and more
 - [Flagers](https://github.com/flagersgit)
     - numerous macOS insights, explanations, and help
+    - LegacyRVPL for rapid testing of new framework shims/patches
+	- preserves snapshots and delta OTAs for developer convenience
 - IronApple
     - OpenCL downgrade testing
 - [dhinakg](https://github.com/dhinakg)
