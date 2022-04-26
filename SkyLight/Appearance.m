@@ -80,7 +80,7 @@ void appearanceSetup()
 	if([process isEqualToString:@"/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"])
 	{
 		NSDate* fire=[NSDate dateWithTimeIntervalSinceNow:0.1]; // time until timer start
-		NSTimeInterval repeat=30; // checking interval
+		NSTimeInterval repeat=60; // checking interval
 		NSTimer* timer=[NSTimer.alloc initWithFireDate:fire interval:repeat repeats:true block:^(NSTimer* timer)
 		{
 			if(!SLSGetAppearanceThemeSwitchesAutomatically())
