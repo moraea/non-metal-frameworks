@@ -30,6 +30,19 @@ NSArray<NSString*>* listFolderEarlyBoot(NSString* path)
 	return files.autorelease;
 }
 
+
+BOOL pluginLoggingValue;
+dispatch_once_t pluginLoggingOnce;
+BOOL pluginLogging()
+{
+	dispatch_once(&pluginLoggingOnce,^()
+	{
+		pluginLoggingValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_PluginLogging"];
+	});
+	
+	return pluginLoggingValue;
+}
+
 void pluginsSetup()
 {
 	NSArray<NSString*>* files=listFolderEarlyBoot((NSString*)PLUGIN_PATH);
@@ -66,13 +79,15 @@ void pluginsSetup()
 		
 		if(!earlyBoot)
 		{
-			if(handle)
-			{
-				trace(@"plugin: loaded %@",dylibName);
-			}
-			else
-			{
-				trace(@"plugin: %s",dlerror());
+			if(pluginLogging()){
+				if(handle)
+				{
+					trace(@"plugin: loaded %@",dylibName);
+				}
+				else
+				{
+					trace(@"plugin: %s",dlerror());
+				}
 			}
 		}
 		
