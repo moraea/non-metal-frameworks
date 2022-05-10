@@ -16,6 +16,8 @@ CFMachPortRef SLSEventTapCreat$(unsigned int edi_location,NSString* rsi_priority
 
 void SLSWindowSetShadowPropertie$(unsigned int edi_windowID,NSDictionary* rsi_properties);
 
+int SLSSetWindowTyp$(int,int,int,int,int,void*);
+
 // SkyLight
 
 unsigned int SLSMainConnectionID();
