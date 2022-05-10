@@ -72,6 +72,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-9
+- smooth transition for auto appearance
+
 ### 2022-5-3
 - Change Plugin logging to a default - disabled by default (`Moraea_PluginLogging`)
 
