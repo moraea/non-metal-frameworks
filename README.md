@@ -72,6 +72,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-12
+- reduce rim blacklists
+
 ### 2022-5-9
 - add back `SLSSetWindowType` shim for Big Sur with defenestrator off
 - smooth transition for auto appearance
