@@ -127,6 +127,8 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
+- fix certain new unresponsive buttons (e.g. UserNotificationCenter crash popups) in 12.4 betas
+- investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - check if Cycle Through Windows fix is breaking anything on Monterey (VirtualBox?)
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
