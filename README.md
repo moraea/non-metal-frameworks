@@ -29,7 +29,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other code contributions, insights, and testing
 	- **TODO: Hedgy, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, several app and WindowServer crashes)
+    - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection, several app and WindowServer crashes)
 	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
 	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
@@ -74,6 +74,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ### 2022-5-12
 - reduce rim blacklists
+- update occlusion workaround to fix unresponsive UNCAlert buttons
 
 ### 2022-5-9
 - add back `SLSSetWindowType` shim for Big Sur with defenestrator off
@@ -127,7 +128,6 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- fix certain new unresponsive buttons (e.g. UserNotificationCenter crash popups) in 12.4 betas
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - check if Cycle Through Windows fix is breaking anything on Monterey (VirtualBox?)
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
