@@ -1,38 +1,25 @@
-// WebKit, Activity Monitor refresh based on window visibility
+// WebKit, Activity Monitor refresh only when visible
+// save panel, UNCAlert buttons, Safari extensions setting check for security
+
+// fix NSWindow.occlusionState
 
 // TODO: results in occlusionState 8194/8192 visible/occluded, NSWindowOcclusionStateVisible == 2
 // first-party apps work, but docs don't specify it should be checked bitwise
 
-void (*real_setWindowNumber)(id self,SEL selector,unsigned long windowID);
-
-void fake_setWindowNumber(id self,SEL selector,unsigned long windowID)
+void (*real__setWindowNumber)(id self,SEL selector,unsigned long windowID);
+void fake__setWindowNumber(id self,SEL selector,unsigned long windowID)
 {
-	real_setWindowNumber(self,selector,windowID);
+	real__setWindowNumber(self,selector,windowID);
 	
 	if(windowID!=-1)
 	{
+		// from Cat -[NSWindow _setWindowNumber:]
+		
 		SLSPackagesEnableWindowOcclusionNotifications(SLSMainConnectionID(),windowID,1,0);
 	}
 }
 
-// NSLocalSavePanel _updateOKButtonEnabledState
-// TODO: not ideal
-
-BOOL fake_isOccluded(id self,SEL selector)
-{
-	trace(@"fake_isOccluded");
-	
-	return false;
-}
-
-// Safari extensions
-
-BOOL fake_validateNoOcclusionSinceToken(id self,SEL selector,void* rdx)
-{
-	trace(@"fake_validateNoOcclusionSinceToken");
-	
-	return true;
-}
+// not present in old SkyLight
 
 @interface SLSecureCursorAssertion(Shim)
 @end
@@ -55,27 +42,35 @@ BOOL fake_validateNoOcclusionSinceToken(id self,SEL selector,void* rdx)
 
 @end
 
-// TODO: temporary hack
+// TODO: idk why 0x526/0x527 notifications aren't sent, so just override these for now
 
-BOOL fake_canEnableExtensions()
+BOOL fake_validateNoOcclusionSinceToken(NSObject* rdi_self,SEL rsi_sel,NSNumber* rdx_token)
 {
-	trace(@"fake_canEnableExtensions");
-	
+	trace(@"NSOcclusionDetectionView validateNoOcclusionSinceToken: %@",rdx_token);
 	return true;
 }
 
-void safariSetup()
+BOOL fake_isOccluded(NSObject* rdi_self,SEL rsi_sel)
 {
-	if([process containsString:@"Safari"])
+	trace(@"NSOcclusionDetectionView isOccluded");
+	return false;
+}
+
+void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
+{
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW,1*NSEC_PER_SEC),dispatch_get_main_queue(),^()
 	{
-		swizzleImp(@"ExtensionsPreferences",@"canEnableExtensions",true,(IMP)fake_canEnableExtensions,NULL);
-	}
+		trace(@"fake unoccluded notification");
+		
+		[NSNotificationCenter.defaultCenter postNotificationName:@"NSOcclusionDetectionViewDidBecomeUnoccluded" object:rdi_self userInfo:@{@"validationToken":SLSecureCursorAssertion.assertion}];
+	});
 }
 
 void occlusionSetup()
 {
-	swizzleImp(@"NSWindow",@"_setWindowNumber:",true,(IMP)fake_setWindowNumber,(IMP*)&real_setWindowNumber);
-	swizzleImp(@"NSOcclusionDetectionView",@"isOccluded",true,(IMP)fake_isOccluded,NULL);
+	swizzleImp(@"NSWindow",@"_setWindowNumber:",true,(IMP)fake__setWindowNumber,(IMP*)&real__setWindowNumber);
+	
 	swizzleImp(@"NSOcclusionDetectionView",@"validateNoOcclusionSinceToken:",true,(IMP)fake_validateNoOcclusionSinceToken,NULL);
-	safariSetup();
+	swizzleImp(@"NSOcclusionDetectionView",@"isOccluded",true,(IMP)fake_isOccluded,NULL);
+	swizzleImp(@"NSOcclusionDetectionView",@"viewDidMoveToWindow",true,(IMP)fake_viewDidMoveToWindow,NULL);
 }
