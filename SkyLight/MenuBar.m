@@ -283,8 +283,6 @@ void menuBarOverrideSetup()
 void (*real_setLength)(NSObject* rdi_self,SEL rsi_sel,double xmm0_length);
 void fake_setLength(NSObject* rdi_self,SEL rsi_sel,double xmm0_length)
 {
-	trace(@"fake_setLength %@ %s %lf",rdi_self,rsi_sel,xmm0_length);
-	
 	real_setLength(rdi_self,rsi_sel,xmm0_length);
 	
 	SLSAdjustSystemStatusBarWindows(SLSMainConnectionID());
