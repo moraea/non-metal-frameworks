@@ -72,6 +72,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-13
+- refresh status bar when item length changes
+
 ### 2022-5-12
 - reduce rim blacklists
 - update occlusion workaround to fix unresponsive UNCAlert buttons
@@ -128,6 +131,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
+- investigate double menu bar clock with `Show date: when space allows` (workaround: set `always` or `never`)
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - check if Cycle Through Windows fix is breaking anything on Monterey (VirtualBox?)
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
@@ -138,7 +142,6 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 - investigate rare binaries not seeing re-exported symbols (Dropbox-specific workaround: [SkyLight plugin](https://github.com/ASentientBot/monterey/releases/download/2021-12-17/throw.this.in.the.SkyLight.plugins.folder.to.fix.Dropbox.in.a.really.non.ideal.way.zip))
 - investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
-- improve status bar item resizing, replicant handling
 - investigate Maps crash
 - fix Photo Booth (workaround: use Big Sur version)
 - fix Books (workaround: use Big Sur version)

@@ -231,10 +231,9 @@ dispatch_block_t SLSCopyCoordinatedDistributedNotificationContinuationBlock()
 	};
 }
 
-// custom backgrounds
-// TODO: cursed
+// custom background colors
 
-void menuBarSetup()
+void menuBarOverrideSetup()
 {
 	if(!isWindowServer)
 	{
@@ -263,18 +262,35 @@ void menuBarSetup()
 		}
 	}
 	
-	trace(@"menuBarSetup sanity checks passed (%f, %f, %f, %f)",floats[0],floats[1],floats[2],floats[3]);
+	trace(@"menu bar override sanity checks passed (%f, %f, %f, %f)",floats[0],floats[1],floats[2],floats[3]);
 	
 	char* base=(char*)SLSMainConnectionID-0x1d8322;
 	char* target=base+0x26ef70;
 	
-	trace(@"menuBarSetup found SkyLight base %p target %p",base,target);
+	trace(@"menu bar override found SkyLight base %p target %p",base,target);
 	
 	if(mprotect(target-(long)target%getpagesize(),getpagesize()*2,PROT_READ|PROT_WRITE))
 	{
-		trace(@"menuBarSetup mprotect failed");
+		trace(@"menu bar override mprotect failed");
 		return;
 	}
 	
 	memcpy(target,floats,16);
+}
+
+// refresh layout on status bar length changes
+
+void (*real_setLength)(NSObject* rdi_self,SEL rsi_sel,double xmm0_length);
+void fake_setLength(NSObject* rdi_self,SEL rsi_sel,double xmm0_length)
+{
+	real_setLength(rdi_self,rsi_sel,xmm0_length);
+	
+	SLSAdjustSystemStatusBarWindows(SLSMainConnectionID());
+}
+
+void menuBarSetup()
+{
+	menuBarOverrideSetup();
+	
+	swizzleImp(@"NSStatusItem",@"setLength:",true,(IMP)fake_setLength,(IMP*)&real_setLength);
 }
