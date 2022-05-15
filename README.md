@@ -72,6 +72,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+## 2022-5-14
+- fix crashes caused by prior occlusion change
+
 ### 2022-5-13
 - refresh status bar when item length changes
 

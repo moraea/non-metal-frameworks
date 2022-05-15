@@ -56,6 +56,7 @@ BOOL fake_isOccluded(NSObject* rdi_self,SEL rsi_sel)
 	return false;
 }
 
+void (*real_viewDidMoveToWindow)(NSObject*,SEL);
 void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
 {
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW,1*NSEC_PER_SEC),dispatch_get_main_queue(),^()
@@ -64,6 +65,8 @@ void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
 		
 		[NSNotificationCenter.defaultCenter postNotificationName:@"NSOcclusionDetectionViewDidBecomeUnoccluded" object:rdi_self userInfo:@{@"validationToken":SLSecureCursorAssertion.assertion}];
 	});
+	
+	real_viewDidMoveToWindow(rdi_self,rsi_sel);
 }
 
 void occlusionSetup()
@@ -72,5 +75,5 @@ void occlusionSetup()
 	
 	swizzleImp(@"NSOcclusionDetectionView",@"validateNoOcclusionSinceToken:",true,(IMP)fake_validateNoOcclusionSinceToken,NULL);
 	swizzleImp(@"NSOcclusionDetectionView",@"isOccluded",true,(IMP)fake_isOccluded,NULL);
-	swizzleImp(@"NSOcclusionDetectionView",@"viewDidMoveToWindow",true,(IMP)fake_viewDidMoveToWindow,NULL);
+	swizzleImp(@"NSOcclusionDetectionView",@"viewDidMoveToWindow",true,(IMP)fake_viewDidMoveToWindow,(IMP*)&real_viewDidMoveToWindow);
 }
