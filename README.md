@@ -16,6 +16,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Safari extensions help
 	- display backlight insights
 	- countless other code contributions, insights, and testing
+	- occlusion workarounds
 	- **TODO: Edu, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -33,6 +34,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
 	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
+	- occlusion workarounds
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
