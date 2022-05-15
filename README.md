@@ -15,8 +15,8 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- auto appearance switching reimplementation
 	- Safari extensions help
 	- display backlight insights
-	- countless other code contributions, insights, and testing
 	- occlusion workarounds
+	- countless other code contributions, insights, and testing
 	- **TODO: Edu, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
