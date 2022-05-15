@@ -13,9 +13,8 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- swipe between pages workaround discovery
 	- window rim improvement code
 	- auto appearance switching reimplementation
-	- Safari extensions help
+	- occlusion research (Safari extensions, disabled buttons, frozen apps)
 	- display backlight insights
-	- occlusion workarounds
 	- countless other code contributions, insights, and testing
 	- **TODO: Edu, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
