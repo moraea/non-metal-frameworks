@@ -46,13 +46,11 @@ void fake__setWindowNumber(id self,SEL selector,unsigned long windowID)
 
 BOOL fake_validateNoOcclusionSinceToken(NSObject* rdi_self,SEL rsi_sel,NSNumber* rdx_token)
 {
-	trace(@"NSOcclusionDetectionView validateNoOcclusionSinceToken: %@",rdx_token);
 	return true;
 }
 
 BOOL fake_isOccluded(NSObject* rdi_self,SEL rsi_sel)
 {
-	trace(@"NSOcclusionDetectionView isOccluded");
 	return false;
 }
 
@@ -61,8 +59,6 @@ void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
 {
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW,1*NSEC_PER_SEC),dispatch_get_main_queue(),^()
 	{
-		trace(@"fake unoccluded notification");
-		
 		[NSNotificationCenter.defaultCenter postNotificationName:@"NSOcclusionDetectionViewDidBecomeUnoccluded" object:rdi_self userInfo:@{@"validationToken":SLSecureCursorAssertion.assertion}];
 	});
 	

@@ -14,7 +14,27 @@ void fixCAContextImpl()
 	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
 }
 
+// reee
+
+void (*real_setScale)(id,SEL,double);
+
+void fake_setScale(id self,SEL selector,double value)
+{
+	value=MAX(value,1.0);
+	
+	real_setScale(self,selector,value);
+}
+
+void blurScaleHack()
+{
+	swizzleImp(@"CABackdropLayer",@"setScale:",true,(IMP)fake_setScale,(IMP*)&real_setScale);
+}
+
 void miscSetup()
 {
 	fixCAContextImpl();
+	
+#ifdef CAT
+	blurScaleHack();
+#endif
 }
