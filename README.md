@@ -16,7 +16,6 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- occlusion research (Safari extensions, disabled buttons, frozen apps)
 	- display backlight insights
 	- countless other code contributions, insights, and testing
-	- **TODO: Edu, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
 	- swipe between pages workaround code
@@ -27,7 +26,6 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- OpenCL downgrade
 	- Night Shift prefpane fix code
 	- countless other code contributions, insights, and testing
-	- **TODO: Hedgy, edit this yourself however you want and add anything i forgot - Amy**
 - [ASentientBot](https://asentientbot.github.io)
     - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection, several app and WindowServer crashes)
 	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
@@ -40,7 +38,6 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- TeraScale 2 insights
 	- excellent hackintosh guides
 	- countless other explanations, insights, help, patience, and testing
-	- **TODO: Mykola, edit this yourself however you want and add anything i forgot - Amy**
 - [dosdude1](http://dosdude1.com)
     - 10.14.4+ OpenGL/GPUSupport downgrade (fixes mysterious WindowServer crash)
 	- Mojave/Catalina patcher development and leadership
