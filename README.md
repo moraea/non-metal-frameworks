@@ -25,6 +25,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- TeraScale 2 insights
 	- OpenCL downgrade
 	- Night Shift prefpane fix code
+	- Shim to selectively reenable transparency with reduce transparency enabled (ex. `defaults write com.apple.dock Moraea_EnableTransparency 1`)
 	- countless other code contributions, insights, and testing
 - [ASentientBot](https://asentientbot.github.io)
     - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection, several app and WindowServer crashes)
