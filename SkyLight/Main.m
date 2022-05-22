@@ -16,6 +16,7 @@ BOOL isWindowServer;
 #import "Defenestrator.m"
 #import "DisplayLink.m"
 #import "Dock.m"
+#import "EnableTransparency.m"
 #import "Glyphs.m"
 #import "Grey.m"
 #import "Hidd.m"
