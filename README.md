@@ -71,6 +71,8 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-22
+- allow selectively re-enabling transparency with reduce transparency enabled (`defaults write (bundle identifier) Moraea_EnableTransparency 1`)
 ### 2022-5-16
 - temporarily disable Cycle Through Windows due to VirtualBox issue
 - re-add CABackdropLayer scale hack for Cat QC builds
