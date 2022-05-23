@@ -1,6 +1,5 @@
 NSString *_AXInterfaceGetReduceTransparencyEnabled();
 int fake__AXInterfaceGetReducedTransparencyEnabled(){
-	NSLog(@"dyld_interposed");
 	
     if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_EnableTransparency"]){
         return 0;
