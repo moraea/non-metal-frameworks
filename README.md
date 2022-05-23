@@ -33,6 +33,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
 	- occlusion workarounds
+	- Discord screen share hack
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -71,8 +72,12 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-23
+- fix Discord (app) screen sharing by making it think it's on High Sierra
+
 ### 2022-5-22
 - allow selectively re-enabling transparency with reduce transparency enabled (`defaults write (bundle identifier) Moraea_EnableTransparency 1`)
+
 ### 2022-5-16
 - temporarily disable Cycle Through Windows due to VirtualBox issue
 - re-add CABackdropLayer scale hack for Cat QC builds
