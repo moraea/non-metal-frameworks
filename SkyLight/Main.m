@@ -14,6 +14,7 @@ BOOL isWindowServer;
 #import "Backlight.m"
 #import "Cycle.m"
 #import "Defenestrator.m"
+#import "Discord.m"
 #import "DisplayLink.m"
 #import "Dock.m"
 #import "EnableTransparency.m"
