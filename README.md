@@ -26,6 +26,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- OpenCL downgrade
 	- Night Shift prefpane fix code
 	- Shim to selectively reenable transparency with reduce transparency enabled (ex. `defaults write com.apple.dock Moraea_EnableTransparency 1`)
+	- AppKit `issetugid` workaround help
 	- countless other code contributions, insights, and testing
 - [ASentientBot](https://asentientbot.github.io)
     - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection, several app and WindowServer crashes)
@@ -71,6 +72,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2022-5-27
+- workaround VirtualBox AppKit `issetugid` crash with Cycle Through Windows implementation
 
 ### 2022-5-23
 - fix Discord (app) screen sharing by making it think it's on High Sierra
