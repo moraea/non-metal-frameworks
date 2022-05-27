@@ -150,7 +150,6 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 
 - investigate double menu bar clock with `Show date: when space allows` (workaround: set `always` or `never`)
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
-- prevent `Cycle Through Windows` reimplementation breaking Big Sur `sudo` and Monterey VirtualBox
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
