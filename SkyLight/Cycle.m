@@ -17,8 +17,43 @@
 -(void)_cycleWindowsReversed:(BOOL)reversed;
 @end
 
+BOOL (*real_boolForKey)(NSUserDefaults* self,SEL sel,NSString* key);
+BOOL fake_boolForKey(NSUserDefaults* self,SEL sel,NSString* key)
+{
+	if([key isEqualToString:@"_NSAppAllowsNonTrustedUGID"])
+	{
+		// trace(@"Cycle setugid hack: _NSAppAllowsNonTrustedUGID - bool");
+		return true;
+	}
+	
+	return real_boolForKey(self,sel,key);
+}
+
+id (*real_objectForKey)(NSUserDefaults* self,SEL sel,NSString* key);
+id fake_objectForKey(NSUserDefaults* self,SEL sel,NSString* key)
+{
+	if([key isEqualToString:@"_NSAppAllowsNonTrustedUGID"])
+	{
+		// trace(@"Cycle setugid hack: _NSAppAllowsNonTrustedUGID - object");
+		return @true;
+	}
+	
+	return real_objectForKey(self,sel,key);
+}
+
 void cycleSetup()
 {
+	// cursed
+	// VirtualBoxVM: (AppKit) The application with bundle ID org.virtualbox.app.VirtualBoxVM is running setugid(), which is not allowed. Exiting.
+	
+	if(issetugid())
+	{
+		// trace(@"Cycle setugid hack: enabling");
+		
+		swizzleImp(@"NSUserDefaults",@"objectForKey:",true,(IMP)fake_objectForKey,(IMP*)&real_objectForKey);
+		swizzleImp(@"NSUserDefaults",@"boolForKey:",true,(IMP)fake_boolForKey,(IMP*)&real_boolForKey);
+	}
+	
 	Class NSEvent=NSClassFromString(@"NSEvent");
 	Class NSApplication=NSClassFromString(@"NSApplication");
 	if(!NSEvent||!NSApplication)

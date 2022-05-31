@@ -76,8 +76,7 @@ BOOL isWindowServer;
 #if MAJOR==11
 	photosSetup();
 #else
-	// TODO: breaks VirtualBox currently, should fix ASAP...
-	// cycleSetup();
+	cycleSetup();
 #endif
 }
 
