@@ -29,11 +29,10 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- AppKit `issetugid` workaround help
 	- countless other code contributions, insights, and testing
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (empty windows, empty menu bar, menu bar styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection, several app and WindowServer crashes)
+    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, several app and WindowServer crashes)
 	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
 	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
-	- occlusion workarounds
 	- Discord screen share hack
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
@@ -49,7 +48,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
     - various SkyLight insights and explanations
 	- previous light mode transparency workarounds
 - [fabioiop](https://github.com/fabioiop)
-    - window rim improvements
+    - window rim improvements, SkyLight analysis and explanations
 - [jackluke](https://github.com/jacklukem)
     - 10.14+ Penryn panic fix (telemetry plugin)
 	- Tesla insights
