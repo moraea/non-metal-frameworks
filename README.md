@@ -72,6 +72,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-5-31
+- update 10.14.6 and 10.15.7 binaries to latest security update
+
 ### 2022-5-27
 - workaround VirtualBox AppKit `issetugid` crash with Cycle Through Windows implementation
 

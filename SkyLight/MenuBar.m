@@ -264,8 +264,8 @@ void menuBarOverrideSetup()
 	
 	trace(@"menu bar override sanity checks passed (%f, %f, %f, %f)",floats[0],floats[1],floats[2],floats[3]);
 	
-	char* base=(char*)SLSMainConnectionID-0x1d8322;
-	char* target=base+0x26ef70;
+	char* base=(char*)SLSMainConnectionID-0x1d8272;
+	char* target=base+0x26ef60;
 	
 	trace(@"menu bar override found SkyLight base %p target %p",base,target);
 	

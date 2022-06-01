@@ -53,23 +53,23 @@ Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSNewWindowWithOpaqueSha
 
 Binpatcher Build/SkyLight.patched Build/SkyLight.patched '
 # the transparency hack
-set 0x216c60
+set 0x216bb0
 nop 0x4
 
 # menubar height (22.0 --> 24.0)
-set 0xb949c
+set 0xb93c4
 write 0x38
 
 # WSBackdropGetCorrectedColor remove 0x17 (MenuBarDark) material background (floats RGBA)
-set 0x26ef70
+set 0x26ef60
 write 0x00000000000000000000000000000000
 
 # force 0x17 for light, inactive
-set 0xb6db6
+set 0xb6ccb
 write 0x17
-set 0xb6da3
+set 0xb6cd8
 write 0x17
-set 0xb6db0
+set 0xb6cde
 write 0x17
 
 # override blend mode
@@ -77,19 +77,19 @@ write 0x17
 # 1: invisible light
 # 2: invisible dark
 # 3+: corrupt
-set 0xb6e4a
+set 0xb6d72
 write 0x00
 set +0x3
 nop 0x4
 
 # hide backstop
 # TODO: weird
-set 0xb88b6
+set 0xb8789
 nop 0x2
-set 0xb8861
-nop 0x2
-set 0xb8877
+set 0xb879f
 nop 0x8
+set 0xb87de
+nop 0x2
 
 # prevent prefpane crash
 # TODO: shim SLSInstallRemoteContextNotificationHandlerV2 instead
@@ -101,9 +101,9 @@ return 0x1
 
 # Fabio rim tweak
 # https://github.com/ASentientBot/monterey/issues/3
-set 0xf4430
+set 0xf4360
 write 0xff
-set 0xf48b7
+set 0xf47e7
 write 0xff'
 
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
