@@ -15,6 +15,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- auto appearance switching reimplementation
 	- occlusion research (Safari extensions, disabled buttons, frozen apps)
 	- display backlight insights
+	- updating downgraded binaries and binpatch offsets for the latest security updates
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
