@@ -73,6 +73,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-8-4
+- Add `_AXInterfaceGetIncreaseContrastEnabled` interposing to EnableTransparency.m to fix selective re-enabling
+
 ### 2022-5-31
 - update 10.14.6 and 10.15.7 binaries to latest security update
 
