@@ -96,8 +96,13 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 @property(assign) CALayer* layer;
 @property unsigned int contextId;
 
++(NSArray<CAContext*>*)allContexts;
 +(instancetype)contextWithCGSConnection:(unsigned int)edx_connectionID options:(NSDictionary*)rcx_options;
 
+@end
+
+@interface CALayer(Private)
+-(CAContext*)context;
 @end
 
 // IOKit

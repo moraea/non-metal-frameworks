@@ -17,6 +17,7 @@ BOOL isWindowServer;
 #import "Discord.m"
 #import "DisplayLink.m"
 #import "Dock.m"
+#import "Done.m"
 #import "EnableTransparency.m"
 #import "Glyphs.m"
 #import "Grey.m"
@@ -72,6 +73,7 @@ BOOL isWindowServer;
 	appearanceSetup();
 	pluginsSetup();
 	trackpadSetup();
+	doneSetup();
 	
 #if MAJOR==11
 	photosSetup();

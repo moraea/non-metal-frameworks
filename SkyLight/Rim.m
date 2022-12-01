@@ -1,24 +1,25 @@
 // window borders
 
-BOOL rimBetaValue;
+BOOL rimBetaDisabledValue;
 dispatch_once_t rimBetaOnce;
-BOOL rimBeta()
+BOOL rimBetaDisabled()
 {
-	dispatch_once(&rimBetaOnce,^()
+	dispatch_once(&rimBetaDisabledOnce,^()
 	{
-		rimBetaValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBeta"];
-		if([process containsString:@"Folx.app"]||[process containsString:@".prefPane"]||[process containsString:@"Siri.app"]||[process containsString:@"PrivateFrameworks"])
+		rimBetaDisabledValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBetaDisabled"];
+		if([process containsString:@"Folx.app"]||[process containsString:@"Blackmagic Disk Speed Test.app"]||[process containsString:@".prefPane"]||[process containsString:@"Siri.app"]||[process containsString:@"PrivateFrameworks"]||[process containsString:@"Simulator.app"])
 		{
-			rimBetaValue=0;
+			rimBetaDisabledValue=1;
 		}
 	});
-	return rimBetaValue;
+	return rimBetaDisabledValue;
 }
 
 void addFakeRim(unsigned int windowID)
 {
 	CALayer* layer=wrapperForWindow(windowID).context.layer;
 	layer.borderWidth=1;
+	layer.cornerRadius=10;
 	CGColorRef color=CGColorCreateGenericRGB(1.0,1.0,1.0,0.2);
 	layer.borderColor=color;
 	CFRelease(color);
@@ -33,7 +34,7 @@ void removeFakeRim(unsigned int windowID)
 void SLSWindowSetShadowProperties(unsigned int edi_windowID,NSDictionary* rsi_properties)
 {	
 	NSNumber* value=rsi_properties[@"com.apple.WindowShadowRimStyleHardActive"];
-	if(rimBeta()&&value&&value.doubleValue==1)
+	if(rimBetaDisabled()==0&&value&&value.doubleValue==1)
 	{
 		addFakeRim(edi_windowID);
 	}
@@ -41,5 +42,13 @@ void SLSWindowSetShadowProperties(unsigned int edi_windowID,NSDictionary* rsi_pr
 	{
 		removeFakeRim(edi_windowID);
 	}
-	SLSWindowSetShadowPropertie$(edi_windowID,rsi_properties);
+	NSMutableDictionary* newProperties=rsi_properties.mutableCopy;
+	
+	newProperties[@"com.apple.WindowShadowInnerRimDensityActive"]=@0;
+	newProperties[@"com.apple.WindowShadowInnerRimDensityInactive"]=@0;
+	
+	SLSWindowSetShadowPropertie$(edi_windowID,newProperties);
+	
+	newProperties.release;
 }
+

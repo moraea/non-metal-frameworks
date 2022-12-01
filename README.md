@@ -73,6 +73,10 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-12-1
+- fix unresponsive Catalyst buttons
+- Re-enable HardRim and improve rim appearence. White rim is now enabled by default (`defaults write -g Moraea_RimBetaDisabled -bool true` to disable)
+
 ### 2022-8-4
 - Add `_AXInterfaceGetIncreaseContrastEnabled` interposing to EnableTransparency.m to fix selective re-enabling
 
@@ -161,7 +165,6 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
 - fix unresponsive password dialogs with downgraded QuartzCore
-- fix unresponsive Catalyst buttons
 - investigate rare binaries not seeing re-exported symbols (Dropbox-specific workaround: [SkyLight plugin](https://github.com/ASentientBot/monterey/releases/download/2021-12-17/throw.this.in.the.SkyLight.plugins.folder.to.fix.Dropbox.in.a.really.non.ideal.way.zip))
 - investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
