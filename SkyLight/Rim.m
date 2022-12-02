@@ -1,7 +1,7 @@
 // window borders
 
 BOOL rimBetaDisabledValue;
-dispatch_once_t rimBetaOnce;
+dispatch_once_t rimBetaDisabledOnce;
 BOOL rimBetaDisabled()
 {
 	dispatch_once(&rimBetaDisabledOnce,^()
