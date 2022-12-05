@@ -8,17 +8,31 @@
 
 @end
 
-BOOL killValue;
-dispatch_once_t killOnce;
-BOOL d2cEnabled()
+BOOL disableValue;
+dispatch_once_t disableOnce;
+BOOL disableD2C()
 {
-	dispatch_once(&killOnce,^()
+	dispatch_once(&disableOnce,^()
 	{
-		killValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Amy_DisableD2C"];
+		disableValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Amy.D2C.Disable"];
 	});
 	
-	return !killValue;
+	return disableValue;
 }
+
+BOOL disableBatchingValue;
+dispatch_once_t disableBatchingOnce;
+BOOL disableBatching()
+{
+	dispatch_once(&disableBatchingOnce,^()
+	{
+		disableBatchingValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Amy.D2C.DisableBatching"];
+	});
+	
+	return disableBatchingValue;
+}
+
+dispatch_once_t defenestratorOnce;
 
 NSMutableDictionary<NSNumber*,Wrapper*>* wrappers;
 
@@ -27,17 +41,15 @@ Wrapper* defenestratorGetWrapper(int wid)
 	return wrappers[[NSNumber numberWithInt:wid]];
 }
 
-dispatch_once_t closeHandlerOnce;
 void closeHandler(int rdi_type,char* rsi_window,int rdx,void* rcx_context)
 {
 	int wid=*(int*)rsi_window;
-	trace(@"D2C: destroy window %d",wid);
 	wrappers[[NSNumber numberWithInt:wid]]=nil;
 }
 
 int SLSSetWindowLayerContext(int edi_cid,int esi_wid,CAContext* rdx_context)
 {
-	if(d2cEnabled())
+	if(!disableD2C())
 	{
 		NSNumber* key=[NSNumber numberWithInt:esi_wid];
 		Wrapper* wrapper=[Wrapper.alloc initWithWid:esi_wid context:rdx_context].autorelease;
@@ -61,6 +73,12 @@ NSMutableArray<CommitBlock>* fuckedBlocks;
 
 void pushCommitBlock(void* transaction,CommitBlock block)
 {
+	if(disableBatching())
+	{
+		block();
+		return;
+	}
+	
 	CommitBlock heapBlock=[block copy];
 	NSNumber* key=[NSNumber numberWithLong:(long)transaction];
 	if(!commitBlocks[key])
@@ -77,6 +95,12 @@ void pushCommitBlock(void* transaction,CommitBlock block)
 
 void pushFuckedBlock(CommitBlock block)
 {
+	if(disableBatching())
+	{
+		block();
+		return;
+	}
+	
 	CommitBlock heapBlock=[block copy];
 	[fuckedBlocks addObject:heapBlock];
 	[heapBlock release];
@@ -86,7 +110,39 @@ void pushFuckedBlock(CommitBlock block)
 // rdi transaction
 // esi 1
 
-void SLSTransactionCommit(void* rdi,int esi);
+// Renamer - test if blocks are buggy because some functions still call this?
+// TODO: no change, undo
+
+void SLSTransactionCommi$(void* rdi,int esi);
+
+void SLSTransactionCommit(void* rdi,int esi)
+{
+	int ranBlockCount=0;
+	int ranFBlockCount=0;
+	
+	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
+	NSArray<CommitBlock>* blocks=commitBlocks[key];
+	if(blocks)
+	{
+		for(CommitBlock block in blocks)
+		{
+			block();
+			ranBlockCount++;
+		}
+		commitBlocks[key]=nil;
+	}
+	
+	for(CommitBlock block in fuckedBlocks)
+	{
+		block();
+		ranFBlockCount++;
+	}
+	fuckedBlocks.removeAllObjects;
+	
+	SLSTransactionCommi$(rdi,esi);
+	
+	trace(@"D2C ran %d blocks, %d fucked blocks (%d other transactions waiting)",ranBlockCount,ranFBlockCount,commitBlocks.count);
+}
 
 // DP8 4ff803653713 - softlink case
 // rdi transaction
@@ -96,23 +152,6 @@ void SLSTransactionCommit(void* rdi,int esi);
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
 {
 	SLSTransactionCommit(rdi,esi);
-	
-	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
-	NSArray<CommitBlock>* blocks=commitBlocks[key];
-	if(blocks)
-	{
-		for(CommitBlock block in blocks)
-		{
-			block();
-		}
-		commitBlocks[key]=nil;
-	}
-	
-	for(CommitBlock block in fuckedBlocks)
-	{
-		block();
-	}
-	fuckedBlocks.removeAllObjects;
 }
 
 NSMutableArray<dispatch_block_t>* onceBlocks;
@@ -175,7 +214,7 @@ void defenestratorSetup()
 	
 	[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
 	
-	dispatch_once(&closeHandlerOnce,^()
+	dispatch_once(&defenestratorOnce,^()
 	{
 		SLSRegisterConnectionNotifyProc(cid,closeHandler,kCGSWindowIsTerminated,NULL);
 		
@@ -255,17 +294,16 @@ int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx)
 
 void SLSTransactionMoveWindowOnMatchingDisplayChangedSeed(void* rdi,int esi,int edx,double xmm0,double xmm1)
 {
+	trace(@"D2C SLSTransactionMoveWindowOnMatchingDisplayChangedSeed (push) %p %d %d %lf %lf",rdi,esi,edx,xmm0,xmm1);
+	
 	pushCommitBlock(rdi,^()
 	{
+		trace(@"D2C SLSTransactionMoveWindowOnMatchingDisplayChangedSeed (commit) %p %d %d %lf %lf",rdi,esi,edx,xmm0,xmm1);
+		
 		int cid=SLSMainConnectionID();
 		
-		// TODO: probably a CGPoint
-		double thing[2]={xmm0,xmm1};
-		SLSMoveWindowOnMatchingDisplayChangedSeed(cid,esi,thing,edx);
-		
-		/*Wrapper* wrapper=wrapperForWindow(esi);
-		CGRect rect=wrapper.context.layer.bounds;
-		SLSSetSurfaceBounds(cid,esi,wrapper.sid,rect);*/
+		CGPoint thing=CGPointMake(xmm0,xmm1);
+		SLSMoveWindowOnMatchingDisplayChangedSeed(cid,esi,&thing,edx);
 	});
 }
 
@@ -297,7 +335,10 @@ void SLSWindowSetShadowProperties(unsigned int,NSDictionary*);
 
 void SLSTransactionSetWindowShadowProperties(void* rdi,int esi,NSDictionary* rdx)
 {
-	SLSWindowSetShadowProperties(esi,rdx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSWindowSetShadowProperties(esi,rdx);
+	});
 }
 
 // 12.5 DP3 4ff8037d07a3
@@ -316,7 +357,10 @@ void SLSWindowSetActiveShadowLegacy(int edi,int esi);
 
 void SLSTransactionSetWindowActiveShadowLegacy(void* rdi,int esi,int edx)
 {
-	SLSWindowSetActiveShadowLegacy(esi,edx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSWindowSetActiveShadowLegacy(esi,edx);
+	});
 }
 
 // 12.5 DP3 4ff8037d0a66
@@ -341,7 +385,10 @@ void SLSSetSurfaceLayerBackingOptions(int edi,int esi,int edx,double xmm0,double
 
 void SLSTransactionSetSurfaceLayerBackingOptions(void* rdi,int esi,int edx,double xmm0,double xmm1,double xmm2)
 {
-	SLSSetSurfaceLayerBackingOptions(SLSMainConnectionID(),esi,edx,xmm0,xmm1,xmm2);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetSurfaceLayerBackingOptions(SLSMainConnectionID(),esi,edx,xmm0,xmm1,xmm2);
+	});
 }
 
 // DP8 7ff803766b2e
@@ -360,7 +407,10 @@ void SLSSetWindowEventShape(int edi,int esi,void* rdx);
 
 void SLSTransactionSetWindowEventShape(void* rdi,int esi,void* rdx)
 {
-	SLSSetWindowEventShape(SLSMainConnectionID(),esi,rdx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowEventShape(SLSMainConnectionID(),esi,rdx);
+	});
 }
 
 // 12.5 DP3 no obvious equivalent
@@ -382,7 +432,10 @@ void SLSSetWindowRegionsLegacy(int edi,void* rsi,void* rdx,void* rcx,void* r8);
 
 void SLSTransactionSetWindowDragRegion(void* rdi,int esi,void* rdx)
 {
-	SLSSetWindowRegionsLegacy(esi,rdx,NULL,NULL,NULL);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowRegionsLegacy(esi,rdx,NULL,NULL,NULL);
+	});
 }
 
 // DP8 4ff8040618c0
@@ -393,7 +446,10 @@ void SLSTransactionSetWindowDragRegion(void* rdi,int esi,void* rdx)
 
 void SLSTransactionSetWindowActivationRegion(void* rdi,int esi,void* rdx)
 {
-	SLSSetWindowRegionsLegacy(esi,NULL,rdx,NULL,NULL);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowRegionsLegacy(esi,NULL,rdx,NULL,NULL);
+	});
 }
 
 // 0x90, bit 0xb
@@ -401,7 +457,10 @@ void SLSTransactionSetWindowActivationRegion(void* rdi,int esi,void* rdx)
 
 void SLSTransactionSetWindowButtonRegion(void* rdi,int esi,void* rdx)
 {
-	SLSSetWindowRegionsLegacy(esi,NULL,NULL,rdx,NULL);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowRegionsLegacy(esi,NULL,NULL,rdx,NULL);
+	});
 }
 
 // 0x98 - setCommandModifierExclusionShape, bit 0xc
@@ -409,7 +468,10 @@ void SLSTransactionSetWindowButtonRegion(void* rdi,int esi,void* rdx)
 
 void SLSTransactionSetWindowSpecialCommandRegion(void* rdi,int esi,void* rdx)
 {
-	SLSSetWindowRegionsLegacy(esi,NULL,NULL,NULL,rdx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowRegionsLegacy(esi,NULL,NULL,NULL,rdx);
+	});
 }
 
 // 12.5 DP3 4ff8037d09d0
@@ -430,12 +492,18 @@ void SLSSetWindowHasKeyAppearance(int edi,int esi,int edx);
 
 void SLSTransactionSetWindowHasMainAppearance(void* rdi,int esi,int edx)
 {
-	SLSSetWindowHasMainAppearance(SLSMainConnectionID(),esi,edx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowHasMainAppearance(SLSMainConnectionID(),esi,edx);
+	});
 }
 
 void SLSTransactionSetWindowHasKeyAppearance(void* rdi,int esi,int edx)
 {
-	SLSSetWindowHasKeyAppearance(SLSMainConnectionID(),esi,edx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowHasKeyAppearance(SLSMainConnectionID(),esi,edx);
+	});
 }
 
 // 12.5 DP3
@@ -459,7 +527,10 @@ void SLSSetWindowCornerMask(int edi,void* rsi,int edx,CGRect stack);
 
 void SLSTransactionSetWindowCornerMask(void* rdi,int esi,void* rdx,int ecx,CGRect stack)
 {
-	SLSSetWindowCornerMask(esi,rdx,ecx,stack);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowCornerMask(esi,rdx,ecx,stack);
+	});
 }
 
 // 12.5 DP3 4ff8037d051c
@@ -487,7 +558,10 @@ void SLSTransactionSetWindowOriginRelativeToWindow(void* rdi,int esi,int edx,int
 {
 	// trace(@"SLSTransactionSetWindowOriginRelativeToWindow shim %p %x %x %x %lf %lf",rdi,esi,edx,ecx,xmm0,xmm1);
 	
-	SLSSetWindowOriginRelativeToWindow(SLSMainConnectionID(),esi,edx,ecx,xmm0,xmm1);
+	pushCommitBlock(rdi,^()
+	{
+		SLSSetWindowOriginRelativeToWindow(SLSMainConnectionID(),esi,edx,ecx,xmm0,xmm1);
+	});
 }
 
 // 12.5 DP3 4ff802f8561d
@@ -504,11 +578,14 @@ int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
 // edx wid
 // TODO: return
 
-int SLSTransactionAddWindowToWindowMovementGroup(void* rdi,int esi,int edx)
+void SLSTransactionAddWindowToWindowMovementGroup(void* rdi,int esi,int edx)
 {
 	// trace(@"SLSTransactionAddWindowToWindowMovementGroup shim %p %x %x",rdi,esi,edx);
 	
-	return SLSAddWindowToWindowMovementGroup(SLSMainConnectionID(),esi,edx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSAddWindowToWindowMovementGroup(SLSMainConnectionID(),esi,edx);
+	});
 }
 
 // 12.5 DP3 4ff802fc5221
@@ -525,11 +602,14 @@ int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
 // edx wid
 // TODO: return
 
-int SLSTransactionRemoveWindowFromWindowMovementGroup(void* rdi,int esi,int edx)
+void SLSTransactionRemoveWindowFromWindowMovementGroup(void* rdi,int esi,int edx)
 {
 	// trace(@"SLSTransactionRemoveWindowFromWindowMovementGroup shim %p %x %x",rdi,esi,edx);
 	
-	return SLSRemoveWindowFromWindowMovementGroup(SLSMainConnectionID(),esi,edx);
+	pushCommitBlock(rdi,^()
+	{
+		SLSRemoveWindowFromWindowMovementGroup(SLSMainConnectionID(),esi,edx);
+	});
 }
 
 // SLSTransactionSetWindowTransform3D - not referenced in DP8 AppKit

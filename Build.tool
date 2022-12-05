@@ -194,6 +194,7 @@ select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
 			break
 			;;
     	"Ventura")
+			Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
 			runWithTargetVersion 13
 			break
 			;;
