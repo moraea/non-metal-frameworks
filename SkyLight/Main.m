@@ -12,8 +12,16 @@ BOOL isWindowServer;
 
 #import "Appearance.m"
 #import "Backlight.m"
-#import "Cycle.m"
+
+#if MAJOR<=12
 #import "Defenestrator.m"
+#endif
+#if MAJOR>=13
+#import "DefenestratorInterface.h"
+#import "Defenestrator2c.m"
+#import "DefenestratorAgnosticBlurs.m"
+#endif
+
 #import "Discord.m"
 #import "DisplayLink.m"
 #import "Dock.m"
@@ -66,6 +74,7 @@ BOOL isWindowServer;
 	swizzleLog=false;
 	
 	defenestratorSetup();
+	doneSetup();
 	glyphsSetup();
 	hiddSetup();
 	menuBarSetup();
@@ -73,12 +82,14 @@ BOOL isWindowServer;
 	appearanceSetup();
 	pluginsSetup();
 	trackpadSetup();
-	doneSetup();
 	
 #if MAJOR==11
 	photosSetup();
 #else
 	cycleSetup();
+#endif
+#if MAJOR>=13
+	blursSetupNew();
 #endif
 }
 

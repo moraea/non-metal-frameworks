@@ -7,13 +7,13 @@
 
 +(instancetype)newFenceFromDefaultServer
 {
-	trace(@"CAFenceHandle newFenceFromDefaultServer %@",NSThread.callStackSymbols);
+	// trace(@"CAFenceHandle newFenceFromDefaultServer %@",NSThread.callStackSymbols);
 	return CAFenceHandle.alloc.init;
 }
 
 +(BOOL)supportsSecureCoding
 {
-	trace(@"CAFenceHandle supportsSecureCoding %@",NSThread.callStackSymbols);
+	// trace(@"CAFenceHandle supportsSecureCoding %@",NSThread.callStackSymbols);
 	return true;
 }
 
@@ -27,4 +27,11 @@
 {
 }
 
+// VENTURA WM CRASH
+
+-(instancetype)copyWithZone:(NSZone*)zone
+{
+	//trace(@"CAFenceHandle fake copyWithZone:");
+	return CAFenceHandle.alloc.init;
+}
 @end

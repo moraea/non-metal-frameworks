@@ -19,6 +19,8 @@
 
 // system-wide animations (e.g. Finder desktop stacks)
 
+#if defined(CAT) || defined(MOJ)
+
 BOOL brightnessHack;
 
 int transactionBoolCount=0;
@@ -58,10 +60,13 @@ NSString* transactionFakeKey(int key)
 	
 	return transactionBoolCount;
 }
-
 @end
+
+#endif
 
 void animationsSetup()
 {
+	#if defined(CAT) || defined(MOJ)
 	brightnessHack=[process isEqualToString:@"/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"];
+	#endif
 }

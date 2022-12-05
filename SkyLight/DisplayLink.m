@@ -1,11 +1,16 @@
-// Monterey display timing
+// AppKit scrolling crashes +[NSDisplayTiming displayTimingForScreenNumber:targetUpdateInterval:]
+// just returning NULL worked in Monterey, but Ventura requires actual values
 
-// AppKit +[NSDisplayTiming displayTimingForScreenNumber:targetUpdateInterval:]
-// returns early if structOut is null
-// otherwise crashes with assertions on structOut members
-char** SLSDisplayGetTiming(char** rdi_structOut,unsigned long rsi,unsigned int edi_screenID)
+char* SLSDisplayGetTiming(char* rdi_structOut,unsigned long rsi,unsigned int edx_screenID)
 {
-	*rdi_structOut=NULL;
+	long* prevUpdateTime=rdi_structOut+0x18;
+	long* interval=rdi_structOut;
+	long* submissionInterval=rdi_structOut+0x20;
+	
+	*prevUpdateTime=0;
+	*interval=1.0/60*NSEC_PER_SEC;
+	*submissionInterval=0;
+	
 	return rdi_structOut;
 }
 

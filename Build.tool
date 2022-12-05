@@ -123,14 +123,56 @@ function runWithTargetVersion
 
 	build Build/SkyLight.patched $binaries/$major.*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
 	build Build/CoreDisplay.patched $binaries/$major.*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
-	if test -n "$USE_CAT_QC"
-	then
-		touch Build/$major/note_used_cat_qc.txt
-		build $binaries/10.15.7*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
-	else
-		touch Build/$major/note_used_mojave_qc.txt
-		build $binaries/10.14.6*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common
-	fi
+	
+	clear
+	
+	echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
+	select opt in "Mojave" "Catalina" "Big Sur" "Exit"; do
+		case $opt in
+			"Mojave")
+				lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
+				if [ "$major" -eq "13" ]
+				then
+				Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol __CASSynchronize
+return 0x0'
+				fi
+				touch Build/$major/note_used_moj_qc.txt
+				build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DMOJ
+				break
+				;;
+			"Catalina")
+				cp $binaries/10.15.7*/QuartzCore Build/QuartzCore.patched
+				if [ "$major" -eq "13" ]
+				then
+				Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol __CASSynchronize
+return 0x0'
+				fi
+				touch Build/$major/note_used_cat_qc.txt
+				build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
+				break
+				;;
+				"Big Sur")
+				if [ "$major" -eq "11" ]
+				then
+					clear
+					echo "#######################\n# Skipping QuartzCore #\n#######################"
+					sleep 2
+				else
+				touch Build/$major/note_used_bs_qc.txt
+				build $binaries/11.*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DBS
+				fi
+				break
+				;;
+	  		"Exit")
+	  			exit
+	  			;;
+		    	*)
+		     	   echo "This is not an option, please try again"
+		     	  ;;
+			  esac
+			done
 
 	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
 
@@ -138,5 +180,28 @@ function runWithTargetVersion
 	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
 }
 
-runWithTargetVersion 11
-runWithTargetVersion 12
+clear
+
+echo "#############\n# Build For #\n#############"
+select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
+    case $opt in
+    	"Big Sur")
+			runWithTargetVersion 11
+			break
+			;;
+    	"Monterey")
+			runWithTargetVersion 12
+			break
+			;;
+    	"Ventura")
+			runWithTargetVersion 13
+			break
+			;;
+	    "Exit")
+	      exit
+	      ;;
+	    *)
+	      echo "This is not an option, please try again"
+	      ;;
+	  esac
+	done

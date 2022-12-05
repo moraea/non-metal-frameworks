@@ -67,7 +67,9 @@ void cycleSetup()
 		{
 			if([event.characters isEqualToString:@"`"])
 			{
-				[[NSApplication sharedApplication] _cycleWindowsReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
+				// trace(@"Cycle: handling %@",event);
+				// [[NSApplication sharedApplication] _cycleWindowsReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
+				[[NSApplication sharedApplication] _cycleWindowsBypassingWindowManagerReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
 				return nil;
 			}
 		}

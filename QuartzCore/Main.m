@@ -7,11 +7,14 @@ NSString* process;
 #import "Animations.m"
 #import "Catalyst.m"
 #import "Misc.m"
-#import "Siri.m"
 
 #ifdef CAT
 #import "Glyphs.m"
-#else
+#import "Siri.m"
+#endif
+
+#ifdef MOJ
+#import "Siri.m"
 #import "Videos.m"
 #endif
 
@@ -23,10 +26,13 @@ void load()
 	swizzleLog=false;
 	
 	process=NSProcessInfo.processInfo.arguments[0];
-	
-	animationsSetup();
+
 	catalystSetup();
 	miscSetup();
+	
+#if defined(CAT) || defined(MOJ)
+	animationsSetup();
+#endif
 	
 #ifdef CAT
 	glyphsSetup();
