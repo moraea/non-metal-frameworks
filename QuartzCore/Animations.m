@@ -66,5 +66,7 @@ NSString* transactionFakeKey(int key)
 
 void animationsSetup()
 {
+	#if defined(CAT) || defined(MOJ)
 	brightnessHack=[process isEqualToString:@"/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"];
+	#endif
 }
