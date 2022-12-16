@@ -123,11 +123,14 @@ function runWithTargetVersion
 
 	build Build/SkyLight.patched $binaries/$major.*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
 	build Build/CoreDisplay.patched $binaries/$major.*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
+	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
+	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
+	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
 	
 	clear
 	
 	echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
-	select opt in "Mojave" "Catalina" "Big Sur" "Exit"; do
+	select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do
 		case $opt in
 			"Mojave")
 				lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
@@ -165,7 +168,7 @@ return 0x0'
 				fi
 				break
 				;;
-	  		"Exit")
+	  		"Skip")
 	  			exit
 	  			;;
 		    	*)
@@ -173,11 +176,6 @@ return 0x0'
 		     	  ;;
 			  esac
 			done
-
-	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
-
-	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
-	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
 }
 
 clear

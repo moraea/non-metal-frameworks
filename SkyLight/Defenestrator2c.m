@@ -140,8 +140,6 @@ void SLSTransactionCommit(void* rdi,int esi)
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
-	
-	trace(@"D2C ran %d blocks, %d fucked blocks (%d other transactions waiting)",ranBlockCount,ranFBlockCount,commitBlocks.count);
 }
 
 // DP8 4ff803653713 - softlink case
@@ -293,32 +291,15 @@ int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx)
 // TODO: return
 
 void SLSTransactionMoveWindowOnMatchingDisplayChangedSeed(void* rdi,int esi,int edx,double xmm0,double xmm1)
-{
-	trace(@"D2C SLSTransactionMoveWindowOnMatchingDisplayChangedSeed (push) %p %d %d %lf %lf",rdi,esi,edx,xmm0,xmm1);
-	
+{	
 	pushCommitBlock(rdi,^()
-	{
-		trace(@"D2C SLSTransactionMoveWindowOnMatchingDisplayChangedSeed (commit) %p %d %d %lf %lf",rdi,esi,edx,xmm0,xmm1);
-		
+	{	
 		int cid=SLSMainConnectionID();
 		
 		CGPoint thing=CGPointMake(xmm0,xmm1);
 		SLSMoveWindowOnMatchingDisplayChangedSeed(cid,esi,&thing,edx);
 	});
 }
-
-// TODO: debugging, remove
-
-void* _NSSoftLinkingGetFrameworkFunction(NSString*,NSString*,char*,void*);
-
-void* fake__NSSoftLinkingGetFrameworkFunction(NSString* rdi,NSString* rsi,char* rdx,void* rcx)
-{
-	void* result=_NSSoftLinkingGetFrameworkFunction(rdi,rsi,rdx,rcx);
-	trace(@"softlink debug hook %@ %@ %s %p --> %p",rdi,rsi,rdx,rcx,result);
-	return result;
-}
-
-DYLD_INTERPOSE(fake__NSSoftLinkingGetFrameworkFunction,_NSSoftLinkingGetFrameworkFunction)
 
 // TODO: move any more of these to the D2C blocks system?
 // slower but may fix some visual glitches
@@ -648,4 +629,4 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 // nostub SLSTransactionOrderWindowGroupFrontConditionally
 // nostub SLSTransactionGetTransactionID
 // nostub SLSTransactionSetWindowTags
-// nostub SLSTransactionRemoveSurface
+// nostub SLSTransactionRemoveSurfaces
