@@ -73,8 +73,13 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2022-12-21
+- fix full-screen transition
+- partially fix split-window
+- improve menubar blur radius
+
 ### 2022-12-1
-- fix unresponsive Catalyst buttons
+- partially fix unresponsive Catalyst buttons
 - Re-enable HardRim and improve rim appearence. White rim is now enabled by default (`defaults write -g Moraea_RimBetaDisabled -bool true` to disable)
 
 ### 2022-8-4
@@ -158,20 +163,19 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
+- fix unresponsive Catalyst buttons
 - investigate double menu bar clock with `Show date: when space allows` (workaround: set `always` or `never`)
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix blank Wabbitemu, Anka VM windows with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
-- fix unresponsive password dialogs with downgraded QuartzCore
 - investigate rare binaries not seeing re-exported symbols (Dropbox-specific workaround: [SkyLight plugin](https://github.com/ASentientBot/monterey/releases/download/2021-12-17/throw.this.in.the.SkyLight.plugins.folder.to.fix.Dropbox.in.a.really.non.ideal.way.zip))
 - investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
-- investigate Maps crash
+- fix Maps
 - fix Photo Booth (workaround: use Big Sur version)
 - fix Books (workaround: use Big Sur version)
 - automatically color menu bar text (workaround: `defaults write -g Moraea_DarkMenuBar -bool true`)
-- fix full-screen transition
 - fix Migration Assistant
 - fix "Move to Display"

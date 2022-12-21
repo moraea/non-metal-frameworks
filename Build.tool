@@ -104,7 +104,20 @@ return 0x1
 # set 0xf4360
 # write 0xff
 # set 0xf47e7
-# write 0xff'
+# write 0xff
+
+# Menubar blur
+# warning: almost certainly breaks CAPL and defenestrator-off!
+set 0x21677c
+write 0xbe60000000
+set 0x216781
+nop 0x5
+set 0x21687e
+nop 0x2
+set 0x294e62
+write 0x2f2f
+set 0x29625a
+write 0x2f2f'
 
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
 
