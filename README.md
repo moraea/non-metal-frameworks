@@ -164,7 +164,6 @@ Previous history is available in the [old repository](https://github.com/ASentie
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
 - fix unresponsive Catalyst buttons
-- investigate double menu bar clock with `Show date: when space allows` (workaround: set `always` or `never`)
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix blank Wabbitemu, Anka VM windows with Mojave QuartzCore

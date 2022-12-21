@@ -109,7 +109,7 @@ return 0x1
 # Menubar blur
 # warning: almost certainly breaks CAPL and defenestrator-off!
 set 0x21677c
-write 0xbe60000000
+write 0xbe80000000
 set 0x216781
 nop 0x5
 set 0x21687e
