@@ -23,7 +23,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- updating window shapes/regions, corners, and shadows
 		- capturing windows (used in fullscreen animation and screenshots)
 		- handling split-screen window management
-		- various other insights
+		- various other changed functionality in Ventura
 	- Ventura screenshot inverted colors research
 	- patch for downgraded QuartzCore crashes in Ventura
 	- countless other code contributions, insights, and testing
