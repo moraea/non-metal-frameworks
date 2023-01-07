@@ -16,6 +16,16 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- occlusion research (Safari extensions, disabled buttons, frozen apps)
 	- display backlight insights
 	- updating downgraded binaries and binpatch offsets for the latest security updates
+	- unification of codebase and build scripts for Big Sur, Monterey, and Ventura
+	- extensive Ventura SkyLight research identifying the functions responsible for:
+		- flushing a display update transaction
+		- updating window positions and sizes
+		- updating window shapes/regions, corners, and shadows
+		- capturing windows (used in fullscreen animation and screenshots)
+		- handling split-screen window management
+		- various other changed functionality in Ventura
+	- Ventura screenshot inverted colors research
+	- patch for downgraded QuartzCore crashes in Ventura
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -29,12 +39,21 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Shim to selectively reenable transparency with reduce transparency enabled (ex. `defaults write com.apple.dock Moraea_EnableTransparency 1`)
 	- AppKit `issetugid` workaround help
 	- countless other code contributions, insights, and testing
+- [Flagers](https://github.com/flagersgit)
+    - LegacyRVPL for rapid testing of new framework shims/patches
+		- preserves snapshots and delta OTAs for developer convenience
+	- Ventura SkyLight transactions/softlinks research
+	- Ventura WindowManager research
+	- Objective-C and dynamic linker cache research
+	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, several app and WindowServer crashes)
+    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, various crashes)
 	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
-	- fixes for problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
+	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
 	- Discord screen share hack
+	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
+	- Catalyst button hacks (ongoing)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -58,10 +77,6 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- many other macOS insights and testing
 - [parrotgeek1](https://parrotgeek.com)
     - numerous macOS and graphics insights regarding Tesla, TeraScale 2, SIP, OpenGL and more
-- [Flagers](https://github.com/flagersgit)
-    - numerous macOS insights, explanations, and help
-    - LegacyRVPL for rapid testing of new framework shims/patches
-	- preserves snapshots and delta OTAs for developer convenience
 - IronApple
     - OpenCL downgrade testing
 - [dhinakg](https://github.com/dhinakg)
@@ -72,6 +87,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-1-7
+- preliminary support for Ventura
 
 ### 2022-12-21
 - fix full-screen transition
@@ -164,7 +182,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
 - fix unresponsive Catalyst buttons
-- Reimplement Window Manager
+- reimplement WindowManager communication
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix blank Wabbitemu, Anka VM windows with Mojave QuartzCore
