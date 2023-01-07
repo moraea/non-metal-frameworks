@@ -25,7 +25,6 @@ BOOL isWindowServer;
 #import "Discord.m"
 #import "DisplayLink.m"
 #import "Dock.m"
-#import "Done.m"
 #import "EnableTransparency.m"
 #import "FullScreen.m"
 #import "Glyphs.m"
@@ -48,6 +47,7 @@ BOOL isWindowServer;
 #import "Photos.m"
 #else
 #import "Cycle.m"
+#import "Done.m"
 #endif
 
 #ifdef SENTIENT_PATCHER
@@ -76,7 +76,7 @@ BOOL isWindowServer;
 	swizzleLog=false;
 	
 	defenestratorSetup();
-	doneSetup();
+
 	glyphsSetup();
 	hiddSetup();
 	menuBarSetup();
@@ -89,6 +89,7 @@ BOOL isWindowServer;
 	photosSetup();
 #else
 	cycleSetup();
+	doneSetup();
 #endif
 #if MAJOR>=13
 	blursSetupNew();

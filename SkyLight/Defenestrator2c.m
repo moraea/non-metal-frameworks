@@ -613,6 +613,27 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 	s.release;
 }
 
+// CG inverted colors workaround
+
+NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
+
+NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
+{
+	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
+	// trace(@"SLSHWCaptureWindowList %d %p %d %d %@ -> %@",edi_cid,rsi_list,edx_count,ecx_flags,NSThread.callStackSymbols,result);
+	
+	for(id image in result)
+	{
+		// TODO: bruh
+		
+		int* flags=(int*)(((char*)image)+0xa8);
+		trace(@"flags %x",flags);
+		*flags=0x2002;
+	}
+	
+	return result;
+}
+
 // still softlinked 13.1 DP3
 // TODO: may not be exhaustive
 

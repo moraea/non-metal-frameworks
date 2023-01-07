@@ -25,22 +25,8 @@
 // rcx flags - 0x2901 in this case
 // stack rect
 
+#if MAJOR<=12
 void* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
-
-// 13.1 DP3 _NSFullScreenModalStackController beginModalPresentationWithCompletionHandler:forCloseSpace:waitUntilDone:
-// _NSWindowListCaptureScreenShot(array,1,1,1,space...
-
-// 13.1 DP3 4ff804092b55
-// NSCGSWindow captureWindowList:inRect:options:
-// edi cid
-// rsi a malloced block - list i guess
-// edx ? - likely count
-// ecx 0x901 sometimes - flags?
-// r8d from NSCGSTransactionGetSLSTransactionID
-// pushes likely CGRect on the stack
-// returns rax
-
-// note - breakpointing on 12.6 Cass2 and setting r8 to 0 reproduces the bug on Zoe
 
 void* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,int r8,CGRect stack)
 {
@@ -53,3 +39,24 @@ void* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_cou
 	
 	return SLSHWCaptureWindowListInRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 }
+#endif
+
+#if MAJOR>=13
+NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
+ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack)
+ {
+ 	return SLSHWCaptureWindowLis$InRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
+ }
+
+void* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,int r8,CGRect stack)
+{
+	// i think *WithSeed is supposed to snapshot the window with the current in-progress transaction
+	// but i have no idea how to do that, and this works
+	// (otherwise the snapshot used for the animation looks a bit weird)
+	
+	CATransaction.commit;
+	CATransaction.flush;
+	
+	return SLSHWCaptureWindowListInRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
+}
+#endif
