@@ -12,13 +12,21 @@ BOOL isWindowServer;
 
 #import "Appearance.m"
 #import "Backlight.m"
-#import "Cycle.m"
+
+#if MAJOR<=12
 #import "Defenestrator.m"
+#endif
+#if MAJOR>=13
+#import "DefenestratorInterface.h"
+#import "Defenestrator2c.m"
+#import "DefenestratorAgnosticBlurs.m"
+#endif
+
 #import "Discord.m"
 #import "DisplayLink.m"
 #import "Dock.m"
-#import "Done.m"
 #import "EnableTransparency.m"
+#import "FullScreen.m"
 #import "Glyphs.m"
 #import "Grey.m"
 #import "Hidd.m"
@@ -28,6 +36,7 @@ BOOL isWindowServer;
 #import "Scroll.m"
 #import "Session.m"
 #import "Sleep.m"
+#import "Split.m"
 #import "Todo.m"
 #import "WindowFlags.m"
 #import "Zoom.m"
@@ -38,6 +47,7 @@ BOOL isWindowServer;
 #import "Photos.m"
 #else
 #import "Cycle.m"
+#import "Done.m"
 #endif
 
 #ifdef SENTIENT_PATCHER
@@ -66,6 +76,7 @@ BOOL isWindowServer;
 	swizzleLog=false;
 	
 	defenestratorSetup();
+
 	glyphsSetup();
 	hiddSetup();
 	menuBarSetup();
@@ -73,12 +84,15 @@ BOOL isWindowServer;
 	appearanceSetup();
 	pluginsSetup();
 	trackpadSetup();
-	doneSetup();
 	
 #if MAJOR==11
 	photosSetup();
 #else
 	cycleSetup();
+	doneSetup();
+#endif
+#if MAJOR>=13
+	blursSetupNew();
 #endif
 }
 

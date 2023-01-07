@@ -3,6 +3,8 @@
 // private, can't use a category to add missing symbols
 // TODO: generate via Stubber, make public, or SOMETHING better than this...
 
+#if defined(CAT) || defined(MOJ)
+
 void doNothing()
 {
 }
@@ -13,6 +15,7 @@ void fixCAContextImpl()
 	class_addMethod(CAContextImpl,@selector(addFence:),(IMP)doNothing,"v@:@");
 	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
 }
+#endif
 
 // reee
 
@@ -25,6 +28,34 @@ void fake_setScale(id self,SEL selector,double value)
 	real_setScale(self,selector,value);
 }
 
+#ifdef BS
+void (*real_setFilters)(id,SEL,NSArray*);
+
+void fake_setFilters(id self,SEL selector,NSArray* filters)
+{
+	NSMutableArray* newFilters=NSMutableArray.alloc.init;
+	
+	for(NSObject* filter in filters)
+	{
+		NSString* name=[filter name];
+		if([name isEqualToString:@"sdrNormalize"]||[name isEqualToString:@"colorSaturate"])
+		{
+			continue;
+		}
+		[newFilters addObject:filter];
+	}
+	
+	real_setFilters(self,selector,newFilters);
+	
+	newFilters.release;
+}
+
+void blurFilterHack()
+{
+	swizzleImp(@"CABackdropLayer",@"setFilters:",true,(IMP)fake_setFilters,(IMP*)&real_setFilters);
+}
+#endif
+
 void blurScaleHack()
 {
 	swizzleImp(@"CABackdropLayer",@"setScale:",true,(IMP)fake_setScale,(IMP*)&real_setScale);
@@ -32,9 +63,12 @@ void blurScaleHack()
 
 void miscSetup()
 {
-	fixCAContextImpl();
-	
-#ifdef CAT
 	blurScaleHack();
+	
+#if defined(CAT) || defined(MOJ)
+	fixCAContextImpl();
+#endif
+#ifdef BS
+	blurFilterHack();
 #endif
 }
