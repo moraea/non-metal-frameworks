@@ -150,8 +150,6 @@ function runWithTargetVersion
 	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
 	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
 	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
-	
-	clear
 
 	# TODO: MOJ/CAT/BS (downgrade version) vs 11/12/13 (target version) a bit confusing?
 
@@ -169,6 +167,7 @@ function runWithTargetVersion
 				;;
 		esac
 	else
+		clear
 		echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
 		select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do
 			case $opt in
@@ -234,6 +233,7 @@ then
 	echo 'skipping target version prompt'
 	target="$AUTO_TARGET"
 else
+	clear
 	echo "#############\n# Build For #\n#############"
 	select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
     case $opt in
