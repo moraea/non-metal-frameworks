@@ -68,12 +68,14 @@ void cycleSetup()
 			if([event.characters isEqualToString:@"`"])
 			{
 				// trace(@"Cycle: handling %@",event);
-				#if MAJOR<=12
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-method-access"
+#if MAJOR<=12
 				[[NSApplication sharedApplication] _cycleWindowsReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
-				#endif
-				#if MAJOR>=13
+#else
 				[[NSApplication sharedApplication] _cycleWindowsBypassingWindowManagerReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
-				#endif
+#endif
+#pragma clang diagnostic pop
 				
 				return nil;
 			}

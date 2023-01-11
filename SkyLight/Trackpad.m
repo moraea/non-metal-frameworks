@@ -6,11 +6,11 @@ void trackpadSetup()
 	{
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"AppleEnableSwipeNavigateWithScrollsDidChangeNotification" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			NSValue *returnValue = ((NSNumber*)note.userInfo[@"value"]).boolValue;
+			BOOL returnValue = ((NSNumber*)note.userInfo[@"value"]).boolValue;
 			if(returnValue){
-				CFPreferencesSetValue(@"AppleEnableMouseSwipeNavigateWithScrolls", kCFBooleanTrue, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+				CFPreferencesSetValue((CFStringRef)@"AppleEnableMouseSwipeNavigateWithScrolls", kCFBooleanTrue, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 			} else{
-				CFPreferencesSetValue(@"AppleEnableMouseSwipeNavigateWithScrolls", kCFBooleanFalse, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+				CFPreferencesSetValue((CFStringRef)@"AppleEnableMouseSwipeNavigateWithScrolls", kCFBooleanFalse, kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 			}
 		}];
 	}

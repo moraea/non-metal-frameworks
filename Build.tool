@@ -33,13 +33,13 @@ function build
 
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
-	echo "current $current compatibility $compatibility"
+	# echo "current $current compatibility $compatibility"
 
 	if test -n "$SENTIENT_PATCHER"
 	then
 		extraArgs=-DSENTIENT_PATCHER
 	fi
-	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" $extraArgs
+	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs
 	
 	codesign -f -s - "$oldOut"
 	codesign -f -s - "$mainOut"

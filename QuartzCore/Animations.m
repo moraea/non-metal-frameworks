@@ -10,7 +10,10 @@
 
 -(void)flushWithTransaction
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-method-access"
 	[self flush];
+#pragma clang diagnostic pop
 }
 
 @end

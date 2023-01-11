@@ -30,8 +30,11 @@ NSDictionary* CoreDisplay_DisplayCreateInfoDictionary(int edi)
 	
 	NSMutableDictionary* mutable=result.mutableCopy;
 	result.release;
-	
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-method-access"
 	NSString* type=[[UTType _typeOfCurrentDevice] identifier];
+#pragma clang diagnostic pop
 	NSString* path=[NSString stringWithFormat:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/%@.icns",type];
 	
 	trace(@"thic: adding %@",path);

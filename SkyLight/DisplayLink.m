@@ -3,9 +3,9 @@
 
 char* SLSDisplayGetTiming(char* rdi_structOut,unsigned long rsi,unsigned int edx_screenID)
 {
-	long* prevUpdateTime=rdi_structOut+0x18;
-	long* interval=rdi_structOut;
-	long* submissionInterval=rdi_structOut+0x20;
+	long* prevUpdateTime=(long*)(rdi_structOut+0x18);
+	long* interval=(long*)rdi_structOut;
+	long* submissionInterval=(long*)(rdi_structOut+0x20);
 	
 	*prevUpdateTime=0;
 	*interval=1.0/60*NSEC_PER_SEC;
