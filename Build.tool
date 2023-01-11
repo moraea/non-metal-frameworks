@@ -157,7 +157,17 @@ function runWithTargetVersion
 
 	if test -n "$AUTO_QC"
 	then
-		qc="$AUTO_QC"
+		case "$AUTO_QC" in
+			10.14)
+				qc=MOJ
+				;;
+			10.15)
+				qc=CAT
+				;;
+			11)
+				qc=BS
+				;;
+		esac
 	else
 		echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
 		select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do

@@ -62,10 +62,10 @@ NSString* transactionFakeKey(int key)
 }
 @end
 
-#endif
-
 void animationsSetup()
 {
 	// removed Cat/Mojave check here because it's in Main - Amy
 	brightnessHack=[process isEqualToString:@"/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"];
 }
+
+#endif
