@@ -208,7 +208,7 @@ function runWithTargetVersion
 			;;
 	esac
 
-	if [[ "$major" -eq 13 && ("$qc" -eq MOJ || "$qc" -eq CAT) ]]
+	if [[ "$major" = 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
 	then
 		echo 'applying _CASSynchronize hack'
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
