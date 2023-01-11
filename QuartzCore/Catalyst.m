@@ -109,6 +109,8 @@ void fake_dealloc(CALayer* self,SEL sel)
 
 void catalystSetup()
 {
+	// TODO: check if this is necessary for BS QC?
+	
 	swizzleImp(@"CATransaction",@"addCommitHandler:forPhase:",false,(IMP)fake_addCommitHandler,(IMP*)&real_addCommitHandler);
 	
 #ifdef MOJ
