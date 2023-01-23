@@ -13,13 +13,13 @@ BOOL isWindowServer;
 #import "Appearance.m"
 #import "Backlight.m"
 
-#if MAJOR<=12
-#import "Defenestrator.m"
-#endif
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator2c.m"
 #import "DefenestratorAgnosticBlurs.m"
+#import "SafariHack.m"
+#else
+#import "Defenestrator.m"
 #endif
 
 #import "Discord.m"
