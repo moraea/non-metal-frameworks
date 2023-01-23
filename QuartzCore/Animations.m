@@ -10,7 +10,10 @@
 
 -(void)flushWithTransaction
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-method-access"
 	[self flush];
+#pragma clang diagnostic pop
 }
 
 @end
@@ -62,11 +65,10 @@ NSString* transactionFakeKey(int key)
 }
 @end
 
-#endif
-
 void animationsSetup()
 {
-#if defined(CAT) || defined(MOJ)
+	// removed Cat/Mojave check here because it's in Main - Amy
 	brightnessHack=[process isEqualToString:@"/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"];
-#endif
 }
+
+#endif

@@ -11,6 +11,8 @@ NSUserDefaults* moraeaDefaults()
 
 void setAppearance()
 {
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wobjc-method-access"
 	Class Transition=NSClassFromString(@"NSGlobalPreferenceTransition");
 	dispatch_async(dispatch_get_main_queue(),^()
 	{
@@ -29,6 +31,7 @@ void setAppearance()
 			return;
 		}];
 	});
+	#pragma clang diagnostic pop
 }
 
 void checkMode(){

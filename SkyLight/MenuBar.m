@@ -120,14 +120,14 @@ NSDictionary* SLSCopySystemStatusBarMetrics()
 	result[@"activeDisplayIdentifier"]=activeID;
 	activeID.release;
 	
-	unsigned int count;
+	int count;
 	SLSGetDisplayList(0,NULL,&count);
-	unsigned int* ids=malloc(sizeof(unsigned int)*count);
+	int* ids=malloc(sizeof(int)*count);
 	SLSGetDisplayList(count,ids,&count);
 	
 	NSMutableArray<NSDictionary*>* displays=NSMutableArray.alloc.init;
 	
-	for(unsigned int index=0;index<count;index++)
+	for(int index=0;index<count;index++)
 	{
 		NSMutableDictionary* display=NSMutableDictionary.alloc.init;
 		
@@ -203,7 +203,7 @@ NSNotificationCenter* SLSCoordinatedLocalNotificationCenter()
 {
 	dispatch_once(&notifyOnce,^()
 	{
-		unsigned int connection=SLSMainConnectionID();
+		int connection=SLSMainConnectionID();
 		
 		SLSRegisterConnectionNotifyProc(connection,statusBarSpaceCallback,kCGSPackagesStatusBarSpaceChanged,nil);
 		

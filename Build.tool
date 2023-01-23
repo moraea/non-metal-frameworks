@@ -33,13 +33,13 @@ function build
 
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
-	echo "current $current compatibility $compatibility"
+	# echo "current $current compatibility $compatibility"
 
 	if test -n "$SENTIENT_PATCHER"
 	then
 		extraArgs=-DSENTIENT_PATCHER
 	fi
-	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" $extraArgs
+	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs
 	
 	codesign -f -s - "$oldOut"
 	codesign -f -s - "$mainOut"
@@ -96,6 +96,7 @@ nop 0x2
 symbol ___SLSRemoveRemoteContextNotificationHandler_block_invoke
 return 0x0
 
+# disable entitlement check
 symbol __ZL26debug_connection_permittedv
 return 0x1
 
@@ -106,14 +107,19 @@ return 0x1
 # set 0xf47e7
 # write 0xff
 
-# Menubar blur
+# Menubar background
 # warning: almost certainly breaks CAPL and defenestrator-off!
+
+# override blur radius (cannibalizes stack canary)
 set 0x21677c
 write 0xbe80000000
 set 0x216781
 nop 0x5
 set 0x21687e
 nop 0x2
+
+# disable saturation (GLSL)
+# TODO: not good
 set 0x294e62
 write 0x2f2f
 set 0x29625a
@@ -131,6 +137,11 @@ function runWithTargetVersion
 	major=$1
 	echo begin $major
 
+	if test "$major" -eq 13
+	then
+		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit _SLSHWCaptureWindowList
+	fi
+
 	rm -rf Build/$major
 	mkdir Build/$major
 
@@ -139,74 +150,103 @@ function runWithTargetVersion
 	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
 	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
 	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
-	
-	clear
-	
-	echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
-	select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do
-		case $opt in
-			"Mojave")
-				lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
-				if [ "$major" -eq "13" ]
-				then
-				Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol __CASSynchronize
-return 0x0'
-				fi
-				touch Build/$major/note_used_moj_qc.txt
-				build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DMOJ
-				break
+
+	# TODO: MOJ/CAT/BS (downgrade version) vs 11/12/13 (target version) a bit confusing?
+
+	if test -n "$AUTO_QC"
+	then
+		case "$AUTO_QC" in
+			10.14)
+				qc=MOJ
 				;;
-			"Catalina")
-				cp $binaries/10.15.7*/QuartzCore Build/QuartzCore.patched
-				if [ "$major" -eq "13" ]
-				then
-				Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol __CASSynchronize
-return 0x0'
-				fi
-				touch Build/$major/note_used_cat_qc.txt
-				build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DCAT
-				break
+			10.15)
+				qc=CAT
 				;;
+			11)
+				qc=BS
+				;;
+		esac
+	else
+		clear
+		echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
+		select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do
+			case $opt in
+				"Mojave")
+					qc=MOJ
+					break
+					;;
+				"Catalina")
+					qc=CAT
+					break
+					;;
 				"Big Sur")
-				if [ "$major" -eq "11" ]
-				then
-					clear
-					echo "#######################\n# Skipping QuartzCore #\n#######################"
-					sleep 2
-				else
-				touch Build/$major/note_used_bs_qc.txt
-				build $binaries/11.*/QuartzCore $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -DBS
-				fi
-				break
-				;;
-	  		"Skip")
-	  			exit
-	  			;;
-		    	*)
-		     	   echo "This is not an option, please try again"
-		     	  ;;
-			  esac
-			done
+					qc=BS
+					break
+					;;
+				"Skip")
+					exit
+					;;
+				*)
+					   echo "This is not an option, please try again"
+					  ;;
+				  esac
+				done
+	fi
+
+	case "$qc" in
+		MOJ)
+			lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
+			;;
+		CAT)
+			cp $binaries/10.15.7*/QuartzCore Build/QuartzCore.patched
+			;;
+		BS)
+			if [[ ! "$major" -eq 11 ]]
+			then
+				cp $binaries/11.*/QuartzCore Build/QuartzCore.patched
+			fi
+			;;
+	esac
+
+	if [[ "$major" = 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
+	then
+		echo 'applying _CASSynchronize hack'
+		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol __CASSynchronize
+return 0x0'
+	fi
+
+	if [[ -e Build/QuartzCore.patched ]]
+	then
+		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
+
+		touch Build/$major/note_used_${qc}_qc.txt
+	else
+		clear
+		echo "#######################\n# Skipping QuartzCore #\n#######################"
+		sleep 2
+	fi
 }
 
-clear
-
-echo "#############\n# Build For #\n#############"
-select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
+if test -n "$AUTO_TARGET"
+then
+	echo 'skipping target version prompt'
+	target="$AUTO_TARGET"
+else
+	clear
+	echo "#############\n# Build For #\n#############"
+	select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
     case $opt in
     	"Big Sur")
-			runWithTargetVersion 11
+			target=11
 			break
 			;;
     	"Monterey")
-			runWithTargetVersion 12
+			target=12
 			break
 			;;
     	"Ventura")
-			Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit _SLSHWCaptureWindowList
-			runWithTargetVersion 13
+			target=13
 			break
 			;;
 	    "Exit")
@@ -217,3 +257,6 @@ select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
 	      ;;
 	  esac
 	done
+fi
+
+runWithTargetVersion "$target"

@@ -1,5 +1,5 @@
-NSString *_AXInterfaceGetReduceTransparencyEnabled();
-NSString *_AXInterfaceGetIncreaseContrastEnabled();
+int _AXInterfaceGetReduceTransparencyEnabled();
+int _AXInterfaceGetIncreaseContrastEnabled();
 int fake__AXInterfaceGetReducedTransparencyEnabled(){	
     if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_EnableTransparency"]){
         return 0;
