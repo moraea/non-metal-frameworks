@@ -93,6 +93,7 @@ BOOL isWindowServer;
 #endif
 #if MAJOR>=13
 	blursSetupNew();
+	safariHackSetup();
 #endif
 }
 
