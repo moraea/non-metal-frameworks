@@ -89,7 +89,10 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ## changes
 
 ### 2023-1-23
-- patch menu bar saturation in a cleaner way
+- update menubar styling patches
+	- `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.BackgroundColor 'R,G,B,A'` where 0 ≤ R, G, B, A ≤ 1 (default: 0, 0, 0, 0)
+	- `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.Radius N` where N is horizontal gaussian blur radius (default: 128)
+	- `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.Saturation M` where M is the saturation value described [here](http://www.graficaobscura.com/matrix/index.html), negative = invert, less than 1 = desaturate, 1 = identity, more than 1 = saturate (default: 1)
 
 ### 2023-1-22
 - workaround Safari download hang issue on Ventura
