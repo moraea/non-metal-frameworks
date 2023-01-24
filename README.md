@@ -88,6 +88,12 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-1-23
+- patch menu bar saturation in a cleaner way
+
+### 2023-1-22
+- workaround Safari download hang issue on Ventura
+
 ### 2023-1-7
 - preliminary support for Ventura
 
