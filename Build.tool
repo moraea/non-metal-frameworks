@@ -124,7 +124,6 @@ nop 0x2
 # write 0x2f2f
 
 # disable saturation (identity matrix)
-# see amys-hacking-tutorial/menubarsaturation2.m
 set 0x26ed60
 write 0x0000803f000000000000000000000000000000000000803f000000000000000000000000000000000000803f00000000
 '
