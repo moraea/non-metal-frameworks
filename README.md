@@ -53,7 +53,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Cycle Through Windows reimplementation
 	- Discord screen share hack
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
-	- Unresponsive button fixes (ongoing)
+	- unresponsive button fixes (ongoing)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
