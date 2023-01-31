@@ -627,7 +627,7 @@ NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned
 		// TODO: bruh
 		
 		int* flags=(int*)(((char*)image)+0xa8);
-		trace(@"flags %x",flags);
+		// trace(@"flags %x",flags);
 		*flags=0x2002;
 	}
 	

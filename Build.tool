@@ -92,7 +92,7 @@ set 0xb87de
 nop 0x2
 
 # prevent prefpane crash
-# TODO: shim SLSInstallRemoteContextNotificationHandlerV2 instead
+# TODO: look at this again now that we have SLSInstallRemoteContextNotificationHandlerV2 shim
 symbol ___SLSRemoveRemoteContextNotificationHandler_block_invoke
 return 0x0
 
