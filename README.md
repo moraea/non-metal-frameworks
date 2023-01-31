@@ -53,7 +53,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Cycle Through Windows reimplementation
 	- Discord screen share hack
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
-	- Catalyst button hacks (ongoing)
+	- Unresponsive button fixes (ongoing)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -87,6 +87,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-1-31
+- fix System Settings hover effects, including Bluetooth connect button
 
 ### 2023-1-23
 - update menubar styling patches
