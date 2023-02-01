@@ -1,3 +1,10 @@
+#define MENUBAR_KEY_TEXT @"Moraea.MenuBar.DarkText"
+#define MENUBAR_KEY_TEXT_OLD @"Moraea_DarkMenuBar"
+#define MENUBAR_KEY_COLOR @"Moraea.MenuBar.BackgroundColor"
+#define MENUBAR_KEY_COLOR_OLD @"Moraea_MenuBarOverride"
+#define MENUBAR_KEY_RADIUS @"Moraea.MenuBar.Radius"
+#define MENUBAR_KEY_SATURATION @"Moraea.MenuBar.Saturation"
+
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
 BOOL styleIsDark()
@@ -6,7 +13,11 @@ BOOL styleIsDark()
 	
 	dispatch_once(&styleIsDarkOnce,^()
 	{
-		styleIsDarkValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_DarkMenuBar"];
+		styleIsDarkValue=[NSUserDefaults.standardUserDefaults boolForKey:MENUBAR_KEY_TEXT];
+		if(!styleIsDarkValue)
+		{
+			styleIsDarkValue=[NSUserDefaults.standardUserDefaults boolForKey:MENUBAR_KEY_TEXT_OLD];
+		}
 	});
 	
 	return styleIsDarkValue;
@@ -231,19 +242,31 @@ dispatch_block_t SLSCopyCoordinatedDistributedNotificationContinuationBlock()
 	};
 }
 
-// custom background colors
+// menu bar customization
 
-void menuBarOverrideSetup()
+BOOL updatePageWith(char* target,char value)
 {
-	if(!isWindowServer)
+	if(mprotect(target-(long)target%getpagesize(),getpagesize()*2,value))
 	{
-		return;
+		trace(@"MenuBar: mprotect failed");
+		return false;
 	}
-	
-	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:@"Moraea_MenuBarOverride"];
+	return true;
+}
+
+// sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.BackgroundColor '1,1,1,0.2'
+// note, Build.tool patches this to 0,0,0,0
+
+void menuBarColorOverrideSetup(char* base)
+{
+	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:MENUBAR_KEY_COLOR];
 	if(!pref)
 	{
-		return;
+		pref=[NSUserDefaults.standardUserDefaults stringForKey:MENUBAR_KEY_COLOR_OLD];
+		if(!pref)
+		{
+			return;
+		}
 	}
 	
 	NSArray<NSString*>* bits=[pref componentsSeparatedByString:@","];
@@ -262,20 +285,104 @@ void menuBarOverrideSetup()
 		}
 	}
 	
-	trace(@"menu bar override sanity checks passed (%f, %f, %f, %f)",floats[0],floats[1],floats[2],floats[3]);
-	
-	char* base=(char*)SLSMainConnectionID-0x1d8272;
 	char* target=base+0x26ef60;
-	
-	trace(@"menu bar override found SkyLight base %p target %p",base,target);
-	
-	if(mprotect(target-(long)target%getpagesize(),getpagesize()*2,PROT_READ|PROT_WRITE))
+	if(!updatePageWith(target,PROT_READ|PROT_WRITE))
 	{
-		trace(@"menu bar override mprotect failed");
 		return;
 	}
 	
+	trace(@"MenuBarColor patching %f %f %f %f",floats[0],floats[1],floats[2],floats[3]);
 	memcpy(target,floats,16);
+}
+
+// sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.Radius 10
+// note, Build.tool patches this to 0x80
+
+void menuBarRadiusOverrideSetup(char* base)
+{
+	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:MENUBAR_KEY_RADIUS];
+	if(!pref)
+	{
+		return;
+	}
+	
+	int value=pref.intValue;
+	if(value<0||value>0xffff)
+	{
+		return;
+	}
+	
+	char* target=base+0x21677d;
+	if(!updatePageWith(target,PROT_READ|PROT_WRITE|PROT_EXEC))
+	{
+		return;
+	}
+	
+	trace(@"MenuBarRadius patching %x",value);
+	memcpy(target,&value,2);
+}
+
+// sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.MenuBar.Saturation 10
+// negative = invert, less than 1 = desaturate, 1 = no saturation, more than 1 = saturate
+// note, Build.tool patches this to no saturation
+
+void menuBarSaturationOverrideSetup(char* base)
+{
+	NSString* pref=[NSUserDefaults.standardUserDefaults stringForKey:MENUBAR_KEY_SATURATION];
+	if(!pref)
+	{
+		return;
+	}
+	
+	float value=pref.floatValue;
+	if(value<-100||value>100)
+	{
+		return;
+	}
+	
+	// math credit http://www.graficaobscura.com/matrix/index.html
+	// these values from SL (slightly differ)
+	
+	float rw=0.212648;
+	float gw=0.715200;
+	float bw=0.072200;
+	
+	float b=(1.0-value)*rw;
+	float a=b+value;
+	float d=(1.0-value)*gw;
+	float e=d+value;
+	float g=(1.0-value)*bw;
+	float i=g+value;
+	float matrix[12]={a,d,g,0.0,b,e,g,0.0,b,d,i,0.0};
+	
+	char* target=base+0x26ed60;
+	if(!updatePageWith(target,PROT_READ|PROT_WRITE|PROT_EXEC))
+	{
+		return;
+	}
+	
+	NSMutableString* output=NSMutableString.alloc.init.autorelease;
+	for(int i=0;i<12;i++)
+	{
+		[output appendFormat:@"%f ",matrix[i]];
+	}
+	trace(@"MenuBarSaturation patching %@",output);
+	
+	memcpy(target,matrix,4*12);
+}
+
+void menuBarOverrideSetup()
+{
+	if(!isWindowServer)
+	{
+		return;
+	}
+	
+	char* base=(char*)SLSMainConnectionID-0x1d8272;
+	
+	menuBarColorOverrideSetup(base);
+	menuBarRadiusOverrideSetup(base);
+	menuBarSaturationOverrideSetup(base);
 }
 
 // refresh layout on status bar length changes

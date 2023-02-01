@@ -92,7 +92,7 @@ set 0xb87de
 nop 0x2
 
 # prevent prefpane crash
-# TODO: shim SLSInstallRemoteContextNotificationHandlerV2 instead
+# TODO: look at this again now that we have SLSInstallRemoteContextNotificationHandlerV2 shim
 symbol ___SLSRemoveRemoteContextNotificationHandler_block_invoke
 return 0x0
 
@@ -113,17 +113,24 @@ return 0x1
 # override blur radius (cannibalizes stack canary)
 set 0x21677c
 write 0xbe80000000
-set 0x216781
 nop 0x5
 set 0x21687e
 nop 0x2
 
 # disable saturation (GLSL)
-# TODO: not good
-set 0x294e62
-write 0x2f2f
-set 0x29625a
-write 0x2f2f'
+# set 0x294e62
+# write 0x2f2f
+# set 0x29625a
+# write 0x2f2f
+
+# disable saturation (identity matrix)
+# set 0x26ed60
+# write 0x0000803f000000000000000000000000000000000000803f000000000000000000000000000000000000803f00000000
+
+# default saturation 1.2
+set 0x26ed60
+write 0xfe27943f888112be68a36cbc0000000080332ebd6949873f68a36cbc0000000080332ebd888112be53c0973f00000000
+'
 
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
 
