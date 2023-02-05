@@ -112,3 +112,24 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 #define kIOMainPortDefault kIOMasterPortDefault
 
 #endif
+
+// for Ventura D2C shims
+
+#if MAJOR >= 13
+
+void SLSTransactionCommi$(void* rdi,int esi);
+NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
+
+int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
+void SLSWindowSetActiveShadowLegacy(int edi,int esi);
+void SLSSetSurfaceLayerBackingOptions(int edi,int esi,int edx,double xmm0,double xmm1,double xmm2);
+void SLSSetWindowEventShape(int edi,int esi,void* rdx);
+void SLSSetWindowRegionsLegacy(int edi,void* rsi,void* rdx,void* rcx,void* r8);
+void SLSSetWindowHasMainAppearance(int edi,int esi,int edx);
+void SLSSetWindowHasKeyAppearance(int edi,int esi,int edx);
+void SLSSetWindowCornerMask(int edi,void* rsi,int edx,CGRect stack);
+void SLSSetWindowOriginRelativeToWindow(int edi,int esi,int edx,int ecx,double xmm0,double xmm1);
+int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
+int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
+
+#endif
