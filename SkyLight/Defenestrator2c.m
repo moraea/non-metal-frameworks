@@ -71,6 +71,8 @@ NSMutableArray<CommitBlock>* fuckedBlocks;
 // this guarantees visual syncronization as is expected with transactions
 // and can be used to implement SLSTransaction* softlinks
 
+// TODO: may be able to use _SLSTransactionCommitAction instead
+
 void pushCommitBlock(void* transaction,CommitBlock block)
 {
 	if(disableBatching())
@@ -106,13 +108,10 @@ void pushFuckedBlock(CommitBlock block)
 	[heapBlock release];
 }
 
-// TODO: no change, undo
+// TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
-	int ranBlockCount=0;
-	int ranFBlockCount=0;
-	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
@@ -120,7 +119,6 @@ void SLSTransactionCommit(void* rdi,int esi)
 		for(CommitBlock block in blocks)
 		{
 			block();
-			ranBlockCount++;
 		}
 		commitBlocks[key]=nil;
 	}
@@ -128,7 +126,6 @@ void SLSTransactionCommit(void* rdi,int esi)
 	for(CommitBlock block in fuckedBlocks)
 	{
 		block();
-		ranFBlockCount++;
 	}
 	fuckedBlocks.removeAllObjects;
 	
@@ -138,6 +135,37 @@ void SLSTransactionCommit(void* rdi,int esi)
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
 {
 	SLSTransactionCommit(rdi,esi);
+}
+
+// TODO: added to test something, can remove
+
+void clearAllBlocks()
+{
+	commitBlocks.removeAllObjects;
+	fuckedBlocks.removeAllObjects;
+}
+
+void forceRunAllBlocks()
+{
+	int count=0;
+	for(NSArray<CommitBlock>* blocks in commitBlocks.allValues)
+	{
+		for(CommitBlock block in blocks)
+		{
+			count++;
+			block();
+		}
+	}
+	
+	for(CommitBlock block in fuckedBlocks)
+	{
+		count++;
+		block();
+	}
+	
+	clearAllBlocks();
+	
+	trace(@"forcibly ran %d D2C blocks (why are you doing this?)",count);
 }
 
 NSMutableArray<dispatch_block_t>* onceBlocks;
@@ -435,21 +463,45 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 
 // CG inverted colors workaround
 
-NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
+void uninvertScreenshots(NSArray* result)
 {
-	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
-	// trace(@"SLSHWCaptureWindowList %d %p %d %d %@ -> %@",edi_cid,rsi_list,edx_count,ecx_flags,NSThread.callStackSymbols,result);
-	
 	for(id image in result)
 	{
-		// TODO: bruh
+		// TODO: generate a new image?
+		// to avoid this cursed in-place patching
 		
 		int* flags=(int*)(((char*)image)+0xa8);
-		// trace(@"flags %x",flags);
 		*flags=0x2002;
 	}
+}
+
+NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
+{
+	trace(@"SLSHWCaptureWindowList flags %x",ecx_flags);
 	
+	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
+	uninvertScreenshots(result);
 	return result;
+}
+
+// TODO: return
+
+void SLSTransactionWait(void* rdi)
+{
+	// TODO: doesn't work (hangs) because block runs at commit time
+	// and this is supposed to return when it's destroyed, not committed
+	// have to hook 2c9d28?
+	
+	/*dispatch_semaphore_t semaphore=dispatch_semaphore_create(0);
+	pushCommitBlock(rdi,^()
+	{
+		trace(@"SLSTransactionWait signal %p %p",rdi,semaphore);
+		dispatch_semaphore_signal(semaphore);
+	});
+	trace(@"SLSTransactionWait wait %p %p",rdi,semaphore);
+	dispatch_semaphore_wait(semaphore,DISPATCH_TIME_FOREVER);
+	trace(@"SLSTransactionWait resume %p %p",rdi,semaphore);
+	semaphore.release;*/
 }
 
 // still softlinked 13.1 DP3

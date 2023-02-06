@@ -1,4 +1,4 @@
-// enable Night Shift
+// enable Night Shift (sentient-patcher only)
 
 NSString* ASI_CopyComputerModelName(int edi_includeNumbers);
 

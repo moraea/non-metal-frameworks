@@ -131,5 +131,7 @@ void SLSSetWindowCornerMask(int edi,void* rsi,int edx,CGRect stack);
 void SLSSetWindowOriginRelativeToWindow(int edi,int esi,int edx,int ecx,double xmm0,double xmm1);
 int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
 int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
+void SLSTileSpaceMoveSpacersForSize(long rdi,int esi,double xmm0,double xmm1);
+void SLSSpaceClientDrivenMoveSpacersToPoint(int edi_cid,long rsi_parentSpaceID,long rdx_tileSpaceID,long rcx_verticalIndex,long r8_horizontalIndex,int r9d_flags,double xmm0_location,double xmm1);
 
 #endif
