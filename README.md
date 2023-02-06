@@ -48,12 +48,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Objective-C and dynamic linker cache research
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, CABL/CAPL blur hacks, various crashes)
 	- most build scripts and stubbing/binpatching/swizzling utils
+    - older fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL blur hacks, Cycle Through Windows hack, wait cursor hack, various crashes)
 	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
-	- Cycle Through Windows reimplementation
-	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
 	- app-specific hacks (Photos, Discord, Safari, Books)
+	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
 	- unresponsive button fixes (ongoing)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
