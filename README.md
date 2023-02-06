@@ -48,11 +48,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
     - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, various crashes)
-	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
+	- most build scripts and stubbing/binpatching/swizzling utils
 	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
-	- Discord screen share hack
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
+	- app-specific hacks (Photos, Discord, Safari, Books)
 	- unresponsive button fixes (ongoing)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
@@ -87,6 +87,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-2-6
+- improve fullscreen transition reliability
+- add wait cursor hack (enable with `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.EnableSpinHack -bool true`)
+- add Books hacks (reimplement cover image generation, disable broken page curl animation)
 
 ### 2023-1-31
 - fix System Settings hover effects, including Bluetooth connect button
