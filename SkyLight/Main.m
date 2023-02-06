@@ -18,6 +18,7 @@ BOOL isWindowServer;
 #import "Defenestrator2c.m"
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
+#import "Spin.m"
 #else
 #import "Defenestrator.m"
 #endif
