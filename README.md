@@ -26,6 +26,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- various other changed functionality in Ventura
 	- Ventura screenshot inverted colors research
 	- patch for downgraded QuartzCore crashes in Ventura
+	- CABL/CAPL blur hack research and code
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -47,7 +48,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Objective-C and dynamic linker cache research
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, various crashes)
+    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, CABL/CAPL blur hacks, various crashes)
 	- most build scripts and stubbing/binpatching/swizzling utils
 	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
 	- Cycle Through Windows reimplementation
