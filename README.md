@@ -26,6 +26,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- various other changed functionality in Ventura
 	- Ventura screenshot inverted colors research
 	- patch for downgraded QuartzCore crashes in Ventura
+	- CABL/CAPL blur hack research and code
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -47,11 +48,10 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Objective-C and dynamic linker cache research
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
-    - most fixes for Catalina/Big Sur (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, display sleep, accessibility zoom, occlusion detection hacks, various crashes)
-	- most build scripts and stubbing/binpatching [utils](https://github.com/moraea/non-metal-common)
+	- most build scripts and stubbing/binpatching/swizzling utils
+    - older fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL blur hacks, Cycle Through Windows hack, wait cursor hack, various crashes)
 	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
-	- Cycle Through Windows reimplementation
-	- Discord screen share hack
+	- app-specific hacks (Photos, Discord, Safari, Books)
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
 	- unresponsive button fixes (ongoing)
 	- various other code and research
@@ -87,6 +87,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-2-6
+- improve fullscreen transition reliability
+- add wait cursor hack (enable with `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.EnableSpinHack -bool true`)
+- add Books hacks (reimplement cover image generation, disable broken page curl animation)
 
 ### 2023-1-31
 - fix System Settings hover effects, including Bluetooth connect button
@@ -198,14 +203,13 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix blank Wabbitemu, Anka VM windows with Mojave QuartzCore
-- fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`, or use [this](https://github.com/ASentientBot/monterey/releases/download/2022-3-20/you.can.edit.the.defines.to.make.it.spin.extremely.fast.or.even.backward.lol.zip) beta SkyLight plugin)
+- fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`)
 - rewrite blur fix to work with Mojave QC and fix flickering/performance issues
 - investigate rare binaries not seeing re-exported symbols (Dropbox-specific workaround: [SkyLight plugin](https://github.com/ASentientBot/monterey/releases/download/2021-12-17/throw.this.in.the.SkyLight.plugins.folder.to.fix.Dropbox.in.a.really.non.ideal.way.zip))
 - investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
 - fix Maps
 - fix Photo Booth (workaround: use Big Sur version)
-- fix Books (workaround: use Big Sur version)
 - automatically color menu bar text (workaround: `defaults write -g Moraea_DarkMenuBar -bool true`)
 - fix Migration Assistant
 - fix "Move to Display"

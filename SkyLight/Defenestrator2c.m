@@ -71,6 +71,8 @@ NSMutableArray<CommitBlock>* fuckedBlocks;
 // this guarantees visual syncronization as is expected with transactions
 // and can be used to implement SLSTransaction* softlinks
 
+// TODO: may be able to use _SLSTransactionCommitAction instead
+
 void pushCommitBlock(void* transaction,CommitBlock block)
 {
 	if(disableBatching())
@@ -106,20 +108,10 @@ void pushFuckedBlock(CommitBlock block)
 	[heapBlock release];
 }
 
-// DP8 4ff80365371f - fallback case
-// rdi transaction
-// esi 1
-
-// Renamer - test if blocks are buggy because some functions still call this?
-// TODO: no change, undo
-
-void SLSTransactionCommi$(void* rdi,int esi);
+// TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
-	int ranBlockCount=0;
-	int ranFBlockCount=0;
-	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
@@ -127,7 +119,6 @@ void SLSTransactionCommit(void* rdi,int esi)
 		for(CommitBlock block in blocks)
 		{
 			block();
-			ranBlockCount++;
 		}
 		commitBlocks[key]=nil;
 	}
@@ -135,21 +126,46 @@ void SLSTransactionCommit(void* rdi,int esi)
 	for(CommitBlock block in fuckedBlocks)
 	{
 		block();
-		ranFBlockCount++;
 	}
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
 }
 
-// DP8 4ff803653713 - softlink case
-// rdi transaction
-// esi bool or flag
-// TODO: return
-
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
 {
 	SLSTransactionCommit(rdi,esi);
+}
+
+// TODO: added to test something, can remove
+
+void clearAllBlocks()
+{
+	commitBlocks.removeAllObjects;
+	fuckedBlocks.removeAllObjects;
+}
+
+void forceRunAllBlocks()
+{
+	int count=0;
+	for(NSArray<CommitBlock>* blocks in commitBlocks.allValues)
+	{
+		for(CommitBlock block in blocks)
+		{
+			count++;
+			block();
+		}
+	}
+	
+	for(CommitBlock block in fuckedBlocks)
+	{
+		count++;
+		block();
+	}
+	
+	clearAllBlocks();
+	
+	trace(@"forcibly ran %d D2C blocks (why are you doing this?)",count);
 }
 
 NSMutableArray<dispatch_block_t>* onceBlocks;
@@ -267,28 +283,7 @@ void defenestratorSetup()
 
 @end
 
-// credit Edu - nostub-ing this in DP1 almost wholly fixes window positioning
-
-// DP1 4ff80414f8c6
-// edi cid
-// esi r12d - wid
-// ecx r14d
-// rdx something
-// SL old - does not use xmm* and returns eax
-
-// AppKit 12.5 DP3
-// edi/esi right
-// rdx - pointer to 2 doubles after each other (CGPoint/CGSize?)
-// ecx - came from NSCGSDisplayConfiguration changeSeed
-
-int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
-
-// rdi transaction
-// esi r12d - wid
-// edx r14d
-// xmm0
-// xmm1
-// TODO: return
+// credit Edu - largely fixes window positioning
 
 void SLSTransactionMoveWindowOnMatchingDisplayChangedSeed(void* rdi,int esi,int edx,double xmm0,double xmm1)
 {	
@@ -301,18 +296,11 @@ void SLSTransactionMoveWindowOnMatchingDisplayChangedSeed(void* rdi,int esi,int 
 	});
 }
 
-// TODO: move any more of these to the D2C blocks system?
-// slower but may fix some visual glitches
-
 // forward Rim.m
 
 void SLSWindowSetShadowProperties(unsigned int,NSDictionary*);
 
-// DP8 7ff804061733
-// rdi probably transaction
-// esi probably wid
-// rdx probably dictionary
-// TODO: check return value
+// TODO: check return value (here and Extern.h)
 
 void SLSTransactionSetWindowShadowProperties(void* rdi,int esi,NSDictionary* rdx)
 {
@@ -322,18 +310,6 @@ void SLSTransactionSetWindowShadowProperties(void* rdi,int esi,NSDictionary* rdx
 	});
 }
 
-// 12.5 DP3 4ff8037d07a3
-// edi probably wid
-// esi probably bool or flags
-// TODO: check return value
-// TODO: move these all to Extern.h
-
-void SLSWindowSetActiveShadowLegacy(int edi,int esi);
-
-// DP8 7ff80406175a
-// rdi probably transaction
-// esi probably wid
-// edx probably bool or flags
 // TODO: check return value
 
 void SLSTransactionSetWindowActiveShadowLegacy(void* rdi,int esi,int edx)
@@ -344,24 +320,6 @@ void SLSTransactionSetWindowActiveShadowLegacy(void* rdi,int esi,int edx)
 	});
 }
 
-// 12.5 DP3 4ff8037d0a66
-// edi probably cid
-// esi probably wid
-// edx 0
-// xmm0 0 sometimes, 1.05 sometimes, NSAutomaticFlatteningDelay sometimes...
-// xmm1 -1
-// xmm2 -1
-// TODO: check return value
-
-void SLSSetSurfaceLayerBackingOptions(int edi,int esi,int edx,double xmm0,double xmm1,double xmm2);
-
-// DP8 7ff804061a28
-// rdi probably transaction
-// esi probably wid
-// edx 0
-// xmm0 0 sometimes, 1.05 sometimes, NSAutomaticFlatteningDelay sometimes
-// xmm1 -1
-// xmm2 -1
 // TODO: check return value
 
 void SLSTransactionSetSurfaceLayerBackingOptions(void* rdi,int esi,int edx,double xmm0,double xmm1,double xmm2)
@@ -372,18 +330,6 @@ void SLSTransactionSetSurfaceLayerBackingOptions(void* rdi,int esi,int edx,doubl
 	});
 }
 
-// DP8 7ff803766b2e
-// edi cid (contextID)
-// esi wid (windowNumber)
-// rdx output parameter from CGSNewRegionWithRectList
-// TODO: check return value
-
-void SLSSetWindowEventShape(int edi,int esi,void* rdx);
-
-// DP8 7ff804061718
-// rdi probably transaction
-// esi probably wid
-// rdx ?
 // TODO: check return value
 
 void SLSTransactionSetWindowEventShape(void* rdi,int esi,void* rdx)
@@ -394,21 +340,6 @@ void SLSTransactionSetWindowEventShape(void* rdi,int esi,void* rdx)
 	});
 }
 
-// 12.5 DP3 no obvious equivalent
-// 4ff8037d092b
-// edi probably wid
-// rsi r13+0x70, jump based on bit 0x9 - 0x70 set by NSCGSWindow setDragShape:
-// rdx r13+0x78, bit 0xa - setActivationShape:
-// rcx r13+0x80, bit 0xb - setButtonShape:
-// r8 r13+0x88, bit 0xc - setCommandModifierExclusionShape:
-// TODO: check return value
-
-void SLSSetWindowRegionsLegacy(int edi,void* rsi,void* rdx,void* rcx,void* r8);
-
-// DP8 4ff8040618a1 (__NSCGSWindowMarkProperty__block_invoke_2)
-// rdi probably transaction
-// esi probably wid
-// rdx r15+0x80, bit 0x9
 // TODO: check return value
 
 void SLSTransactionSetWindowDragRegion(void* rdi,int esi,void* rdx)
@@ -419,10 +350,6 @@ void SLSTransactionSetWindowDragRegion(void* rdi,int esi,void* rdx)
 	});
 }
 
-// DP8 4ff8040618c0
-// rdi probably transaction
-// esi probably wid
-// rdx r15+0x88, bit 0xa
 // TODO: return value
 
 void SLSTransactionSetWindowActivationRegion(void* rdi,int esi,void* rdx)
@@ -433,7 +360,6 @@ void SLSTransactionSetWindowActivationRegion(void* rdi,int esi,void* rdx)
 	});
 }
 
-// 0x90, bit 0xb
 // TODO: return value
 
 void SLSTransactionSetWindowButtonRegion(void* rdi,int esi,void* rdx)
@@ -444,7 +370,6 @@ void SLSTransactionSetWindowButtonRegion(void* rdi,int esi,void* rdx)
 	});
 }
 
-// 0x98 - setCommandModifierExclusionShape, bit 0xc
 // TODO: return value
 
 void SLSTransactionSetWindowSpecialCommandRegion(void* rdi,int esi,void* rdx)
@@ -455,20 +380,6 @@ void SLSTransactionSetWindowSpecialCommandRegion(void* rdi,int esi,void* rdx)
 	});
 }
 
-// 12.5 DP3 4ff8037d09d0
-// edi cid
-// esi wid
-// edx bool or flags
-// TODO: return value
-
-void SLSSetWindowHasMainAppearance(int edi,int esi,int edx);
-
-void SLSSetWindowHasKeyAppearance(int edi,int esi,int edx);
-
-// DP8 4ff80406196c, 4ff804061963
-// rdi probably transaction
-// esi probably wid
-// edx bool or flags
 // TODO: return value
 
 void SLSTransactionSetWindowHasMainAppearance(void* rdi,int esi,int edx)
@@ -487,23 +398,7 @@ void SLSTransactionSetWindowHasKeyAppearance(void* rdi,int esi,int edx)
 	});
 }
 
-// 12.5 DP3
-// edi probably wid
-// rsi image
-// edx 0xf
-// same large stack thing
 // TODO: return value
-
-void SLSSetWindowCornerMask(int edi,void* rsi,int edx,CGRect stack);
-
-// DP8 4ff804061882
-// rdi transaction
-// esi wid
-// rdx [something image]
-// ecx 0xf
-// stack 16 * 2 bytes - CGRect?
-// TODO: return value
-// TODO: verify stack part
 // note - Edu determined this somehow fixes CAPL
 
 void SLSTransactionSetWindowCornerMask(void* rdi,int esi,void* rdx,int ecx,CGRect stack)
@@ -514,24 +409,6 @@ void SLSTransactionSetWindowCornerMask(void* rdi,int esi,void* rdx,int ecx,CGRec
 	});
 }
 
-// 12.5 DP3 4ff8037d051c
-// edi cid
-// esi wid
-// edx r13+0x10 - ?
-// ecx 0
-// xmm0 r13+0xb0 - ?
-// xmm1 r13+0xb8 - ?
-// TODO: return
-
-void SLSSetWindowOriginRelativeToWindow(int edi,int esi,int edx,int ecx,double xmm0,double xmm1);
-
-// DP8 4ff80406151f
-// rdi transaction
-// esi wid
-// edx r15+0x10 - ?
-// ecx 0
-// xmm0 r15+0xc0 - ?
-// xmm1 r15+0xc8 - ?
 // TODO: return
 // TODO: i don't think called at all
 
@@ -545,18 +422,6 @@ void SLSTransactionSetWindowOriginRelativeToWindow(void* rdi,int esi,int edx,int
 	});
 }
 
-// 12.5 DP3 4ff802f8561d
-// edi rdi+0x20 - per crash message, cid
-// esi rdi+0x24 - per crash message, wid
-// edx wid - per crash message, "other window id"
-// TODO: check return, i think int
-
-int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
-
-// DP8 4ff80405ccb4
-// rdi rdi+0x20 - i think transaction
-// esi rdi+0x28 - i think wid
-// edx wid
 // TODO: return
 
 void SLSTransactionAddWindowToWindowMovementGroup(void* rdi,int esi,int edx)
@@ -569,18 +434,6 @@ void SLSTransactionAddWindowToWindowMovementGroup(void* rdi,int esi,int edx)
 	});
 }
 
-// 12.5 DP3 4ff802fc5221
-// edi rdi+0x20 - i think cid
-// esi rdi+0x24 - i think wid
-// edx wid
-// returns eax
-
-int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
-
-// DP8 4ff80405cce7
-// rdi rdi+0x20 - i think transaction
-// esi rdi+0x28 - i think wid
-// edx wid
 // TODO: return
 
 void SLSTransactionRemoveWindowFromWindowMovementGroup(void* rdi,int esi,int edx)
@@ -593,45 +446,62 @@ void SLSTransactionRemoveWindowFromWindowMovementGroup(void* rdi,int esi,int edx
 	});
 }
 
-// SLSTransactionSetWindowTransform3D - not referenced in DP8 AppKit
-// DP8 WindowManager 10012407e
-// rdi ?
-// esi ?
-// copies 0x80 bytes i think to the stack
 // TODO: return
 // TODO: no obvious equivalent in Mojave SL
 
 void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 {
-	// trace(@"SLSTransactionSetWindowTransform3D stub %p %x %@ (stack object follows)",rdi,esi,NSThread.callStackSymbols);
+	/*trace(@"SLSTransactionSetWindowTransform3D stub %p %x %@ (stack object follows)",rdi,esi,NSThread.callStackSymbols);
 	NSMutableString* s=NSMutableString.alloc.init;
 	for(int i=0;i<0x80;i++)
 	{
 		[s appendFormat:@"%02x",stack[i]];
 	}
-	// trace(@"%@",s);
-	s.release;
+	trace(@"%@",s);
+	s.release;*/
 }
 
 // CG inverted colors workaround
 
-NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
+void uninvertScreenshots(NSArray* result)
+{
+	for(id image in result)
+	{
+		// TODO: generate a new image?
+		// to avoid this cursed in-place patching
+		
+		int* flags=(int*)(((char*)image)+0xa8);
+		*flags=0x2002;
+	}
+}
 
 NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
 {
+	trace(@"SLSHWCaptureWindowList flags %x",ecx_flags);
+	
 	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
-	// trace(@"SLSHWCaptureWindowList %d %p %d %d %@ -> %@",edi_cid,rsi_list,edx_count,ecx_flags,NSThread.callStackSymbols,result);
-	
-	for(id image in result)
-	{
-		// TODO: bruh
-		
-		int* flags=(int*)(((char*)image)+0xa8);
-		// trace(@"flags %x",flags);
-		*flags=0x2002;
-	}
-	
+	uninvertScreenshots(result);
 	return result;
+}
+
+// TODO: return
+
+void SLSTransactionWait(void* rdi)
+{
+	// TODO: doesn't work (hangs) because block runs at commit time
+	// and this is supposed to return when it's destroyed, not committed
+	// have to hook 2c9d28?
+	
+	/*dispatch_semaphore_t semaphore=dispatch_semaphore_create(0);
+	pushCommitBlock(rdi,^()
+	{
+		trace(@"SLSTransactionWait signal %p %p",rdi,semaphore);
+		dispatch_semaphore_signal(semaphore);
+	});
+	trace(@"SLSTransactionWait wait %p %p",rdi,semaphore);
+	dispatch_semaphore_wait(semaphore,DISPATCH_TIME_FOREVER);
+	trace(@"SLSTransactionWait resume %p %p",rdi,semaphore);
+	semaphore.release;*/
 }
 
 // still softlinked 13.1 DP3

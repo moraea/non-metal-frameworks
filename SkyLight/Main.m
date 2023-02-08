@@ -18,6 +18,8 @@ BOOL isWindowServer;
 #import "Defenestrator2c.m"
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
+#import "Spin.m"
+#import "Books.m"
 #else
 #import "Defenestrator.m"
 #endif
@@ -94,6 +96,7 @@ BOOL isWindowServer;
 #if MAJOR>=13
 	blursSetupNew();
 	safariHackSetup();
+	booksHackSetup();
 #endif
 }
 
