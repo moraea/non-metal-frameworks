@@ -9,10 +9,22 @@ void doNothing()
 {
 }
 
-NSObject* fake_contextWithId(NSObject* self,SEL sel,int target)
+void fixCAContextImpl()
 {
-	NSObject* found=nil;
-	for(NSObject* context in [self allContexts])
+	Class CAContextImpl=NSClassFromString(@"CAContextImpl");
+	class_addMethod(CAContextImpl,@selector(addFence:),(IMP)doNothing,"v@:@");
+	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
+}
+
+@interface CAContext(Shim)
+@end
+
+@implementation CAContext(Shim)
+
++(CAContext*)contextWithId:(int)target
+{
+	CAContext* found=nil;
+	for(CAContext* context in [self allContexts])
 	{
 		if([context contextId]==target)
 		{
@@ -20,16 +32,14 @@ NSObject* fake_contextWithId(NSObject* self,SEL sel,int target)
 			break;
 		}
 	}
+	
+	// trace(@"contextWithId %@ %x -> %@",self,target,found);
+	
 	return found;
 }
 
-void fixCAContextImpl()
-{
-	Class CAContextImpl=NSClassFromString(@"CAContextImpl");
-	class_addMethod(CAContextImpl,@selector(addFence:),(IMP)doNothing,"v@:@");
-	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
-	class_addMethod(CAContextImpl,@selector(contextWithId:),(IMP)fake_contextWithId,"v@:i");
-}
+@end
+
 #endif
 
 // reee
