@@ -1,6 +1,6 @@
 // TODO: stuff to be cleaned or moved elsewhere
 
-// private, can't use a category to add missing symbols
+// private, can't use a category to add missing selectors
 // TODO: generate via Stubber, make public, or SOMETHING better than this...
 
 #if defined(CAT) || defined(MOJ)
@@ -9,11 +9,26 @@ void doNothing()
 {
 }
 
+NSObject* fake_contextWithId(NSObject* self,SEL sel,int target)
+{
+	NSObject* found=nil;
+	for(NSObject* context in [self allContexts])
+	{
+		if([context contextId]==target)
+		{
+			found=context;
+			break;
+		}
+	}
+	return found;
+}
+
 void fixCAContextImpl()
 {
 	Class CAContextImpl=NSClassFromString(@"CAContextImpl");
 	class_addMethod(CAContextImpl,@selector(addFence:),(IMP)doNothing,"v@:@");
 	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
+	class_addMethod(CAContextImpl,@selector(contextWithId:),(IMP)fake_contextWithId,"v@:i");
 }
 #endif
 
