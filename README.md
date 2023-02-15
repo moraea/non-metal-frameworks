@@ -49,11 +49,11 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
 	- most build scripts and stubbing/binpatching/swizzling utils
-    - older fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL blur hacks, Cycle Through Windows hack, wait cursor hack, various crashes)
-	- fixes for some problems caused by downgraded QuartzCore (animations, Catalyst issues, Siri issues, black videos)
+    - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, various crashes)
+	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books)
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
-	- unresponsive button fixes (ongoing)
+	- unresponsive button fixes
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -89,7 +89,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ## changes
 
 ### 2023-2-15
-- replace Catalyst buttons hack with a different, similarly awful, hack
+- replace Catalyst buttons hack with a better (still awful) hack
 
 ### 2023-2-6
 - improve fullscreen transition reliability
@@ -201,7 +201,6 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- fix unresponsive Catalyst buttons
 - reimplement WindowManager communication
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
