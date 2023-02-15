@@ -88,6 +88,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-2-15
+- replace Catalyst buttons hack with a different, similarly awful, hack
+
 ### 2023-2-6
 - improve fullscreen transition reliability
 - add wait cursor hack (enable with `sudo defaults write /Library/Preferences/.GlobalPreferences.plist Moraea.EnableSpinHack -bool true`)
