@@ -1,7 +1,25 @@
-// originally for Weather widget done button, but fixes a number of unresponsive Catalyst buttons
-// TODO: does not solve the root issue
+// fix a number of unresponsive Catalyst buttons
 
-@interface UIWindowLite:NSObject
+// TODO: still does not solve the root issue
+// note - requires this branch's updated QC wrapper if using ≤ Cat QC
+
+void (*real_setContextId)(CALayer*,SEL,int);
+void fake_setContextId(CALayer* self,SEL sel,int hostedContextID)
+{
+	real_setContextId(self,sel,hostedContextID);
+	
+	NSObject* hostedContext=[CAContext contextWithId:hostedContextID];
+	CALayer* hostedLayer=[hostedContext layer];
+	
+	if([NSStringFromClass(hostedLayer.class) isEqual:@"_NSViewBackingLayer"])
+	{
+		[hostedLayer setAllowsHitTesting:false];
+	}
+}
+
+// TODO: clean
+
+/*@interface UIWindowLite:NSObject
 -(BOOL)isKeyWindow;
 @end
 
@@ -29,11 +47,13 @@ UIWindowLite* fake_WWCI(UIWindowLite* self,SEL sel,int contextID)
 	}
 	
 	return window;
-}
+}*/
 
 void doneSetup()
 {
-	swizzleImp(@"UIWindow",@"_windowWithContextId:",false,(IMP)fake_WWCI,(IMP*)&real_WWCI);
+	// swizzleImp(@"UIWindow",@"_windowWithContextId:",false,(IMP)fake_WWCI,(IMP*)&real_WWCI);
+	
+	swizzleImp(@"CALayerHost",@"setContextId:",true,(IMP)fake_setContextId,(IMP*)&real_setContextId);
 }
 
 // Ventura System Settings hover controls (Bluetooth button, dropdowns)
