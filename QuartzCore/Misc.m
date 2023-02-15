@@ -1,6 +1,6 @@
 // TODO: stuff to be cleaned or moved elsewhere
 
-// private, can't use a category to add missing symbols
+// private, can't use a category to add missing selectors
 // TODO: generate via Stubber, make public, or SOMETHING better than this...
 
 #if defined(CAT) || defined(MOJ)
@@ -15,6 +15,31 @@ void fixCAContextImpl()
 	class_addMethod(CAContextImpl,@selector(addFence:),(IMP)doNothing,"v@:@");
 	class_addMethod(CAContextImpl,@selector(transferSlot:toContextWithId:),(IMP)doNothing,"v@:@@");
 }
+
+@interface CAContext(Shim)
+@end
+
+@implementation CAContext(Shim)
+
++(CAContext*)contextWithId:(int)target
+{
+	CAContext* found=nil;
+	for(CAContext* context in [self allContexts])
+	{
+		if([context contextId]==target)
+		{
+			found=context;
+			break;
+		}
+	}
+	
+	// trace(@"contextWithId %@ %x -> %@",self,target,found);
+	
+	return found;
+}
+
+@end
+
 #endif
 
 // reee
