@@ -88,6 +88,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-3-7
+- update fixes version scoping (11/12: buttons, books, fullscreen, splitscreen, etc)
+
 ### 2023-2-15
 - replace Catalyst buttons hack with a better (still awful) hack
 
