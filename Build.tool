@@ -49,7 +49,7 @@ binaries=Build/non-metal-binaries
 
 lipo -thin x86_64 $binaries/10.14.6*/SkyLight -output Build/SkyLight.patched
 
-Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSNewWindowWithOpaqueShape _SLSSetMenuBars _SLSCopyDevicesDictionary _SLSCopyCoordinatedDistributedNotificationContinuationBlock _SLSShapeWindowInWindowCoordinates _SLSEventTapCreate _SLSWindowSetShadowProperties _SLSSetWindowType
+Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSNewWindowWithOpaqueShape _SLSSetMenuBars _SLSCopyDevicesDictionary _SLSCopyCoordinatedDistributedNotificationContinuationBlock _SLSShapeWindowInWindowCoordinates _SLSEventTapCreate _SLSWindowSetShadowProperties _SLSSetWindowType _SLSHWCaptureWindowList
 
 Binpatcher Build/SkyLight.patched Build/SkyLight.patched '
 # the transparency hack
@@ -146,7 +146,7 @@ function runWithTargetVersion
 
 	if test "$major" -eq 13
 	then
-		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit _SLSHWCaptureWindowList
+		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
 	fi
 
 	rm -rf Build/$major

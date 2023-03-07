@@ -117,12 +117,15 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 #if MAJOR>=13
 void SLSTransactionCommi$(void* rdi,int esi);
-NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
 #endif
+
+// renamed always now
+
+NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
+NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
 
 // more SL functions
 
-NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
 int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
 void SLSWindowSetActiveShadowLegacy(int edi,int esi);
 void SLSSetSurfaceLayerBackingOptions(int edi,int esi,int edx,double xmm0,double xmm1,double xmm2);

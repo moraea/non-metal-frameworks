@@ -475,15 +475,6 @@ void uninvertScreenshots(NSArray* result)
 	}
 }
 
-NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
-{
-	trace(@"SLSHWCaptureWindowList flags %x",ecx_flags);
-	
-	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
-	uninvertScreenshots(result);
-	return result;
-}
-
 // TODO: return
 
 void SLSTransactionWait(void* rdi)
