@@ -27,6 +27,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Ventura screenshot inverted colors research
 	- patch for downgraded QuartzCore crashes in Ventura
 	- CABL/CAPL blur hack research and code
+	- producing and testing builds for OCLP
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
