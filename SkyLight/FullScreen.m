@@ -11,21 +11,6 @@ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,un
 {
 	// trace(@"SLSHWCaptureWindowListInRect flags %x",ecx_flags);
 	
-	// TODO: hack, not sure why new AppKit is messing up the flags
-	// works, but we might sometimes want others...
-	
-	#define SHADOW 1
-	#define JUST_WINDOW 8
-	
-	if(ecx_flags&SHADOW)
-	{
-		ecx_flags=SHADOW|JUST_WINDOW;
-	}
-	else
-	{
-		ecx_flags=0;
-	}
-	
 	NSArray* result=SLSHWCaptureWindowLis$InRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 	uninvertScreenshots(result);
 	return result;
@@ -45,6 +30,21 @@ NSArray* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_
 	
 	CATransaction.commit;
 	CATransaction.flush;
+	
+	// TODO: hack, not sure why AppKit is messing up the flags
+	// works, but we might sometimes want others... look at this again soon
+	
+	#define SHADOW 1
+	#define JUST_WINDOW 8
+	
+	if(ecx_flags&SHADOW)
+	{
+		ecx_flags=SHADOW|JUST_WINDOW;
+	}
+	else
+	{
+		ecx_flags=0;
+	}
 	
 	return SLSHWCaptureWindowListInRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 }
