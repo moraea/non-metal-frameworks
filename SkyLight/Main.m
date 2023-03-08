@@ -16,10 +16,6 @@ BOOL isWindowServer;
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator2c.m"
-#import "DefenestratorAgnosticBlurs.m"
-#import "SafariHack.m"
-#import "Spin.m"
-#import "Books.m"
 #else
 #import "Defenestrator.m"
 #endif
@@ -44,12 +40,19 @@ BOOL isWindowServer;
 #import "Zoom.m"
 #import "Trackpad.m"
 #import "Plugins.m"
+#import "Spin.m"
+#import "Done.m"
 
 #if MAJOR==11
 #import "Photos.m"
-#else
+#endif
+#if MAJOR>=12
 #import "Cycle.m"
-#import "Done.m"
+#import "Books.m"
+#endif
+#if MAJOR>=13
+#import "DefenestratorAgnosticBlurs.m"
+#import "SafariHack.m"
 #endif
 
 #ifdef SENTIENT_PATCHER
@@ -87,16 +90,18 @@ BOOL isWindowServer;
 	pluginsSetup();
 	trackpadSetup();
 	
+	doneSetup();
+	
 #if MAJOR==11
 	photosSetup();
-#else
+#endif
+#if MAJOR>=12
 	cycleSetup();
-	doneSetup();
+	booksHackSetup();
 #endif
 #if MAJOR>=13
 	blursSetupNew();
 	safariHackSetup();
-	booksHackSetup();
 #endif
 }
 

@@ -1,18 +1,23 @@
 // credit EduCovas - implementation is required for fullscreen animation
 // AppKit "screenshots" the window to animate smoothly, similar to light/dark transition
 
-// TODO: working around a Renamer bug
-// TODO: move to D2C?
+NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags)
+{
+	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
 
 #if MAJOR>=13
+	uninvertScreenshots(result);
+#endif
+	
+	return result;
+}
 
-NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
 NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack)
 {
 	// trace(@"SLSHWCaptureWindowListInRect flags %x",ecx_flags);
 	
-	// TODO: hack, not sure why new AppKit is messing up the flags
-	// works, but we might sometimes want others...
+	// TODO: hack, not sure why AppKit is messing up the flags
+	// works, but we might sometimes want others... look at this again soon
 	
 	#define SHADOW 1
 	#define JUST_WINDOW 8
@@ -27,15 +32,13 @@ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,un
 	}
 	
 	NSArray* result=SLSHWCaptureWindowLis$InRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
+
+#if MAJOR>=13
 	uninvertScreenshots(result);
+#endif
+
 	return result;
 }
-
-#else
-
-NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
-
-#endif
 
 NSArray* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,int r8,CGRect stack)
 {

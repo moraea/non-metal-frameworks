@@ -27,6 +27,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- Ventura screenshot inverted colors research
 	- patch for downgraded QuartzCore crashes in Ventura
 	- CABL/CAPL blur hack research and code
+	- producing and testing builds for OCLP
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -49,11 +50,10 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
 	- most build scripts and stubbing/binpatching/swizzling utils
-    - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, various crashes)
+    - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, various crashes)
 	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books)
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
-	- unresponsive button fixes
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -87,6 +87,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-3-7
+- update fixes version scoping (brings buttons, books, fullscreen, splitscreen, etc. to Big Sur/Monterey)
 
 ### 2023-2-15
 - replace Catalyst buttons hack with a better (still awful) hack

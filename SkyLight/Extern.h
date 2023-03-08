@@ -113,12 +113,18 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 #endif
 
-// for Ventura D2C shims
+// renamed only for Ventura
 
-#if MAJOR >= 13
-
+#if MAJOR>=13
 void SLSTransactionCommi$(void* rdi,int esi);
+#endif
+
+// renamed always now
+
 NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
+NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
+
+// more SL functions
 
 int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
 void SLSWindowSetActiveShadowLegacy(int edi,int esi);
@@ -133,5 +139,3 @@ int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
 int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
 void SLSTileSpaceMoveSpacersForSize(long rdi,int esi,double xmm0,double xmm1);
 void SLSSpaceClientDrivenMoveSpacersToPoint(int edi_cid,long rsi_parentSpaceID,long rdx_tileSpaceID,long rcx_verticalIndex,long r8_horizontalIndex,int r9d_flags,double xmm0_location,double xmm1);
-
-#endif
