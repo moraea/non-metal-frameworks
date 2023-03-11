@@ -33,7 +33,6 @@ function build
 
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
-	# echo "current $current compatibility $compatibility"
 
 	if test -n "$SENTIENT_PATCHER"
 	then
@@ -147,6 +146,9 @@ function runWithTargetVersion
 	if test "$major" -eq 13
 	then
 		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
+		Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
+	else
+		cp $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched
 	fi
 
 	rm -rf Build/$major
@@ -154,8 +156,8 @@ function runWithTargetVersion
 
 	build Build/SkyLight.patched $binaries/$major.*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
 	build Build/CoreDisplay.patched $binaries/$major.*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
-	build $binaries/10.15.7*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe
-	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2
+	build Build/IOSurface.cat.patched $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe -DCAT
+	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2 -DMOJ
 	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
 
 	# TODO: MOJ/CAT/BS (downgrade version) vs 11/12/13 (target version) a bit confusing?
