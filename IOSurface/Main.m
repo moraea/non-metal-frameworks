@@ -4,9 +4,7 @@
 #ifdef CAT
 
 // TODO: downgrading IOSurface to 10.14.6 (TS2 patchset) fixes the underlying issue for me
-// but Edu can't replicate this on his identical Zoe...
-// confirmed with IOConnectCallMethod that i get 8192 after downgrading, he still gets INT_MAX
-// need to reverse IOSurface.kext, but it's quite opaque...
+// but Edu can't replicate this on his identical Zoe... should reverse IOSurface.kext
 
 size_t IOSurfaceGetPropertyMaximu$(CFStringRef);
 
