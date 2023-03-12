@@ -88,6 +88,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-3-11
+- workaround Safari 16.4 blank windows when focused
+
 ### 2023-3-7
 - update fixes version scoping (brings buttons, books, fullscreen, splitscreen, etc. to Big Sur/Monterey)
 
