@@ -124,7 +124,7 @@ void SLSTransactionCommi$(void* rdi,int esi);
 NSArray* SLSHWCaptureWindowLis$(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags);
 NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack);
 
-// more SL functions
+// TODO: dumped here by Amy for Ventura stuff, sort
 
 int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
 void SLSWindowSetActiveShadowLegacy(int edi,int esi);
@@ -139,3 +139,11 @@ int SLSAddWindowToWindowMovementGroup(int edi,int esi,int edx);
 int SLSRemoveWindowFromWindowMovementGroup(int edi,int esi,int edx);
 void SLSTileSpaceMoveSpacersForSize(long rdi,int esi,double xmm0,double xmm1);
 void SLSSpaceClientDrivenMoveSpacersToPoint(int edi_cid,long rsi_parentSpaceID,long rdx_tileSpaceID,long rcx_verticalIndex,long r8_horizontalIndex,int r9d_flags,double xmm0_location,double xmm1);
+
+CGContextRef SLWindowContextCreate(int,int,CFDictionaryRef);
+CGImageRef SLWindowContextCreateImage(CGContextRef);
+int SLSNewWindow(int edi_cid,int esi_backing,void* rdx_region,int* rcx_widOut,double xmm0,double xmm1);
+void SLSReleaseWindow(int edi_cid,int esi_wid);
+int SLSSetWindowOpaqueShape(int edi_cid,int esi_wid,void* rdx_region);
+int SLSSetWindowOpacity(int edi_cid,int esi_wid,BOOL dl_opaque);
+int CGSNewRegionWithRect(CGRect* rdi_rect,void* rsi_regionOut);

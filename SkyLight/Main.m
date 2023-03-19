@@ -29,6 +29,7 @@ BOOL isWindowServer;
 #import "Grey.m"
 #import "Hidd.m"
 #import "MenuBar.m"
+#import "MenuBar2.m"
 #import "Occlusion.m"
 #import "Rim.m"
 #import "Scroll.m"

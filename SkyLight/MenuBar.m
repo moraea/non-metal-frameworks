@@ -5,6 +5,10 @@
 #define MENUBAR_KEY_RADIUS @"Moraea.MenuBar.Radius"
 #define MENUBAR_KEY_SATURATION @"Moraea.MenuBar.Saturation"
 
+#define MENUBAR_PILL_RADIUS 4
+#define MENUBAR_PILL_ALPHA_DARK 0.1
+#define MENUBAR_PILL_ALPHA_LIGHT 0.25
+
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
 BOOL styleIsDark()
@@ -64,14 +68,16 @@ void SLSTransactionSystemStatusBarSetSelectedContentFrame(unsigned long rdi_tran
 	else
 	{
 		// TODO: totally guessed
+		
 		CGColorRef fillBase=CGColorGetConstantColor(styleIsDark()?kCGColorBlack:kCGColorWhite);
-		float fillAlpha=styleIsDark()?0.1:0.25;
+		float fillAlpha=styleIsDark()?MENUBAR_PILL_ALPHA_DARK:MENUBAR_PILL_ALPHA_LIGHT;
 		CGColorRef fillColor=CGColorCreateCopyWithAlpha(fillBase,fillAlpha);
 		layer.backgroundColor=fillColor;
 		CFRelease(fillColor);
 		
 		// sort of measured from Catherine's screenshot
-		layer.cornerRadius=3.5;
+		
+		layer.cornerRadius=MENUBAR_PILL_RADIUS;
 	}
 }
 
@@ -82,10 +88,20 @@ const NSString* kSLMenuBarImageWindowLightKey=@"kSLMenuBarImageWindowLight";
 const NSString* kSLMenuBarInactiveImageWindowDarkKey=@"kSLMenuBarInactiveImageWindowDark";
 const NSString* kSLMenuBarInactiveImageWindowLightKey=@"kSLMenuBarInactiveImageWindowLight";
 
+// TODO: temporarily separated
+
+int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
+BOOL useMenuBar2();
+
 // intercept from HIToolbox MenuBarInstance::SetServerBounds()
 
 unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_array,NSMutableDictionary* rdx_dict)
 {
+	if(useMenuBar2())
+	{
+		return menuBar2Set(edi_connectionID,rsi_array,rdx_dict);
+	}
+	
 	// emulate the new highlight color
 	// TODO: strings may be defined somewhere
 	// TODO: obviously better to do via CALayer if possible
