@@ -53,6 +53,7 @@ BOOL isWindowServer;
 #if MAJOR>=13
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
+#import "Logic.m"
 #endif
 
 #ifdef SENTIENT_PATCHER
@@ -102,6 +103,7 @@ BOOL isWindowServer;
 #if MAJOR>=13
 	blursSetupNew();
 	safariHackSetup();
+	logicHackSetup();
 #endif
 }
 
