@@ -143,13 +143,8 @@ function runWithTargetVersion
 	major=$1
 	echo begin $major
 
-	if test "$major" -eq 13
-	then
-		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
-		Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
-	else
-		cp $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched
-	fi
+	Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
+	Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
 
 	rm -rf Build/$major
 	mkdir Build/$major
