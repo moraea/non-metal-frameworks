@@ -8,11 +8,25 @@
 #define MENUBAR_PILL_RADIUS 4
 #define MENUBAR_PILL_ALPHA_DARK 0.1
 #define MENUBAR_PILL_ALPHA_LIGHT 0.25
+#define MENUBAR_HEIGHT 24
+#define MENUBAR_WALLPAPER_THRESHOLD 0.5
+
+// TODO: temporarily separated
+
+BOOL useMenuBar2();
+int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
+void menuBar2UnconditionalSetup();
+BOOL menuBar2ReadDark();
 
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
 BOOL styleIsDark()
 {
+	if(useMenuBar2())
+	{
+		return menuBar2ReadDark();
+	}
+	
 	// NSUserDefaults is unavailable in early boot
 	
 	dispatch_once(&styleIsDarkOnce,^()
@@ -87,11 +101,6 @@ const NSString* kSLMenuBarImageWindowDarkKey=@"kSLMenuBarImageWindowDark";
 const NSString* kSLMenuBarImageWindowLightKey=@"kSLMenuBarImageWindowLight";
 const NSString* kSLMenuBarInactiveImageWindowDarkKey=@"kSLMenuBarInactiveImageWindowDark";
 const NSString* kSLMenuBarInactiveImageWindowLightKey=@"kSLMenuBarInactiveImageWindowLight";
-
-// TODO: temporarily separated
-
-int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
-BOOL useMenuBar2();
 
 // intercept from HIToolbox MenuBarInstance::SetServerBounds()
 
@@ -416,4 +425,6 @@ void menuBarSetup()
 	menuBarOverrideSetup();
 	
 	swizzleImp(@"NSStatusItem",@"setLength:",true,(IMP)fake_setLength,(IMP*)&real_setLength);
+	
+	menuBar2UnconditionalSetup();
 }

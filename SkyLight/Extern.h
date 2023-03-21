@@ -84,6 +84,7 @@ extern const NSString* kCGMenuBarTitleMaterialKey;
 extern const NSString* kCGMenuBarActiveMaterialKey;
 extern const NSString* kCGMenuBarImageWindowKey;
 extern const NSString* kCGMenuBarInactiveImageWindowKey;
+extern const NSString* kCGMenuBarMenuTitlesArrayKey;
 
 // HIServices private
 // https://github.com/rcarmo/qsb-mac/blob/master/QuickSearchBox/externals/UndocumentedGoodness/CoreDock/CoreDockPrivate.h
@@ -147,3 +148,13 @@ void SLSReleaseWindow(int edi_cid,int esi_wid);
 int SLSSetWindowOpaqueShape(int edi_cid,int esi_wid,void* rdx_region);
 int SLSSetWindowOpacity(int edi_cid,int esi_wid,BOOL dl_opaque);
 int CGSNewRegionWithRect(CGRect* rdi_rect,void* rsi_regionOut);
+
+NSDictionary* SLSCopyCurrentSessionDictionary();
+void SLSSetDictionaryForCurrentSession(NSDictionary*);
+void* SLSWindowQueryCreate(int edi);
+void* SLSWindowQueryRun(int edi_cid,void* rsi_query,int edx);
+void* SLSWindowQueryResultCopyWindows(void* rdi_result);
+long SLSWindowIteratorGetCount(void* rdi_iterator);
+int SLSWindowIteratorGetWindowID(void* rdi_iterator,long rsi_index);
+long SLSWindowIteratorGetTags(void* rdi_iterator,long rsi_index);
+int SLSWindowIteratorGetPID(void* rdi_iterator,long rsi_index);
