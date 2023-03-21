@@ -138,13 +138,17 @@ Binpatcher Build/CoreDisplay.patched Build/CoreDisplay.patched '
 set 0x7e53f
 write 0xe9c5feffff'
 
+Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
+
 function runWithTargetVersion
 {
 	major=$1
 	echo begin $major
 
-	Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
-	Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
+	if test "$major" -eq 13
+	then
+		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
+	fi
 
 	rm -rf Build/$major
 	mkdir Build/$major
