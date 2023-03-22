@@ -212,7 +212,7 @@ void menuBar2DockRecalculate()
 	BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
 	
 	menuBar2WriteDark(darkText);
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"Amy.MenuBar2.DarkTextChanged" object:nil userInfo:nil];
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"Amy.MenuBar2.DarkTextChanged" object:nil userInfo:nil deliverImmediately:true];
 }
 
 void menuBar2UnconditionalSetup()
@@ -239,6 +239,8 @@ void menuBar2UnconditionalSetup()
 	
 	[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"Amy.MenuBar2.DarkTextChanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 	{
+		trace(@"mb2 got change notification");
+		
 		menuBar2SendCached();
 		
 		// TODO: hack to avoid code duplication with MB1
