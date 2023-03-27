@@ -43,6 +43,23 @@ BOOL useMenuBar2()
 	return useMenuBar2Value;
 }
 
+void menuBar2ConfigurePillLayer(CALayer* layer,BOOL dark)
+{
+	CGColorRef color;
+	if(dark)
+	{
+		color=CGColorCreateGenericRGB(0,0,0,MENUBAR_PILL_ALPHA_DARK);
+	}
+	else
+	{
+		color=CGColorCreateGenericRGB(1,1,1,MENUBAR_PILL_ALPHA_LIGHT);
+	}
+	layer.backgroundColor=color;
+	CFRelease(color);
+	layer.cornerCurve=kCACornerCurveContinuous;
+	layer.cornerRadius=MENUBAR_PILL_RADIUS;
+}
+
 NSMutableArray<NSMutableDictionary*>* menuBar2ArrayCache=nil;
 NSMutableDictionary* menuBar2DictCache=nil;
 
@@ -120,13 +137,23 @@ void menuBar2SendCached()
 			SLSNewWindow(cid,2,realRegion,&fakeWid,0,0);
 			CFRelease(realRegion);
 			SLSSetWindowOpacity(cid,fakeWid,false);
-			SLSWindowSetShadowProperties(fakeWid,@{});
 			
 			fakeContext=SLWindowContextCreate(cid,fakeWid,NULL);
 			
 			menuBar2Wids[key]=[NSNumber numberWithInt:fakeWid];
 			menuBar2Contexts[key]=(NSObject*)fakeContext;
 			CFRelease(fakeContext);
+		}
+		
+		if(displayDark)
+		{
+			SLSWindowSetShadowProperties(fakeWid,@{});
+		}
+		else
+		{
+			// values from NSStatusBarContentView setHasCAShadow:
+			
+			SLSWindowSetShadowProperties(fakeWid,@{@"com.apple.WindowShadowRadiusInactive":@2.5,@"com.apple.WindowShadowDensityInactive":@0.3,@"com.apple.WindowShadowVerticalOffsetInactive":@1.75});
 		}
 		
 		CGContextClearRect(fakeContext,realRect);
@@ -137,19 +164,7 @@ void menuBar2SendCached()
 			CALayer* layer=CALayer.layer;
 			layer.bounds=*(CGRect*)title.bytes;
 			
-			CGColorRef color;
-			if(displayDark)
-			{
-				color=CGColorCreateGenericRGB(0,0,0,MENUBAR_PILL_ALPHA_DARK);
-			}
-			else
-			{
-				color=CGColorCreateGenericRGB(1,1,1,MENUBAR_PILL_ALPHA_LIGHT);
-			}
-			layer.backgroundColor=color;
-			CFRelease(color);
-			layer.cornerCurve=kCACornerCurveContinuous;
-			layer.cornerRadius=MENUBAR_PILL_RADIUS;
+			menuBar2ConfigurePillLayer(layer,displayDark);
 			
 			[layer renderInContext:fakeContext];
 		}
@@ -370,4 +385,27 @@ NSDictionary* menuBar2CopyMetrics()
 	// don't autorelease because *Copy*
 	
 	return result;
+}
+
+void menuBar2SetRightSideSelection(void* rdi_transaction,int esi_wid,CGRect stack_rect)
+{
+	CALayer* layer=defenestratorGetWrapper(esi_wid).context.layer;
+	
+	CATransaction.begin;
+	CATransaction.animationDuration=0;
+	if(NSIsEmptyRect(stack_rect))
+	{
+		layer.backgroundColor=CGColorGetConstantColor(kCGColorClear);
+	}
+	else
+	{
+		CGRect frame=CGRectZero;
+		SLSGetWindowBounds(SLSMainConnectionID(),esi_wid,&frame);
+		int display=0;
+		int count=0;
+		SLSGetDisplaysWithRect(&frame,1,&display,&count);
+		
+		menuBar2ConfigurePillLayer(layer,menuBar2ReadDark(display));
+	}
+	CATransaction.commit;
 }

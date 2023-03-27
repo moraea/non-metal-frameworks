@@ -164,3 +164,5 @@ long SLSWindowIteratorGetSpaceAttributes(void* rdi_iterator,long rsi_index);
 void SLSWindowIteratorGetScreenRect(CGRect* rdi_out,void* rsi_iterator,long rsi_index);
 NSArray<NSDictionary*>* SLSCopyManagedDisplaySpaces(int edi_cid);
 int SLSGetDisplayForUUID(CFUUIDRef rdi_uuid);
+int SLSGetDisplaysWithRect(CGRect* rdi_rect,int esi_count,int* rdx_listOut,int* rcx_countOut);
+int SLSGetWindowBounds(int edi_cid,int esi_wid,CGRect* rdx_rectOut);

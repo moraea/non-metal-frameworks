@@ -18,6 +18,7 @@ BOOL useMenuBar2();
 int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
 void menuBar2UnconditionalSetup();
 NSDictionary* menuBar2CopyMetrics();
+void menuBar2SetRightSideSelection(void*,int,CGRect);
 
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
@@ -69,6 +70,12 @@ void SLSTransactionSystemStatusBarUnregisterWindow(unsigned long rdi_transaction
 
 void SLSTransactionSystemStatusBarSetSelectedContentFrame(unsigned long rdi_transaction,unsigned int esi_windowID,CGRect stack_rect)
 {
+	if(useMenuBar2())
+	{
+		menuBar2SetRightSideSelection(rdi_transaction,esi_windowID,stack_rect);
+		return;
+	}
+	
 	CALayer* layer=wrapperForWindow(esi_windowID).context.layer;
 	
 	if(NSIsEmptyRect(stack_rect))
