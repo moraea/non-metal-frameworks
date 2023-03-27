@@ -106,7 +106,7 @@ void menuBar2SendCached()
 			[layer renderInContext:menuBar2Context];
 		}
 		
-		// prevent stock material-based title rects
+		// prevent stock material-based title rects (Big Sur)
 		
 		bar[kCGMenuBarMenuTitlesArrayKey]=nil;
 		
@@ -227,11 +227,21 @@ void menuBar2UnconditionalSetup()
 		return;
 	}
 	
+	if(!useMenuBar2())
+	{
+		return;
+	}
+	
 	if([process containsString:@"Dock.app/Contents/MacOS/Dock"])
 	{
 		[NSNotificationCenter.defaultCenter addObserverForName:@"desktoppicturechanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			menuBar2DockRecalculate();
+			// TODO: handle the fade time in auto changing wallpapers... not ideal
+			
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
+			{
+				menuBar2DockRecalculate();
+			});
 		}];
 		
 		return;
@@ -239,8 +249,6 @@ void menuBar2UnconditionalSetup()
 	
 	[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"Amy.MenuBar2.DarkTextChanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 	{
-		trace(@"mb2 got change notification");
-		
 		menuBar2SendCached();
 		
 		// TODO: hack to avoid code duplication with MB1

@@ -10,6 +10,7 @@
 #define MENUBAR_PILL_ALPHA_LIGHT 0.25
 #define MENUBAR_HEIGHT 24
 #define MENUBAR_WALLPAPER_THRESHOLD 0.5
+#define MENUBAR_WALLPAPER_DELAY 2
 
 // TODO: temporarily separated
 
