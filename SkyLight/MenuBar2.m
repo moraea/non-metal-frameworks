@@ -392,7 +392,7 @@ NSDictionary* menuBar2CopyMetrics()
 
 void menuBar2SetRightSideSelection(void* rdi_transaction,int esi_wid,CGRect stack_rect)
 {
-	CALayer* layer=defenestratorGetWrapper(esi_wid).context.layer;
+	CALayer* layer=wrapperForWindow(esi_wid).context.layer;
 	
 	CATransaction.begin;
 	CATransaction.animationDuration=0;
