@@ -57,6 +57,7 @@ void menuBar2SendCached()
 	}
 
 	int cid=SLSMainConnectionID();
+	
 	NSMutableArray<NSMutableDictionary*>* array=menuBar2ArrayCache;
 	NSMutableDictionary* dict=menuBar2DictCache;
 	
@@ -64,9 +65,37 @@ void menuBar2SendCached()
 	
 	dict[kCGMenuBarActiveMaterialKey]=@"Light";
 	
+	NSArray<NSDictionary*>* spaceInfo=SLSCopyManagedDisplaySpaces(cid);
+	
 	for(NSMutableDictionary* bar in array)
 	{
+		// TODO: some string keys i can't be bothered looking for right now
+		
 		NSNumber* key=bar[kCGMenuBarDisplayIDKey];
+		if(!key)
+		{
+			int displayID=-1;
+			for(NSDictionary* display in spaceInfo)
+			{
+				NSArray<NSDictionary*>* spaces=display[@"Spaces"];
+				for(NSDictionary* space in spaces)
+				{
+					if([space[@"ManagedSpaceID"] isEqual:bar[kCGMenuBarSpaceIDKey]])
+					{
+						CFUUIDRef uuid=CFUUIDCreateFromString(NULL,(CFStringRef)display[@"Display Identifier"]);
+						displayID=SLSGetDisplayForUUID(uuid);
+						CFRelease(uuid);
+						break;
+					}
+				}
+				if(displayID!=-1)
+				{
+					break;
+				}
+			}
+			assert(displayID!=-1);
+			key=[NSNumber numberWithInt:displayID];
+		}
 		
 		BOOL displayDark=menuBar2ReadDark(key.intValue);
 		
@@ -137,6 +166,8 @@ void menuBar2SendCached()
 		bar[kCGMenuBarImageWindowKey]=[NSNumber numberWithInt:fakeWid];
 		bar[kCGMenuBarInactiveImageWindowKey]=bar[displayDark?kSLMenuBarInactiveImageWindowDarkKey:kSLMenuBarInactiveImageWindowLightKey];
 	}
+	
+	spaceInfo.release;
 	
 	SLSSetMenuBar$(cid,array,dict);
 }

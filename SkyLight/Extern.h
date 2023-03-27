@@ -86,6 +86,7 @@ extern const NSString* kCGMenuBarImageWindowKey;
 extern const NSString* kCGMenuBarInactiveImageWindowKey;
 extern const NSString* kCGMenuBarMenuTitlesArrayKey;
 extern const NSString* kCGMenuBarDisplayIDKey;
+extern const NSString* kCGMenuBarSpaceIDKey;
 
 // HIServices private
 // https://github.com/rcarmo/qsb-mac/blob/master/QuickSearchBox/externals/UndocumentedGoodness/CoreDock/CoreDockPrivate.h
@@ -161,3 +162,5 @@ long SLSWindowIteratorGetTags(void* rdi_iterator,long rsi_index);
 int SLSWindowIteratorGetPID(void* rdi_iterator,long rsi_index);
 long SLSWindowIteratorGetSpaceAttributes(void* rdi_iterator,long rsi_index);
 void SLSWindowIteratorGetScreenRect(CGRect* rdi_out,void* rsi_iterator,long rsi_index);
+NSArray<NSDictionary*>* SLSCopyManagedDisplaySpaces(int edi_cid);
+int SLSGetDisplayForUUID(CFUUIDRef rdi_uuid);
