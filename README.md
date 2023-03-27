@@ -224,6 +224,5 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
 - fix Maps
 - fix Photo Booth (workaround: use Big Sur version)
-- automatically color menu bar text (workaround: `defaults write -g Moraea_DarkMenuBar -bool true`)
 - fix Migration Assistant
 - fix "Move to Display"
