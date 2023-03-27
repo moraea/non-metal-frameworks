@@ -89,7 +89,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ## changes
 
 ### 2023-3-27
-- implement automatic light/dark menubar text and rounded selections (`defaults write -g Amy.MenuBar2Beta -bool true`, probably buggy)
+- implement automatic light/dark menubar text based on average wallpaper brightness, rounded selections, and text shadows (`defaults write -g Amy.MenuBar2Beta -bool true` to enable, will be on by default after further testing)
 
 ### 2023-3-15
 - add Logic Pro playhead hack (`defaults write -g Moraea.LogicPlayheadHack -bool true` to enable)
