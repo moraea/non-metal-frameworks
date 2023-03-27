@@ -1,30 +1,34 @@
 // testing some new menu bar hacks (proper selections, auto text color)
-// TODO: currently very pre-alpha quality, spaghetti-ed, slow, no support for dual monitors, etc
+// TODO: currently very pre-alpha quality!
+
+#define MENUBAR_DARK_FORMAT @"Amy.MenuBar2.DarkText.%d"
+#define MENUBAR_DARK_NOTE @"Amy.MenuBar2.DarkTextChanged"
+#define MENUBAR_KEY_BETA @"Amy.MenuBar2Beta"
 
 // forward Rim.m
 
 void SLSWindowSetShadowProperties(unsigned int,NSDictionary*);
 
-// TODO: per screen
-
-int menuBar2Wid=0;
-CGContextRef menuBar2Context=NULL;
-
 // cheat at shared state using the session storage
 
-void menuBar2WriteDark(BOOL value)
+NSString* menuBar2KeyWithDisplay(int display)
+{
+	return [NSString stringWithFormat:MENUBAR_DARK_FORMAT,display];
+}
+
+void menuBar2WriteDark(BOOL value,int display)
 {
 	NSMutableDictionary* dict=((NSMutableDictionary*)SLSCopyCurrentSessionDictionary().autorelease.mutableCopy).autorelease;
-	dict[@"Amy.MenuBar2.DarkText"]=[NSNumber numberWithBool:value];
+	dict[menuBar2KeyWithDisplay(display)]=[NSNumber numberWithBool:value];
 	SLSSetDictionaryForCurrentSession(dict);
 }
 
-BOOL menuBar2ReadDark()
+BOOL menuBar2ReadDark(int display)
 {
 	// TODO: cache, only update when receiving notification
 	
 	NSDictionary* dict=SLSCopyCurrentSessionDictionary().autorelease;
-	return ((NSNumber*)dict[@"Amy.MenuBar2.DarkText"]).boolValue;
+	return ((NSNumber*)dict[menuBar2KeyWithDisplay(display)]).boolValue;
 }
 
 BOOL useMenuBar2Value;
@@ -33,7 +37,7 @@ BOOL useMenuBar2()
 {
 	dispatch_once(&useMenuBar2Once,^()
 	{
-		useMenuBar2Value=[NSUserDefaults.standardUserDefaults boolForKey:@"Amy.MenuBar2Beta"];
+		useMenuBar2Value=[NSUserDefaults.standardUserDefaults boolForKey:MENUBAR_KEY_BETA];
 	});
 	
 	return useMenuBar2Value;
@@ -41,6 +45,9 @@ BOOL useMenuBar2()
 
 NSMutableArray<NSMutableDictionary*>* menuBar2ArrayCache=nil;
 NSMutableDictionary* menuBar2DictCache=nil;
+
+NSMutableDictionary<NSNumber*,NSNumber*>* menuBar2Wids;
+NSMutableDictionary<NSNumber*,NSObject*>* menuBar2Contexts;
 
 void menuBar2SendCached()
 {
@@ -59,29 +66,41 @@ void menuBar2SendCached()
 	
 	for(NSMutableDictionary* bar in array)
 	{
-		int realWid=((NSNumber*)bar[styleIsDark()?kSLMenuBarImageWindowDarkKey:kSLMenuBarImageWindowLightKey]).intValue;
+		NSNumber* key=bar[kCGMenuBarDisplayIDKey];
+		
+		BOOL displayDark=menuBar2ReadDark(key.intValue);
+		
+		int realWid=((NSNumber*)bar[displayDark?kSLMenuBarImageWindowDarkKey:kSLMenuBarImageWindowLightKey]).intValue;
 		CGContextRef realContext=SLWindowContextCreate(SLSMainConnectionID(),realWid,0);
 		CGImageRef realImage=SLWindowContextCreateImage(realContext);
 		CFRelease(realContext);
 		
 		CGRect realRect=CGRectMake(0,0,CGImageGetWidth(realImage),CGImageGetHeight(realImage));
 		
-		if(menuBar2Wid==0)
+		int fakeWid;
+		CGContextRef fakeContext;
+		if(menuBar2Wids[key])
+		{
+			fakeWid=menuBar2Wids[key].intValue;
+			fakeContext=(CGContextRef)menuBar2Contexts[key];
+		}
+		else
 		{
 			void* realRegion;
 			CGSNewRegionWithRect(&realRect,&realRegion);
-			SLSNewWindow(cid,2,realRegion,&menuBar2Wid,0,0);
+			SLSNewWindow(cid,2,realRegion,&fakeWid,0,0);
 			CFRelease(realRegion);
-			SLSSetWindowOpacity(cid,menuBar2Wid,false);
+			SLSSetWindowOpacity(cid,fakeWid,false);
+			SLSWindowSetShadowProperties(fakeWid,@{});
 			
-			// TODO: mimic rather than clearing?
+			fakeContext=SLWindowContextCreate(cid,fakeWid,NULL);
 			
-			SLSWindowSetShadowProperties(menuBar2Wid,@{});
-			
-			menuBar2Context=SLWindowContextCreate(cid,menuBar2Wid,NULL);
+			menuBar2Wids[key]=[NSNumber numberWithInt:fakeWid];
+			menuBar2Contexts[key]=(NSObject*)fakeContext;
+			CFRelease(fakeContext);
 		}
 		
-		CGContextClearRect(menuBar2Context,realRect);
+		CGContextClearRect(fakeContext,realRect);
 		
 		NSArray<NSData*>* titles=bar[kCGMenuBarMenuTitlesArrayKey];
 		for(NSData* title in titles)
@@ -90,7 +109,7 @@ void menuBar2SendCached()
 			layer.bounds=*(CGRect*)title.bytes;
 			
 			CGColorRef color;
-			if(styleIsDark())
+			if(displayDark)
 			{
 				color=CGColorCreateGenericRGB(0,0,0,MENUBAR_PILL_ALPHA_DARK);
 			}
@@ -103,19 +122,20 @@ void menuBar2SendCached()
 			layer.cornerCurve=kCACornerCurveContinuous;
 			layer.cornerRadius=MENUBAR_PILL_RADIUS;
 			
-			[layer renderInContext:menuBar2Context];
+			[layer renderInContext:fakeContext];
 		}
 		
 		// prevent stock material-based title rects (Big Sur)
 		
 		bar[kCGMenuBarMenuTitlesArrayKey]=nil;
 		
-		CGContextDrawImage(menuBar2Context,realRect,realImage);
+		CGContextDrawImage(fakeContext,realRect,realImage);
 		CFRelease(realImage);
 		
-		CGContextFlush(menuBar2Context);
+		CGContextFlush(fakeContext);
 		
-		bar[kCGMenuBarImageWindowKey]=[NSNumber numberWithInt:menuBar2Wid];
+		bar[kCGMenuBarImageWindowKey]=[NSNumber numberWithInt:fakeWid];
+		bar[kCGMenuBarInactiveImageWindowKey]=bar[displayDark?kSLMenuBarInactiveImageWindowDarkKey:kSLMenuBarInactiveImageWindowLightKey];
 	}
 	
 	SLSSetMenuBar$(cid,array,dict);
@@ -137,8 +157,10 @@ int menuBar2Set(int edi_cid,NSMutableArray<NSMutableDictionary*>* rsi_array,NSMu
 	return 0;
 }
 
-void menuBar2DockRecalculate()
+void menuBar2DockRecalculateWithDisplay(CGDirectDisplayID display)
 {
+	CGRect displayFrame=CGDisplayBounds(display);
+	
 	int cid=SLSMainConnectionID();
 	
 	void* query=SLSWindowQueryCreate(0);
@@ -161,7 +183,20 @@ void menuBar2DockRecalculate()
 			continue;
 		}
 		
+		if(SLSWindowIteratorGetSpaceAttributes(iterator,index)!=5)
+		{
+			continue;
+		}
+		
+		CGRect windowRect;
+		SLSWindowIteratorGetScreenRect(&windowRect,iterator,index);
+		if(!CGRectEqualToRect(windowRect,displayFrame))
+		{
+			continue;
+		}
+		
 		wid=SLSWindowIteratorGetWindowID(iterator,index);
+		
 		break;
 	}
 	
@@ -208,11 +243,11 @@ void menuBar2DockRecalculate()
 	// TODO: i think it's supposed to be weighted by color based on perception?
 	
 	float brightness=(float)(redMean+greenMean+blueMean)/3/0xff;
-	trace(@"mb2 calculated brightness %f",brightness);
+	trace(@"MenuBar2 calculated brightness %f for display %d (%@)",brightness,display,NSStringFromRect(displayFrame));
 	BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
 	
-	menuBar2WriteDark(darkText);
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"Amy.MenuBar2.DarkTextChanged" object:nil userInfo:nil deliverImmediately:true];
+	menuBar2WriteDark(darkText,display);
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
 }
 
 void menuBar2UnconditionalSetup()
@@ -240,14 +275,17 @@ void menuBar2UnconditionalSetup()
 			
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
 			{
-				menuBar2DockRecalculate();
+				menuBar2DockRecalculateWithDisplay(((NSNumber*)note.userInfo[@"did"]).intValue);
 			});
 		}];
 		
 		return;
 	}
 	
-	[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"Amy.MenuBar2.DarkTextChanged" object:nil queue:nil usingBlock:^(NSNotification* note)
+	menuBar2Wids=NSMutableDictionary.alloc.init;
+	menuBar2Contexts=NSMutableDictionary.alloc.init;
+	
+	[NSDistributedNotificationCenter.defaultCenter addObserverForName:MENUBAR_DARK_NOTE object:nil queue:nil usingBlock:^(NSNotification* note)
 	{
 		menuBar2SendCached();
 		
@@ -255,4 +293,50 @@ void menuBar2UnconditionalSetup()
 		
 		statusBarSpaceCallback();
 	}];
+}
+
+// TODO: a lot of code duplication, but only until MB2 replaces MB1
+
+NSDictionary* menuBar2CopyMetrics()
+{
+	NSMutableDictionary* result=NSMutableDictionary.alloc.init;
+	
+	NSString* activeID=SLSCopyActiveMenuBarDisplayIdentifier(SLSMainConnectionID());
+	result[@"activeDisplayIdentifier"]=activeID;
+	activeID.release;
+	
+	int count;
+	SLSGetDisplayList(0,NULL,&count);
+	int* ids=malloc(sizeof(int)*count);
+	SLSGetDisplayList(count,ids,&count);
+	
+	NSMutableArray<NSDictionary*>* displays=NSMutableArray.alloc.init;
+	
+	for(int index=0;index<count;index++)
+	{
+		NSMutableDictionary* display=NSMutableDictionary.alloc.init;
+		
+		NSNumber* appearance=menuBar2ReadDark(ids[index])?@0:@1;
+		display[@"appearances"]=@[appearance];
+		display[@"currentAppearance"]=appearance;
+		
+		CFUUIDRef uuid;
+		SLSCopyDisplayUUID(ids[index],&uuid);
+		NSString* uuidString=(NSString*)CFUUIDCreateString(NULL,uuid);
+		CFRelease(uuid);
+		display[@"identifier"]=uuidString;
+		uuidString.release;
+		
+		[displays addObject:display];
+		display.release;
+	}
+	
+	free(ids);
+	
+	result[@"displays"]=displays;
+	displays.release;
+	
+	// don't autorelease because *Copy*
+	
+	return result;
 }

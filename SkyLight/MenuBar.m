@@ -17,17 +17,12 @@
 BOOL useMenuBar2();
 int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
 void menuBar2UnconditionalSetup();
-BOOL menuBar2ReadDark();
+NSDictionary* menuBar2CopyMetrics();
 
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
 BOOL styleIsDark()
 {
-	if(useMenuBar2())
-	{
-		return menuBar2ReadDark();
-	}
-	
 	// NSUserDefaults is unavailable in early boot
 	
 	dispatch_once(&styleIsDarkOnce,^()
@@ -151,6 +146,11 @@ unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_ar
 
 NSDictionary* SLSCopySystemStatusBarMetrics()
 {
+	if(useMenuBar2())
+	{
+		return menuBar2CopyMetrics();
+	}
+	
 	NSMutableDictionary* result=NSMutableDictionary.alloc.init;
 	
 	NSString* activeID=SLSCopyActiveMenuBarDisplayIdentifier(SLSMainConnectionID());
