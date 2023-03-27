@@ -5,6 +5,27 @@
 #define MENUBAR_KEY_RADIUS @"Moraea.MenuBar.Radius"
 #define MENUBAR_KEY_SATURATION @"Moraea.MenuBar.Saturation"
 
+#define MENUBAR_PILL_RADIUS 4
+#define MENUBAR_PILL_ALPHA_DARK 0.1
+#define MENUBAR_PILL_ALPHA_LIGHT 0.25
+#define MENUBAR_HEIGHT 24
+#define MENUBAR_WALLPAPER_THRESHOLD 0.57
+#define MENUBAR_WALLPAPER_DELAY 2
+
+// taken from SkyLight, slightly differs from values found online
+	
+#define LUMINANCE_RED 0.212648
+#define LUMINANCE_GREEN 0.715200
+#define LUMINANCE_BLUE 0.072200
+
+// TODO: temporarily separated
+
+BOOL useMenuBar2();
+int menuBar2Set(int,NSMutableArray*,NSMutableDictionary*);
+void menuBar2UnconditionalSetup();
+NSDictionary* menuBar2CopyMetrics();
+void menuBar2SetRightSideSelection(void*,int,CGRect);
+
 BOOL styleIsDarkValue;
 dispatch_once_t styleIsDarkOnce;
 BOOL styleIsDark()
@@ -55,6 +76,12 @@ void SLSTransactionSystemStatusBarUnregisterWindow(unsigned long rdi_transaction
 
 void SLSTransactionSystemStatusBarSetSelectedContentFrame(unsigned long rdi_transaction,unsigned int esi_windowID,CGRect stack_rect)
 {
+	if(useMenuBar2())
+	{
+		menuBar2SetRightSideSelection(rdi_transaction,esi_windowID,stack_rect);
+		return;
+	}
+	
 	CALayer* layer=wrapperForWindow(esi_windowID).context.layer;
 	
 	if(NSIsEmptyRect(stack_rect))
@@ -64,14 +91,16 @@ void SLSTransactionSystemStatusBarSetSelectedContentFrame(unsigned long rdi_tran
 	else
 	{
 		// TODO: totally guessed
+		
 		CGColorRef fillBase=CGColorGetConstantColor(styleIsDark()?kCGColorBlack:kCGColorWhite);
-		float fillAlpha=styleIsDark()?0.1:0.25;
+		float fillAlpha=styleIsDark()?MENUBAR_PILL_ALPHA_DARK:MENUBAR_PILL_ALPHA_LIGHT;
 		CGColorRef fillColor=CGColorCreateCopyWithAlpha(fillBase,fillAlpha);
 		layer.backgroundColor=fillColor;
 		CFRelease(fillColor);
 		
 		// sort of measured from Catherine's screenshot
-		layer.cornerRadius=3.5;
+		
+		layer.cornerRadius=MENUBAR_PILL_RADIUS;
 	}
 }
 
@@ -86,6 +115,11 @@ const NSString* kSLMenuBarInactiveImageWindowLightKey=@"kSLMenuBarInactiveImageW
 
 unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_array,NSMutableDictionary* rdx_dict)
 {
+	if(useMenuBar2())
+	{
+		return menuBar2Set(edi_connectionID,rsi_array,rdx_dict);
+	}
+	
 	// emulate the new highlight color
 	// TODO: strings may be defined somewhere
 	// TODO: obviously better to do via CALayer if possible
@@ -125,6 +159,11 @@ unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_ar
 
 NSDictionary* SLSCopySystemStatusBarMetrics()
 {
+	if(useMenuBar2())
+	{
+		return menuBar2CopyMetrics();
+	}
+	
 	NSMutableDictionary* result=NSMutableDictionary.alloc.init;
 	
 	NSString* activeID=SLSCopyActiveMenuBarDisplayIdentifier(SLSMainConnectionID());
@@ -341,17 +380,12 @@ void menuBarSaturationOverrideSetup(char* base)
 	}
 	
 	// math credit http://www.graficaobscura.com/matrix/index.html
-	// these values from SL (slightly differ)
 	
-	float rw=0.212648;
-	float gw=0.715200;
-	float bw=0.072200;
-	
-	float b=(1.0-value)*rw;
+	float b=(1.0-value)*LUMINANCE_RED;
 	float a=b+value;
-	float d=(1.0-value)*gw;
+	float d=(1.0-value)*LUMINANCE_GREEN;
 	float e=d+value;
-	float g=(1.0-value)*bw;
+	float g=(1.0-value)*LUMINANCE_BLUE;
 	float i=g+value;
 	float matrix[12]={a,d,g,0.0,b,e,g,0.0,b,d,i,0.0};
 	
@@ -400,4 +434,6 @@ void menuBarSetup()
 	menuBarOverrideSetup();
 	
 	swizzleImp(@"NSStatusItem",@"setLength:",true,(IMP)fake_setLength,(IMP*)&real_setLength);
+	
+	menuBar2UnconditionalSetup();
 }
