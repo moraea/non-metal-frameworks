@@ -253,7 +253,14 @@ void menuBar2DockRecalculateWithDisplay(CGDirectDisplayID display)
 	CFRelease(iterator);
 	
 	NSArray* screenshots=SLSHWCaptureWindowList(cid,&wid,1,0);
-	assert(screenshots.count==1);
+	if(screenshots.count!=1)
+	{
+		// TODO: should probably retry later since the color might be wrong now
+		
+		trace(@"MenuBar2 failed to capture screenshot for wid %d (non-fatal, but brightness may be out of date)",wid);
+		return;
+	}
+	
 	CGImageRef screenshot=(CGImageRef)screenshots[0];
 	
 	NSData* data=(NSData*)CGDataProviderCopyData(CGImageGetDataProvider(screenshot));
