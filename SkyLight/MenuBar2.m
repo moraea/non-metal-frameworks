@@ -1,7 +1,6 @@
 // new menu bar hacks (proper selections, auto text color)
 // TODO: test thoroughly, then enable by default, then replace MenuBar entirely
 // TODO: correct bar background on fullscreen windows
-// TODO: tweak color threshold to exactly match Metal
 
 #define MENUBAR_DARK_FORMAT @"Amy.MenuBar2.DarkText.%d"
 #define MENUBAR_DARK_NOTE @"Amy.MenuBar2.DarkTextChanged"
