@@ -9,8 +9,14 @@
 #define MENUBAR_PILL_ALPHA_DARK 0.1
 #define MENUBAR_PILL_ALPHA_LIGHT 0.25
 #define MENUBAR_HEIGHT 24
-#define MENUBAR_WALLPAPER_THRESHOLD 0.5
+#define MENUBAR_WALLPAPER_THRESHOLD 0.57
 #define MENUBAR_WALLPAPER_DELAY 2
+
+// taken from SkyLight, slightly differs from values found online
+	
+#define LUMINANCE_RED 0.212648
+#define LUMINANCE_GREEN 0.715200
+#define LUMINANCE_BLUE 0.072200
 
 // TODO: temporarily separated
 
@@ -374,17 +380,12 @@ void menuBarSaturationOverrideSetup(char* base)
 	}
 	
 	// math credit http://www.graficaobscura.com/matrix/index.html
-	// these values from SL (slightly differ)
 	
-	float rw=0.212648;
-	float gw=0.715200;
-	float bw=0.072200;
-	
-	float b=(1.0-value)*rw;
+	float b=(1.0-value)*LUMINANCE_RED;
 	float a=b+value;
-	float d=(1.0-value)*gw;
+	float d=(1.0-value)*LUMINANCE_GREEN;
 	float e=d+value;
-	float g=(1.0-value)*bw;
+	float g=(1.0-value)*LUMINANCE_BLUE;
 	float i=g+value;
 	float matrix[12]={a,d,g,0.0,b,e,g,0.0,b,d,i,0.0};
 	

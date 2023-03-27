@@ -84,6 +84,10 @@ void menuBar2SendCached()
 	
 	dict[kCGMenuBarActiveMaterialKey]=@"Light";
 	
+	// prevent blue material selection (Big Sur)
+	
+	dict[kCGMenuBarTitleMaterialKey]=nil;
+	
 	NSArray<NSDictionary*>* spaceInfo=SLSCopyManagedDisplaySpaces(cid);
 	
 	for(NSMutableDictionary* bar in array)
@@ -170,10 +174,6 @@ void menuBar2SendCached()
 			
 			[layer renderInContext:fakeContext];
 		}
-		
-		// prevent stock material-based title rects (Big Sur)
-		
-		bar[kCGMenuBarMenuTitlesArrayKey]=nil;
 		
 		CGContextDrawImage(fakeContext,realRect,realImage);
 		CFRelease(realImage);
@@ -288,9 +288,11 @@ void menuBar2DockRecalculateWithDisplay(CGDirectDisplayID display)
 	int greenMean=greenSum/MENUBAR_HEIGHT/width;
 	int blueMean=blueSum/MENUBAR_HEIGHT/width;
 	
-	// TODO: i think it's supposed to be weighted by color based on perception?
+	// float brightness=(float)(redMean+greenMean+blueMean)/3/0xff;
+	// TODO: doesn't quite match Metal (at least one of solid cyan and the green M2 Air wallpaper
+	// will be incorrect no matter the threshold value...)
 	
-	float brightness=(float)(redMean+greenMean+blueMean)/3/0xff;
+	float brightness=(LUMINANCE_RED*redMean+LUMINANCE_GREEN*greenMean+LUMINANCE_BLUE*blueMean)/0xff;
 	trace(@"MenuBar2 calculated brightness %f for display %d (%@)",brightness,display,NSStringFromRect(displayFrame));
 	BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
 	
