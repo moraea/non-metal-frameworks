@@ -50,7 +50,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
 	- most build scripts and stubbing/binpatching/swizzling utils
-    - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, various crashes)
+    - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, sshd/cryptexd problem, various crashes)
 	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books, Logic)
 	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
@@ -87,6 +87,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-5-12
+- workaround `cryptexd`/`sshd` crashes due to SkyLight initializers
 
 ### 2023-3-27
 - implement automatic light/dark menubar text based on average wallpaper brightness, rounded selections, and text shadows (`defaults write -g Amy.MenuBar2Beta -bool true` to enable, will be on by default after further testing)
