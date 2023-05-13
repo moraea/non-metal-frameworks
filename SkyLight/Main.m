@@ -43,6 +43,7 @@ BOOL isWindowServer;
 #import "Plugins.m"
 #import "Spin.m"
 #import "Done.m"
+#import "Preflight.m"
 
 #if MAJOR==11
 #import "Photos.m"
