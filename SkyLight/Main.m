@@ -61,15 +61,20 @@ BOOL isWindowServer;
 #import "NightShift.m"
 #endif
 
-@interface Setup:NSObject
-@end
+#define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd"]
 
-@implementation Setup
-
-+(void)load
+__attribute__((constructor)) void load()
 {
-	earlyBoot=getpid()<200;
 	process=NSProcessInfo.processInfo.arguments[0];
+	if([processDenylist containsObject:process])
+	{
+		// entirely disable SL shims initializers for these processes
+		// this will completely break anything graphical!
+		
+		return;
+	}
+	
+	earlyBoot=getpid()<200;
 	isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
 	
 	if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
@@ -107,5 +112,3 @@ BOOL isWindowServer;
 	logicHackSetup();
 #endif
 }
-
-@end
