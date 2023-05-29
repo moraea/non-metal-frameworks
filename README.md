@@ -88,6 +88,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-5-29
+- replace `SLS*DockRectWithOrientation` implementation (fix incorrect orientation returned to root processes)
+
 ### 2023-5-12
 - workaround `cryptexd`/`sshd` crashes due to SkyLight initializers
 - stub `SL*Preflight*Access()` functions (fix screen recording regression)
