@@ -14,6 +14,7 @@ jobs:
     env:
       AUTO_TARGET: "12"
       AUTO_QC:     "Skip"
+      TERM:        "xterm-256color"
 
     steps:
       - uses: actions/checkout@v3
