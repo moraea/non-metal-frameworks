@@ -1,4 +1,4 @@
-name: Build Ventura Binaries
+name: Build Monterey Binaries
 
 on:
   push:
@@ -9,10 +9,10 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-13
+    runs-on: macos-12
 
     env:
-      AUTO_TARGET: "13"
+      AUTO_TARGET: "12"
       AUTO_QC:     "Skip"
 
     steps:
