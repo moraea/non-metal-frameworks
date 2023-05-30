@@ -67,16 +67,15 @@ void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
 
 void occlusionSetup()
 {
-	BOOL retry=!swizzleImp(@"NSWindow",@"_setWindowNumber:",true,(IMP)fake__setWindowNumber,(IMP*)&real__setWindowNumber);
+	BOOL appKitAvailable=swizzleImp(@"NSWindow",@"_setWindowNumber:",true,(IMP)fake__setWindowNumber,(IMP*)&real__setWindowNumber);
 	
-	if(!retry)
+	if(appKitAvailable)
 	{
 		swizzleImp(@"NSOcclusionDetectionView",@"validateNoOcclusionSinceToken:",true,(IMP)fake_validateNoOcclusionSinceToken,NULL);
 		swizzleImp(@"NSOcclusionDetectionView",@"isOccluded",true,(IMP)fake_isOccluded,NULL);
 		swizzleImp(@"NSOcclusionDetectionView",@"viewDidMoveToWindow",true,(IMP)fake_viewDidMoveToWindow,(IMP*)&real_viewDidMoveToWindow);
 	}
-	
-	if(retry)
+	else
 	{
 		[NSNotificationCenter.defaultCenter addObserverForName:@"NSApplicationWillFinishLaunchingNotification" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
