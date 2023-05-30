@@ -1,0 +1,23 @@
+name: Build Ventura Binaries
+
+on:
+  push:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-13
+
+    env:
+      AUTO_TARGET: "13"
+      AUTO_QC:     "Skip"
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Fetch dependencies
+        run: Dependancies.tool
+      - name: Build Ventura
+        run: Build.tool
