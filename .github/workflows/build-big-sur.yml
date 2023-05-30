@@ -23,3 +23,9 @@ jobs:
         run: /bin/zsh Dependencies.tool
       - name: Build
         run: /bin/zsh Build.tool
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: Big-Sur-Binaries
+          path: Build/11
