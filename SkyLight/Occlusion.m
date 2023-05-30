@@ -67,6 +67,11 @@ void fake_viewDidMoveToWindow(NSObject* rdi_self,SEL rsi_sel)
 
 void occlusionSetup()
 {
+	if(earlyBoot)
+	{
+		return;
+	}
+	
 	BOOL appKitAvailable=swizzleImp(@"NSWindow",@"_setWindowNumber:",true,(IMP)fake__setWindowNumber,(IMP*)&real__setWindowNumber);
 	
 	if(appKitAvailable)
