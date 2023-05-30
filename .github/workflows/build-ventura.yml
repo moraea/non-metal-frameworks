@@ -1,0 +1,31 @@
+name: Build Ventura Binaries
+
+on:
+  push:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-13
+
+    env:
+      AUTO_TARGET: "13"
+      AUTO_QC:     "Skip"
+      TERM:        "xterm-256color"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch dependencies
+        run: /bin/zsh Dependencies.tool
+      - name: Build
+        run: /bin/zsh Build.tool
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: Ventura-Binaries
+          path: Build/13
