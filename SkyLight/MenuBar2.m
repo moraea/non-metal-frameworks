@@ -91,40 +91,23 @@ void menuBar2SendCached()
 	
 	for(NSMutableDictionary* bar in array)
 	{
-		// TODO: some string keys i can't be bothered looking for right now
+		int aWid=((NSNumber*)bar[kSLMenuBarImageWindowDarkKey]).intValue;
 		
-		NSNumber* key=bar[kCGMenuBarDisplayIDKey];
-		if(!key)
+		CGRect aRect=CGRectZero;
+		SLSGetWindowBounds(SLSMainConnectionID(),aWid,&aRect);
+		
+		unsigned int display=-1;
+		unsigned int displayCount=0;
+		CGGetDisplaysWithRect(aRect,1,&display,&displayCount);
+		if(display==-1||displayCount!=1)
 		{
-			int displayID=-1;
-			for(NSDictionary* display in spaceInfo)
-			{
-				NSArray<NSDictionary*>* spaces=display[@"Spaces"];
-				for(NSDictionary* space in spaces)
-				{
-					if([space[@"ManagedSpaceID"] isEqual:bar[kCGMenuBarSpaceIDKey]])
-					{
-						CFUUIDRef uuid=CFUUIDCreateFromString(NULL,(CFStringRef)display[@"Display Identifier"]);
-						displayID=SLSGetDisplayForUUID(uuid);
-						CFRelease(uuid);
-						break;
-					}
-				}
-				if(displayID!=-1)
-				{
-					break;
-				}
-			}
-			
-			if(displayID==-1)
-			{
-				displayID=CGMainDisplayID();
-				trace(@"MenuBar2: failed finding display ID for space, fallback %d, bar: %@",displayID,bar);
-			}
-			
-			key=[NSNumber numberWithInt:displayID];
+			display=CGMainDisplayID();
+			trace(@"MenuBar2 (client): failed finding display for rect %@, count %d, fallback %d, bar: %@",NSStringFromRect(aRect),displayCount,display,bar);
 		}
 		
+		// trace(@"MenuBar2 (client): got display %d for rect %@",display,NSStringFromRect(aRect));
+		
+		NSNumber* key=key=[NSNumber numberWithInt:display];
 		BOOL displayDark=menuBar2ReadDark(key.intValue);
 		
 		int realWid=((NSNumber*)bar[displayDark?kSLMenuBarImageWindowDarkKey:kSLMenuBarImageWindowLightKey]).intValue;
