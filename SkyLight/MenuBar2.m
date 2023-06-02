@@ -210,105 +210,112 @@ int menuBar2Set(int edi_cid,NSMutableArray<NSMutableDictionary*>* rsi_array,NSMu
 	return 0;
 }
 
-void menuBar2DockRecalculateWithDisplay(CGDirectDisplayID display)
+void menuBar2DockRecalculate2()
 {
-	CGRect displayFrame=CGDisplayBounds(display);
-	
 	int cid=SLSMainConnectionID();
 	
-	void* query=SLSWindowQueryCreate(0);
-	void* result=SLSWindowQueryRun(cid,query,0);
-	void* iterator=SLSWindowQueryResultCopyWindows(result);
-	long iteratorCount=SLSWindowIteratorGetCount(iterator);
+	CFArrayRef windows=CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly,kCGNullWindowID);
 	
-	int wid=-1;
-	for(int index=0;index<iteratorCount;index++)
+	for(int index=0;index<CFArrayGetCount(windows);index++)
 	{
-		// TODO: experimentally determined, probably dumb but seems to work consistently
+		NSDictionary* info=(NSDictionary*)CFArrayGetValueAtIndex(windows,index);
 		
-		if(SLSWindowIteratorGetTags(iterator,index)!=0x6200000011200)
+		int pid=((NSNumber*)info[(NSString*)kCGWindowOwnerPID]).intValue;
+		if(pid!=getpid())
 		{
 			continue;
 		}
 		
-		if(SLSWindowIteratorGetPID(iterator,index)!=getpid())
+		NSString* name=info[(NSString*)kCGWindowName];
+		if(![name containsString:@"Desktop Picture"])
 		{
 			continue;
 		}
 		
-		if(SLSWindowIteratorGetSpaceAttributes(iterator,index)!=5)
+		CGRect rect;
+		if(!CGRectMakeWithDictionaryRepresentation((CFDictionaryRef)info[(NSString*)kCGWindowBounds],&rect))
 		{
+			trace(@"MenuBar2 (server): failed parsing rect, info %@",info);
 			continue;
 		}
 		
-		CGRect windowRect;
-		SLSWindowIteratorGetScreenRect(&windowRect,iterator,index);
-		if(!CGRectEqualToRect(windowRect,displayFrame))
+		unsigned int display;
+		unsigned int displayCount=0;
+		if(CGGetDisplaysWithRect(rect,1,&display,&displayCount)!=kCGErrorSuccess)
 		{
+			trace(@"MenuBar2 (server): error matching display, info %@",info);
+			continue;
+		}
+		if(displayCount!=1)
+		{
+			trace(@"MenuBar2 (server): matched the wrong amount (%d) of displays, info %@",displayCount,info);
 			continue;
 		}
 		
-		wid=SLSWindowIteratorGetWindowID(iterator,index);
+		int wid=((NSNumber*)info[(NSString*)kCGWindowNumber]).intValue;
 		
-		break;
+		NSArray* screenshots=SLSHWCaptureWindowList(cid,&wid,1,0);
+		if(screenshots.count!=1)
+		{
+			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
+			continue;
+		}
+		
+		CGImageRef screenshot=(CGImageRef)screenshots[0];
+		NSData* data=(NSData*)CGDataProviderCopyData(CGImageGetDataProvider(screenshot));
+		if(!data)
+		{
+			trace(@"MenuBar2 (server): failed copying image data");
+			continue;
+		}
+		
+		// TODO: will break on some displays?
+		
+		int bytesPerPixel=CGImageGetBitsPerPixel(screenshot)/8;
+		if(bytesPerPixel!=4)
+		{
+			trace(@"MenuBar2 (server): screenshot %@ violates bpp assumption",screenshot);
+			continue;
+		}
+		
+		int width=CGImageGetWidth(screenshot);
+		if(CGImageGetHeight(screenshot)<MENUBAR_HEIGHT)
+		{
+			trace(@"MenuBar2 (server): screenshot %@ too short",screenshot);
+			continue;
+		}
+		
+		long redSum=0;
+		long greenSum=0;
+		long blueSum=0;
+		
+		int* pixels=(int*)data.bytes;
+		for(int index=0;index<MENUBAR_HEIGHT*width;index++)
+		{
+			long pixel=pixels[index];
+			redSum+=(pixel>>16)&0xff;
+			greenSum+=(pixel>>8)&0xff;
+			blueSum+=pixel&0xff;
+		}
+		
+		data.release;
+		
+		int redMean=redSum/MENUBAR_HEIGHT/width;
+		int greenMean=greenSum/MENUBAR_HEIGHT/width;
+		int blueMean=blueSum/MENUBAR_HEIGHT/width;
+		
+		// TODO: doesn't quite match Metal still...
+		
+		float brightness=(LUMINANCE_RED*redMean+LUMINANCE_GREEN*greenMean+LUMINANCE_BLUE*blueMean)/0xff;
+		BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
+		
+		trace(@"MenuBar2 (server): calculated brightness %f, display %d, dark text %d",brightness,display,darkText);
+		
+		menuBar2WriteDark(darkText,display);
 	}
 	
-	assert(wid!=-1);
+	CFRelease(windows);
 	
-	CFRelease(query);
-	CFRelease(iterator);
-	
-	NSArray* screenshots=SLSHWCaptureWindowList(cid,&wid,1,0);
-	if(screenshots.count!=1)
-	{
-		// TODO: should probably retry later since the color might be wrong now
-		
-		trace(@"MenuBar2 failed to capture screenshot for wid %d (non-fatal, but brightness may be out of date)",wid);
-		return;
-	}
-	
-	CGImageRef screenshot=(CGImageRef)screenshots[0];
-	
-	NSData* data=(NSData*)CGDataProviderCopyData(CGImageGetDataProvider(screenshot));
-	assert(data);
-	
-	// TODO: will break on some displays...
-	// TODO: check byte ordering as well as size
-	
-	int bytesPerPixel=CGImageGetBitsPerPixel(screenshot)/8;
-	assert(bytesPerPixel==4);
-	
-	int width=CGImageGetWidth(screenshot);
-	assert(CGImageGetHeight(screenshot)>MENUBAR_HEIGHT);
-	
-	long redSum=0;
-	long greenSum=0;
-	long blueSum=0;
-	
-	int* pixels=(int*)data.bytes;
-	for(int index=0;index<MENUBAR_HEIGHT*width;index++)
-	{
-		long pixel=pixels[index];
-		redSum+=(pixel>>16)&0xff;
-		greenSum+=(pixel>>8)&0xff;
-		blueSum+=pixel&0xff;
-	}
-	
-	data.release;
-	
-	int redMean=redSum/MENUBAR_HEIGHT/width;
-	int greenMean=greenSum/MENUBAR_HEIGHT/width;
-	int blueMean=blueSum/MENUBAR_HEIGHT/width;
-	
-	// float brightness=(float)(redMean+greenMean+blueMean)/3/0xff;
-	// TODO: doesn't quite match Metal (at least one of solid cyan and the green M2 Air wallpaper
-	// will be incorrect no matter the threshold value...)
-	
-	float brightness=(LUMINANCE_RED*redMean+LUMINANCE_GREEN*greenMean+LUMINANCE_BLUE*blueMean)/0xff;
-	trace(@"MenuBar2 calculated brightness %f for display %d (%@)",brightness,display,NSStringFromRect(displayFrame));
-	BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
-	
-	menuBar2WriteDark(darkText,display);
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
 }
 
@@ -337,7 +344,7 @@ void menuBar2UnconditionalSetup()
 			
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
 			{
-				menuBar2DockRecalculateWithDisplay(((NSNumber*)note.userInfo[@"did"]).intValue);
+				menuBar2DockRecalculate2();
 			});
 		}];
 		
