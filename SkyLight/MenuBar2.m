@@ -227,6 +227,12 @@ void menuBar2DockRecalculate2()
 			trace(@"MenuBar2 (server): matched the wrong amount (%d) of displays, info %@",displayCount,info);
 			continue;
 		}
+		CGRect displayRect=CGDisplayBounds(display);
+		if(!CGRectEqualToRect(displayRect,rect))
+		{
+			trace(@"MenuBar2 (server): matched display %d, but bounds %@ ≠ wallpaper bounds %@",display,NSStringFromRect(displayRect),NSStringFromRect(rect));
+			continue;
+		}
 		
 		int wid=((NSNumber*)info[(NSString*)kCGWindowNumber]).intValue;
 		
