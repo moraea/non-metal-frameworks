@@ -254,14 +254,17 @@ void menuBar2DockRecalculate2()
 		
 		int wid=((NSNumber*)info[(NSString*)kCGWindowNumber]).intValue;
 		
-		NSArray* screenshots=SLSHWCaptureWindowList(cid,&wid,1,0);
-		if(screenshots.count!=1)
+		long longWid=wid;
+		CFArrayRef array=CFArrayCreate(NULL,(const void**)&longWid,1,NULL);
+		CGImageRef screenshot=CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
+		if(!screenshot)
 		{
 			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
 			continue;
 		}
 		
-		CGImageRef screenshot=(CGImageRef)screenshots[0];
+		CFRelease(array);
+		
 		NSData* data=(NSData*)CGDataProviderCopyData(CGImageGetDataProvider(screenshot));
 		if(!data)
 		{
@@ -274,7 +277,7 @@ void menuBar2DockRecalculate2()
 		int bytesPerPixel=CGImageGetBitsPerPixel(screenshot)/8;
 		if(bytesPerPixel!=4)
 		{
-			trace(@"MenuBar2 (server): screenshot %@ violates bpp assumption",screenshot);
+			trace(@"MenuBar2 (server): screenshot %@ unexpected bpp %d",screenshot,bytesPerPixel);
 			continue;
 		}
 		
@@ -284,6 +287,8 @@ void menuBar2DockRecalculate2()
 			trace(@"MenuBar2 (server): screenshot %@ too short",screenshot);
 			continue;
 		}
+		
+		CFRelease(screenshot);
 		
 		long redSum=0;
 		long greenSum=0;
