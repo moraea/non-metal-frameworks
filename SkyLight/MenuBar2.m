@@ -115,7 +115,13 @@ void menuBar2SendCached()
 					break;
 				}
 			}
-			assert(displayID!=-1);
+			
+			if(displayID==-1)
+			{
+				displayID=CGMainDisplayID();
+				trace(@"MenuBar2: failed finding display ID for space, fallback %d, bar: %@",displayID,bar);
+			}
+			
 			key=[NSNumber numberWithInt:displayID];
 		}
 		
