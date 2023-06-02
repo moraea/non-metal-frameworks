@@ -76,18 +76,15 @@ void menuBar2SendCached()
 
 	int cid=SLSMainConnectionID();
 	
-	NSMutableArray<NSMutableDictionary*>* array=menuBar2ArrayCache;
-	NSMutableDictionary* dict=menuBar2DictCache;
-	
 	// prevent black background
 	
-	dict[kCGMenuBarActiveMaterialKey]=@"Light";
+	menuBar2DictCache[kCGMenuBarActiveMaterialKey]=@"Light";
 	
 	// prevent blue material selection (Big Sur)
 	
-	dict[kCGMenuBarTitleMaterialKey]=nil;
+	menuBar2DictCache[kCGMenuBarTitleMaterialKey]=nil;
 	
-	for(NSMutableDictionary* bar in array)
+	for(NSMutableDictionary* bar in menuBar2ArrayCache)
 	{
 		int aWid=((NSNumber*)bar[kSLMenuBarImageWindowDarkKey]).intValue;
 		
@@ -170,7 +167,7 @@ void menuBar2SendCached()
 		bar[kCGMenuBarInactiveImageWindowKey]=bar[displayDark?kSLMenuBarInactiveImageWindowDarkKey:kSLMenuBarInactiveImageWindowLightKey];
 	}
 	
-	SLSSetMenuBar$(cid,array,dict);
+	SLSSetMenuBar$(cid,menuBar2ArrayCache,menuBar2DictCache);
 }
 
 int menuBar2Set(int edi_cid,NSMutableArray<NSMutableDictionary*>* rsi_array,NSMutableDictionary* rdx_dict)
