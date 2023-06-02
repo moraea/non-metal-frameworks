@@ -87,8 +87,6 @@ void menuBar2SendCached()
 	
 	dict[kCGMenuBarTitleMaterialKey]=nil;
 	
-	NSArray<NSDictionary*>* spaceInfo=SLSCopyManagedDisplaySpaces(cid);
-	
 	for(NSMutableDictionary* bar in array)
 	{
 		int aWid=((NSNumber*)bar[kSLMenuBarImageWindowDarkKey]).intValue;
@@ -171,8 +169,6 @@ void menuBar2SendCached()
 		bar[kCGMenuBarImageWindowKey]=[NSNumber numberWithInt:fakeWid];
 		bar[kCGMenuBarInactiveImageWindowKey]=bar[displayDark?kSLMenuBarInactiveImageWindowDarkKey:kSLMenuBarInactiveImageWindowLightKey];
 	}
-	
-	spaceInfo.release;
 	
 	SLSSetMenuBar$(cid,array,dict);
 }
