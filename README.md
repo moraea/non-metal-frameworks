@@ -88,6 +88,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-6-2
+- rewrite MenuBar2 for better stability
+
 ### 2023-5-29
 - replace `SLS*DockRectWithOrientation` implementation (fix incorrect orientation returned to root processes)
 - retry occlusion-related swizzles if AppKit is not available at SL init (fix OCLP indeterminate progress bar)
