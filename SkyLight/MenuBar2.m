@@ -26,6 +26,11 @@ void menuBar2WriteDark(BOOL value,int display)
 
 BOOL menuBar2ReadDark(int display)
 {
+	if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+	{
+		return true;
+	}
+	
 	// TODO: cache, only update when receiving notification
 	
 	NSDictionary* dict=SLSCopyCurrentSessionDictionary().autorelease;
@@ -86,6 +91,16 @@ void menuBar2SendCached()
 	
 	for(NSMutableDictionary* bar in menuBar2ArrayCache)
 	{
+		// a hack. Big Sur uses the old keys when Reduce Transparency is on
+		
+		if(!bar[kSLMenuBarImageWindowDarkKey])
+		{
+			bar[kSLMenuBarImageWindowDarkKey]=bar[kCGMenuBarImageWindowKey];
+			bar[kSLMenuBarImageWindowLightKey]=bar[kCGMenuBarImageWindowKey];
+			bar[kSLMenuBarInactiveImageWindowDarkKey]=bar[kCGMenuBarInactiveImageWindowKey];
+			bar[kSLMenuBarInactiveImageWindowLightKey]=bar[kCGMenuBarInactiveImageWindowKey];
+		}
+		
 		int aWid=((NSNumber*)bar[kSLMenuBarImageWindowDarkKey]).intValue;
 		
 		CGRect aRect=CGRectZero;
@@ -146,6 +161,28 @@ void menuBar2SendCached()
 		}
 		
 		CGContextClearRect(fakeContext,realRect);
+		
+		if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+		{
+			CALayer* greyLayer=CALayer.layer;
+			greyLayer.bounds=realRect;
+			
+			// Digital Color Meter-ed on M1 Air lol
+			
+			CGColorRef greyColor;
+			if(_AXInterfaceGetIncreaseContrastEnabled())
+			{
+				greyColor=CGColorCreateGenericRGB(0.9,0.9,0.9,1);
+			}
+			else
+			{
+				greyColor=CGColorCreateGenericRGB(0.85,0.85,0.85,1);
+			}
+			greyLayer.backgroundColor=greyColor;
+			CFRelease(greyColor);
+			
+			[greyLayer renderInContext:fakeContext];
+		}
 		
 		NSArray<NSData*>* titles=bar[kCGMenuBarMenuTitlesArrayKey];
 		for(NSData* title in titles)

@@ -89,7 +89,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ## changes
 
 ### 2023-6-2
-- rewrite MenuBar2 for better stability
+- rewrite MenuBar2; improve stability and implement Reduce Transparency/Increase Contrast handling
 
 ### 2023-5-29
 - replace `SLS*DockRectWithOrientation` implementation (fix incorrect orientation returned to root processes)
