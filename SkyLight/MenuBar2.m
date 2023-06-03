@@ -28,7 +28,9 @@ BOOL menuBar2ReadDark(int display)
 {
 	if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
 	{
-		return true;
+		// SLSGetAppearanceThemeLegacy true = dark
+		
+		return !SLSGetAppearanceThemeLegacy();
 	}
 	
 	// TODO: cache, only update when receiving notification
@@ -172,11 +174,28 @@ void menuBar2SendCached()
 			CGColorRef greyColor;
 			if(_AXInterfaceGetIncreaseContrastEnabled())
 			{
-				greyColor=CGColorCreateGenericRGB(0.9,0.9,0.9,1);
+				if(SLSGetAppearanceThemeLegacy())
+				{
+					// yes, this is backwards (IC results in lower contrast than RT)
+					// this is Apple's mistake and i am just mimicking it
+					
+					greyColor=CGColorCreateGenericRGB(0.175,0.175,0.175,1);
+				}
+				else
+				{
+					greyColor=CGColorCreateGenericRGB(0.9,0.9,0.9,1);
+				}
 			}
 			else
 			{
-				greyColor=CGColorCreateGenericRGB(0.85,0.85,0.85,1);
+				if(SLSGetAppearanceThemeLegacy())
+				{
+					greyColor=CGColorCreateGenericRGB(0.125,0.125,0.125,1);
+				}
+				else
+				{
+					greyColor=CGColorCreateGenericRGB(0.85,0.85,0.85,1);
+				}
 			}
 			greyLayer.backgroundColor=greyColor;
 			CFRelease(greyColor);
@@ -343,6 +362,13 @@ void menuBar2DockRecalculate2()
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
 }
 
+void menuBar2DockReduceTransparencyCallback(CFNotificationCenterRef center,void* observer,CFNotificationName name,const void* object,CFDictionaryRef userInfo)
+{
+	trace(@"MenuBar2 (server): forwarding Reduce Transparency/Increase Contrast to clients");
+	
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
+}
+
 void menuBar2UnconditionalSetup()
 {
 	if(earlyBoot)
@@ -371,6 +397,9 @@ void menuBar2UnconditionalSetup()
 				menuBar2DockRecalculate2();
 			});
 		}];
+		
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceReduceTransparencyStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceIncreaseContrastStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		
 		return;
 	}
