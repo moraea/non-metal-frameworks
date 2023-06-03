@@ -369,6 +369,16 @@ void menuBar2DockReduceTransparencyCallback(CFNotificationCenterRef center,void*
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
 }
 
+void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observer,CFNotificationName name,const void* object,CFDictionaryRef userInfo)
+{
+	if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+	{
+		trace(@"MenuBar2 (server): forwarding appearance toggle to clients because Reduce Transparency/Increase Contrast is on");
+		
+		[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
+	}
+}
+
 void menuBar2UnconditionalSetup()
 {
 	if(earlyBoot)
@@ -400,6 +410,7 @@ void menuBar2UnconditionalSetup()
 		
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceReduceTransparencyStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceIncreaseContrastStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockAppearanceCallback,@"AppleInterfaceThemeChangedNotification",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		
 		return;
 	}
