@@ -1,6 +1,6 @@
 // new menu bar hacks (proper selections, auto text color)
 // TODO: test thoroughly, then enable by default, then replace MenuBar entirely
-// TODO: correct bar background on fullscreen windows
+// TODO: black bar background on fullscreen windows
 
 #define MENUBAR_DARK_FORMAT @"Amy.MenuBar2.DarkText.%d"
 #define MENUBAR_DARK_NOTE @"Amy.MenuBar2.DarkTextChanged"
@@ -158,6 +158,7 @@ void menuBar2SendCached()
 		else
 		{
 			// values from NSStatusBarContentView setHasCAShadow:
+			// TODO: with greyLayer, ofc this doesn't work...
 			
 			SLSWindowSetShadowProperties(fakeWid,@{@"com.apple.WindowShadowRadiusInactive":@2.5,@"com.apple.WindowShadowDensityInactive":@0.3,@"com.apple.WindowShadowVerticalOffsetInactive":@1.75});
 		}
