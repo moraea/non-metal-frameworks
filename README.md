@@ -28,6 +28,10 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- patch for downgraded QuartzCore crashes in Ventura
 	- CABL/CAPL blur hack research and code
 	- producing and testing builds for OCLP
+	- Sonoma research and shim development (ongoing)
+		- identification of new SkyLight transactions responsible for windowing functionality (window ordering, front process, window tags, etc.)
+			- reimplementation of many of these
+		- identification of functionality dependent on WM
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -45,15 +49,16 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
     - LegacyRVPL for rapid testing of new framework shims/patches
 		- preserves snapshots and delta OTAs for developer convenience
 	- Ventura SkyLight transactions/softlinks research
-	- Ventura WindowManager research
+	- Ventura/Sonoma WindowManager research
 	- Objective-C and dynamic linker cache research
+	- Sonoma research and shim development (ongoing)
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
 	- most build scripts and stubbing/binpatching/swizzling utils
     - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, sshd/cryptexd, permissions, various crashes)
 	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books, Logic)
-	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
+	- misc Ventura/Sonoma shims (many **based on Edu's research**, see above)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -87,6 +92,17 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-6-14
+- preliminary Sonoma support
+	- build script update (requires `non-metal-common:sonoma`)
+	- SkyLight libSystem symbols hack
+	- essential SkyLight transactions shims (as usual, credit **EduCovas** for most research and some code!!)
+	- WSCA tweaks (`SLSNewWindowWithOpaqueShapeAndContext`, permit layer changing, Dock-specific surface size hack 🤦🏻‍♀️)
+	- WallpaperAgent connection ID hack
+	- _menubar is currently broken with the new AppKit path_, force Carbon path with `defaults write -g NSEnableAppKitMenus -bool false`
+	- make monochrome widgets semi-usable
+	- _QuartzCore downgrade currently causes white artifacts_, workaround is to set display profile to sRGB/Unknown Display (as for HD 3000 problem)
 
 ### 2023-6-2
 - rewrite MenuBar2; improve stability and implement Reduce Transparency/Increase Contrast handling
