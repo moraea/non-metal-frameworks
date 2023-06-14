@@ -3,6 +3,7 @@
 @property(assign) int wid;
 @property(assign) int sid;
 @property(assign) CAContext* context;
+@property(assign) CALayer* trackedLayer;
 
 -(instancetype)initWithWid:(int)wid context:(CAContext*)context;
 
@@ -230,8 +231,13 @@ void defenestratorSetup()
 	_sid=sid;
 	_context=context.retain;
 	
-	// [context addObserver:self forKeyPath:@"layer.bounds" options:0 context:NULL];
-	[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+	[context addObserver:self forKeyPath:@"layer" options:0 context:NULL];
+	
+	if(context.layer)
+	{
+		[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+		_trackedLayer=context.layer;
+	}
 	
 	dispatch_once(&defenestratorOnce,^()
 	{
@@ -269,6 +275,20 @@ void defenestratorSetup()
 
 -(void)observeValueForKeyPath:(NSString*)path ofObject:(NSObject*)object change:(NSDictionary*)change context:(void*)context
 {
+	// sometimes context.layer now gets changed (Dock)
+	// so we have to do extra bookkeeping to avoid KVO crashes...
+	
+	if([path isEqual:@"layer"])
+	{
+		if(_trackedLayer)
+		{
+			[_trackedLayer removeObserver:self forKeyPath:@"bounds"];
+		}
+		
+		[_context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+		_trackedLayer=_context.layer;
+	}
+	
 	self.queueUpdate;
 }
 
@@ -279,12 +299,14 @@ void defenestratorSetup()
 		block(self);
 	}
 	
-	// [self.context removeObserver:self forKeyPath:@"layer.bounds"];
-	[self.context.layer removeObserver:self forKeyPath:@"bounds"];
+	[self.context removeObserver:self forKeyPath:@"layer"];
+	
+	if(_trackedLayer)
+	{
+		[_trackedLayer removeObserver:self forKeyPath:@"bounds"];
+	}
 	
 	self.context.release;
-	
-	// TODO: any other cleanup?
 }
 
 @end
@@ -588,12 +610,18 @@ void SLSTransactionAddWindowToWindowOrderingGroup(void* rdi_trans,int esi_wid,in
 
 void SLSTransactionOrderWindowGroup(void* rdi_trans,int esi_wid,int edx_op,int ecx_relativeWid);
 
+void SLSOrderFrontConditionally(int edi_cid,int esi_wid,void* rdx_timestamp);
+
 void SLSTransactionOrderWindowGroupFrontConditionally(void* rdi_trans,int esi_wid,void* rdx_timestamp)
 {
-	// TODO: uhhhh conditionally
-	// per Edu's research, this may be causing windows to disappear sometimes
+	// TODO: should use the other function (per Ventura softlink) but doesn't work?
 	
 	SLSTransactionOrderWindowGroup(rdi_trans,esi_wid,1,0);
+	
+	/*pushFuckedBlock(^()
+	{
+		SLSOrderFrontConditionally(SLSMainConnectionID(),esi_wid,rdx_timestamp);
+	});*/
 }
 
 // TODO: SLSTransactionRemoveWindowFromWindowOrderingGroup
@@ -649,6 +677,8 @@ void defenestrator3Setup()
 				
 				if(rect.size.width<1||rect.size.height<1)
 				{
+					trace(@"Dock size hack %@",NSStringFromRect(rect));
+					
 					int display=CGMainDisplayID();
 					
 					rect.size=CGSizeMake(CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
