@@ -18,6 +18,10 @@ NSString* process;
 #import "Videos.m"
 #endif
 
+#if MAJOR==14
+#import "Sonoma.m"
+#endif
+
 __attribute__((constructor))
 void load()
 {
@@ -36,5 +40,9 @@ void load()
 	
 #ifdef CAT
 	glyphsSetup();
+#endif
+
+#if MAJOR==14
+	sonomaSetup();
 #endif
 }
