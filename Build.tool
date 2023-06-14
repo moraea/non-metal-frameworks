@@ -29,7 +29,12 @@ function build
 	
 	mainIn="$prefixOut/${name}Wrapper.m"
 
-	Stubber "$oldIn" "$newIn" "$PWD" "$mainIn"
+	# TODO: stopgap for dlopening issues until Stubber 3
+
+	hackNew="${newIn}.json"
+	hackOld="${oldIn}.json"
+
+	Stubber "$oldIn" "$newIn" "$PWD" "$mainIn" "$hackNew" "$hackOld"
 
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
@@ -39,7 +44,18 @@ function build
 		extraArgs=-DSENTIENT_PATCHER
 	fi
 	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs
-	
+
+	# TODO: automatically handle in Stubber? move elsewhere? edit imports and binpatch?
+	# idk. this works for now...
+
+	if [[ ($name = SkyLight) && ($major -ge 14) ]]
+	then
+		clang -fmodules -dynamiclib -Xlinker -reexport_library -Xlinker /usr/lib/libSystem.B.dylib LibSystemWrapper.m -o "$prefixOut/LibSystemWrapper.dylib"
+		codesign -fs - "$prefixOut/LibSystemWrapper.dylib"
+
+		install_name_tool -change /usr/lib/libSystem.B.dylib /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/LibSystemWrapper.dylib "$oldOut"
+	fi
+
 	codesign -f -s - "$oldOut"
 	codesign -f -s - "$mainOut"
 }
@@ -145,7 +161,7 @@ function runWithTargetVersion
 	major=$1
 	echo begin $major
 
-	if test "$major" -eq 13
+	if test "$major" -ge 13
 	then
 		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
 	fi
@@ -216,7 +232,7 @@ function runWithTargetVersion
 			;;
 	esac
 
-	if [[ "$major" = 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
+	if [[ "$major" -ge 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
 	then
 		echo 'applying _CASSynchronize hack'
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
