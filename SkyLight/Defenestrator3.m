@@ -592,7 +592,7 @@ void SLSEnsureSpaceSwitchToActiveProcess();
 
 void SLSTransactionEnsureSpaceSwitchToActiveProcess(void* rdi_trans)
 {
-	pushFuckedBlock(^()
+	pushCommitBlock(rdi_trans,^()
 	{
 		SLSEnsureSpaceSwitchToActiveProcess();
 	});
@@ -602,7 +602,7 @@ void SLSAddWindowToWindowOrderingGroup(int edi_cid,int esi_wid,int edx_relativeW
 
 void SLSTransactionAddWindowToWindowOrderingGroup(void* rdi_trans,int esi_wid,int edx_relativeWid,int ecx_above)
 {
-	pushFuckedBlock(^()
+	pushCommitBlock(rdi_trans,^()
 	{
 		SLSAddWindowToWindowOrderingGroup(SLSMainConnectionID(),esi_wid,edx_relativeWid,ecx_above);
 	});
@@ -618,19 +618,27 @@ void SLSTransactionOrderWindowGroupFrontConditionally(void* rdi_trans,int esi_wi
 	
 	SLSTransactionOrderWindowGroup(rdi_trans,esi_wid,1,0);
 	
-	/*pushFuckedBlock(^()
+	/*pushCommitBlock(rdi_trans,^()
 	{
 		SLSOrderFrontConditionally(SLSMainConnectionID(),esi_wid,rdx_timestamp);
 	});*/
 }
 
-// TODO: SLSTransactionRemoveWindowFromWindowOrderingGroup
+void SLSRemoveFromOrderingGroup(int edi_cid,int esi_wid);
+
+void SLSTransactionRemoveWindowFromWindowOrderingGroup(void* rdi_trans,int esi_wid)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSRemoveFromOrderingGroup(SLSMainConnectionID(),esi_wid);
+	});
+}
 
 void SLSReorderWindows(int edi_cid);
 
 void SLSTransactionReorderWindows(void* rdi_trans)
 {
-	pushFuckedBlock(^()
+	pushCommitBlock(rdi_trans,^()
 	{
 		SLSReorderWindows(SLSMainConnectionID());
 	});
