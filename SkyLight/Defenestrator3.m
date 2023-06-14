@@ -230,7 +230,8 @@ void defenestratorSetup()
 	_sid=sid;
 	_context=context.retain;
 	
-	[context addObserver:self forKeyPath:@"layer.bounds" options:0 context:NULL];
+	// [context addObserver:self forKeyPath:@"layer.bounds" options:0 context:NULL];
+	[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
 	
 	dispatch_once(&defenestratorOnce,^()
 	{
@@ -278,7 +279,8 @@ void defenestratorSetup()
 		block(self);
 	}
 	
-	[self.context removeObserver:self forKeyPath:@"layer.bounds"];
+	// [self.context removeObserver:self forKeyPath:@"layer.bounds"];
+	[self.context.layer removeObserver:self forKeyPath:@"bounds"];
 	
 	self.context.release;
 	
