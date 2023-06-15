@@ -29,9 +29,14 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- CABL/CAPL blur hack research and code
 	- producing and testing builds for OCLP
 	- Sonoma research and shim development (ongoing)
-		- identification of new SkyLight transactions responsible for windowing functionality (window ordering, front process, window tags, etc.)
-			- reimplementation of many of these
-		- identification of functionality dependent on WM
+		- identification of many functions responsible for:
+			- window grouping/ordering
+			- setting the frontmost process
+			- setting window tags (attributes)
+			- SkyLight notifications
+		- implmentation of shims for some of the above
+		- identification of windowing functionality dependent on WindowManager interfaces
+		- QuartzCore filter research and fallback idea (fixes monochrome widgets)
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -58,7 +63,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
     - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, sshd/cryptexd, permissions, various crashes)
 	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books, Logic)
-	- misc Ventura/Sonoma shims (many **based on Edu's research**, see above)
+	- misc Ventura/Sonoma shims (**many based on Edu's research**, see above)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -95,13 +100,11 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ### 2023-6-14
 - preliminary Sonoma support
-	- build script update (requires `non-metal-common:sonoma`)
-	- SkyLight libSystem symbols hack
-	- essential SkyLight transactions shims (as usual, credit **EduCovas** for most research and some code!!)
-	- WSCA tweaks (`SLSNewWindowWithOpaqueShapeAndContext`, permit layer changing, Dock-specific surface size hack 🤦🏻‍♀️)
-	- WallpaperAgent connection ID hack
+	- build script update (requires `non-metal-common:sonoma`); SkyLight libSystem symbols hack
+	- essential SkyLight transactions shims (**as usual, credit EduCovas for most research and significant parts of the shims!!**)
+	- WSCA tweaks (`SLSNewWindowWithOpaqueShapeAndContext`, permit layer changing, Dock-specific surface size hack 🤦🏻‍♀️, WallpaperAgent connection ID hack)
 	- _menubar is currently broken with the new AppKit path_, force Carbon path with `defaults write -g NSEnableAppKitMenus -bool false`
-	- make monochrome widgets semi-usable
+	- monochrome widgets fix
 	- _QuartzCore downgrade currently causes white artifacts_, workaround is to set display profile to sRGB/Unknown Display (as for HD 3000 problem)
 
 ### 2023-6-2
