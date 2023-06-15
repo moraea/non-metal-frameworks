@@ -3,34 +3,39 @@
 
 // monochrome widgets
 
-void (*widgetReal_setFilters)(CALayer*,SEL,NSArray*);
-void widgetFake_setFilters(CALayer* self,SEL sel,NSArray* filters)
+extern const NSString* kCAFilterColorMatrix;
+extern const NSString* kCAFilterVibrantColorMatrix;
+
+NSObject* (*real_filterWithType)(id,SEL,NSString*);
+
+NSObject* fake_filterWithType(id meta,SEL sel,NSString* type)
 {
-	NSMutableArray* filters2=NSMutableArray.alloc.init;
-	for(id filter in filters)
+	if([type isEqual:kCAFilterVibrantColorMatrix])
 	{
-		// TODO: this makes it visible but VERY ugly
-		// we will need to either fix or reimplement this filter
-		
-		if([filter respondsToSelector:@selector(name)]&&[[filter name] isEqualToString:@"vibrantColorMatrix"])
-		{
-			continue;
-		}
-		else
-		{
-			[filters2 addObject:filter];
-		}
+		type=kCAFilterColorMatrix;
 	}
 	
-	widgetReal_setFilters(self,sel,filters2);
+	return real_filterWithType(meta,sel,type);
+}
+
+// example for EduCovas - hooking to print the filters
+
+void (*debugReal_setFilters)(CALayer*,SEL,NSArray*);
+void debugFake_setFilters(CALayer* self,SEL sel,NSArray* filters)
+{
+	trace(@"debug hook - setFilters: self %@ filters %@ stack trace %@",self,filters,NSThread.callStackSymbols);
 	
-	filters2.release;
+	debugReal_setFilters(self,sel,filters);
 }
 
 void sonomaSetup()
 {
 	if([process containsString:@"NotificationCenter.app"])
 	{
-		swizzleImp(@"CALayer",@"setFilters:",true,widgetFake_setFilters,&widgetReal_setFilters);
+		swizzleImp(@"CAFilter",@"filterWithType:",false,fake_filterWithType,&real_filterWithType);
 	}
+	
+	// example
+	
+	// swizzleImp(@"CALayer",@"setFilters:",true,debugFake_setFilters,&debugReal_setFilters);
 }
