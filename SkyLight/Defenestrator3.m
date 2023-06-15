@@ -634,6 +634,16 @@ void SLSTransactionRemoveWindowFromWindowOrderingGroup(void* rdi_trans,int esi_w
 	});
 }
 
+void SLSClearWindowOrderingGroup(int edi_cid,int esi_wid);
+
+void SLSTransactionClearWindowOrderingGroup(void* rdi_trans,int esi_wid)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSClearWindowOrderingGroup(SLSMainConnectionID(),esi_wid);
+	});
+}
+
 void SLSReorderWindows(int edi_cid);
 
 void SLSTransactionReorderWindows(void* rdi_trans)
@@ -642,6 +652,15 @@ void SLSTransactionReorderWindows(void* rdi_trans)
 	{
 		SLSReorderWindows(SLSMainConnectionID());
 	});
+}
+
+void SLSPostCoordinatedDistributedNotification(int edi_cid,int esi_note,void* rdx_block);
+
+// softlinked in loginwindow
+
+void SLSPostCoordinatedDistributedNotificationFenced(int edi_cid,int esi_note,int edx_port,void* rcx_block)
+{
+	SLSPostCoordinatedDistributedNotification(edi_cid,esi_note,rcx_block);
 }
 
 // hack for blank wallpaper
