@@ -7,7 +7,7 @@ void SLSGetDockRectWithOrientation(unsigned int edi_connectionID,CGRect* rsi_rec
 {
 	int merged=0;
 	
-	SLSGetDockRectWithReason(edi_connectionID,rsi_rectOut,&merged);
+	SLSGetDockRectWithReason(edi_connectionID,rsi_rectOut,(char*)&merged);
 	
 	*rdx_reasonOut=merged&0xffff;
 	*rcx_orientationOut=merged>>16;

@@ -564,7 +564,7 @@ unsigned int SLSNewWindowWithOpaqueShape(unsigned int edi_connectionID,unsigned 
 void* SLSNewWindowWithOpaqueShapeAndContext(int edi_cid,int esi_5,void* rdx_region,void* rcx_region,int r8d_1,void* r9,double xmm0,double xmm1,int stack_0x40,int* stack_widOut,CAContext* stack_context)
 {
 	int myWid=0;
-	SLSNewWindowWithOpaqueShape(edi_cid,esi_5,rdx_region,rcx_region,r8d_1,r9,stack_0x40,&myWid,xmm0,xmm1);
+	SLSNewWindowWithOpaqueShape(edi_cid,esi_5,rdx_region,rcx_region,r8d_1,r9,stack_0x40,(unsigned long)&myWid,xmm0,xmm1);
 	SLSSetWindowLayerContext(edi_cid,myWid,stack_context);
 	
 	*stack_widOut=myWid;
@@ -578,7 +578,7 @@ unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_ar
 
 // AppKit-based left menubar
 
-void SLSTransactionSetMenuBars(void* rdi_trans,NSArray<NSDictionary*>* rsi_perbar,NSDictionary* rdx_global)
+void SLSTransactionSetMenuBars(void* rdi_trans,NSMutableArray<NSDictionary*>* rsi_perbar,NSMutableDictionary* rdx_global)
 {
 	// TODO: doesn't currently work. for now, use the Carbon (HIToolbox) path
 	// defaults write -g NSEnableAppKitMenus -bool false
@@ -658,10 +658,12 @@ void SLSPostCoordinatedDistributedNotification(int edi_cid,int esi_note,void* rd
 
 // softlinked in loginwindow
 
-void SLSPostCoordinatedDistributedNotificationFenced(int edi_cid,int esi_note,int edx_port,void* rcx_block)
+// nostub SLSPostCoordinatedDistributedNotificationFenced
+
+/*void SLSPostCoordinatedDistributedNotificationFenced(int edi_cid,int esi_note,int edx_port,void* rcx_block)
 {
 	SLSPostCoordinatedDistributedNotification(edi_cid,esi_note,rcx_block);
-}
+}*/
 
 // hack for blank wallpaper
 
@@ -688,7 +690,7 @@ void defenestrator3Setup()
 		return;
 	}
 	
-	swizzleImp(@"CAContext",@"contextWithCGSConnection:options:",false,fake_contextWithCGSConnection,&real_contextWithCGSConnection);
+	swizzleImp(@"CAContext",@"contextWithCGSConnection:options:",false,(IMP)fake_contextWithCGSConnection,(IMP*)&real_contextWithCGSConnection);
 	
 	// TODO: the infamous Dock Hack, kill asap...
 	// at least it's not hardcoded 1440x900 and uses The Defenestrator API, right? 🤷🏻‍♀️

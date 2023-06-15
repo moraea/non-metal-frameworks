@@ -409,9 +409,9 @@ void menuBar2UnconditionalSetup()
 			});
 		}];
 		
-		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceReduceTransparencyStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
-		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,@"AXInterfaceIncreaseContrastStatusDidChange",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
-		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockAppearanceCallback,@"AppleInterfaceThemeChangedNotification",NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceReduceTransparencyStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceIncreaseContrastStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
+		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockAppearanceCallback,CFSTR("AppleInterfaceThemeChangedNotification"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		
 		return;
 	}

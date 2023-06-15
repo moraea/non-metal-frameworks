@@ -13,12 +13,12 @@ NSDictionary* (*dynamic_SLSCopyDisplayInfoDictionary)(int)=NULL;
 
 NSDictionary* CoreDisplay_DisplayCreateInfoDictionary(int edi)
 {
-	trace(@"thic: CoreDisplay_DisplayCreateInfoDictionary %d %@",edi,NSThread.callStackSymbols);
+	// trace(@"thic: CoreDisplay_DisplayCreateInfoDictionary %d %@",edi,NSThread.callStackSymbols);
 	
 	dispatch_once(&slsOnce,^()
 	{
 		dynamic_SLSCopyDisplayInfoDictionary=dlsym(RTLD_DEFAULT,"SLSCopyDisplayInfoDictionary");
-		trace(@"thic: dlsym %p %s",dynamic_SLSCopyDisplayInfoDictionary,dlerror());
+		// trace(@"thic: dlsym %p %s",dynamic_SLSCopyDisplayInfoDictionary,dlerror());
 	});
 	
 	if(!dynamic_SLSCopyDisplayInfoDictionary)
@@ -37,7 +37,7 @@ NSDictionary* CoreDisplay_DisplayCreateInfoDictionary(int edi)
 #pragma clang diagnostic pop
 	NSString* path=[NSString stringWithFormat:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/%@.icns",type];
 	
-	trace(@"thic: adding %@",path);
+	// trace(@"thic: adding %@",path);
 	mutable[@"display-icon"]=path;
 	mutable[@"display-resolution-preview-icon"]=path;
 	
@@ -47,7 +47,7 @@ NSDictionary* CoreDisplay_DisplayCreateInfoDictionary(int edi)
 	mutable[@"resolution-preview-x"]=
 	mutable[@"resolution-preview-x"]=*/
 	
-	trace(@"thic: result %@",mutable);
+	// trace(@"thic: result %@",mutable);
 	
 	return mutable;
 }
