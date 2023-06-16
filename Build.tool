@@ -238,6 +238,12 @@ function runWithTargetVersion
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol __CASSynchronize
 return 0x0'
+
+	if [[ "$major" -ge 14 ]]
+		echo 'applying _CARequiresColorMatching hack'
+		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol _CARequiresColorMatching
+return 0x0'
 	fi
 
 	if [[ -e Build/QuartzCore.patched ]]
