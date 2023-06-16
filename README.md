@@ -37,6 +37,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- implmentation of shims for some of the above
 		- identification of windowing functionality dependent on WindowManager interfaces
 		- QuartzCore filter research and fallback idea (fixes monochrome widgets)
+		- QuartzCore patch for white UI elements
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -97,6 +98,9 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-6-16
+- fix white artifacts with downgraded QuartzCore
 
 ### 2023-6-14
 - preliminary Sonoma support
