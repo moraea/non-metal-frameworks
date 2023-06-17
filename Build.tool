@@ -224,6 +224,11 @@ symbol __CASSynchronize
 return 0x0'
 	fi
 
+		echo 'applying _CARequiresColorMatching hack'
+		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol _CARequiresColorMatching
+return 0x0'
+
 	if [[ -e Build/QuartzCore.patched ]]
 	then
 		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
