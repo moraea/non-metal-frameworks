@@ -39,3 +39,13 @@ void sonomaSetup()
 	
 	// swizzleImp(@"CALayer",@"setFilters:",true,debugFake_setFilters,&debugReal_setFilters);
 }
+
+// fix speed up QuickTime videos
+// ASB should look at this since i just copied the signatures from the Mojave QC shim
+
+int CAImageQueueSetMediaTiming(void* rdi_queue,int esi,void* rdx_surface,int ecx,void* r8_function,void* r9,double xmm0);
+
+int CAImageQueueSetMediaTimingClamped(void* rdi_queue,int esi,void* rdx,int ecx,int r8d,void* r9_function,double xmm0,void* stack)
+{
+	return CAImageQueueSetMediaTiming(rdi_queue,esi,rdx,ecx,r9_function,stack,xmm0);
+}
