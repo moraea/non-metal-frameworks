@@ -12,6 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: cpp-linter/cpp-linter-action@v2
+      id: linter
       with:
         style: file
         extensions: 'c,h,m,C,H,cpp,mm,hpp,cc,hh,c++,h++,cxx,hxx'
@@ -21,4 +22,10 @@ jobs:
         thread-comments: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check for lint failure
+      if: steps.linter.outputs.checks-failed > 0
+      run: |
+        echo "::error::Code style check failed."
+        exit 1
 
