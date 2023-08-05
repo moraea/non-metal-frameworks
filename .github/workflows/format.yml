@@ -16,7 +16,7 @@ jobs:
         style: file
         extensions: 'c,h,m,C,H,cpp,mm,hpp,cc,hh,c++,h++,cxx,hxx'
         tidy-checks: '-*'
-        version: ''
+        version: '16'
         files-changed-only: ${{ github.event_name == 'pull_request' }}
         step-summary: true
 
