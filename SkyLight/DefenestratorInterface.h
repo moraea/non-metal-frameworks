@@ -17,10 +17,7 @@ void defenestratorSetup();
 NSObject<DefenestratorWrapper>* defenestratorGetWrapper(int);
 
 // TODO: D1 compatibility, update other shims and remove
-NSObject<DefenestratorWrapper>* wrapperForWindow(int wid)
-{
-	return defenestratorGetWrapper(wid);
-}
+NSObject<DefenestratorWrapper>* wrapperForWindow(int wid) { return defenestratorGetWrapper(wid); }
 
 typedef void (^DefenestratorBlock)(NSObject<DefenestratorWrapper>*);
 void defenestratorRegisterOnce(dispatch_block_t);

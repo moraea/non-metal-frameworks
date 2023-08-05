@@ -13,32 +13,27 @@ __isPlatformVersionAtLeast - uses _availability_version_check
 BOOL enableDiscordHack;
 dispatch_once_t enableDiscordHackOnce;
 
-BOOL _availability_version_check(int,int*);
-BOOL fake_avc(int count,int* versions)
-{
-	dispatch_once(&enableDiscordHackOnce,^()
-	{
-		enableDiscordHack=[process containsString:@"/Discord.app/Contents/"];
-		if(enableDiscordHack)
-		{
-			trace(@"Discord screenshare hack: enabled");
-		}
-	});
-	
-	if(enableDiscordHack&&count==1)
-	{
-		int major=(versions[1]>>16)&0xffff;
-		int minor=(versions[1]>>8)&0xff;
-		int subminor=versions[1]&0xff;
-		
-		if(major>10||minor>13)
-		{
-			trace(@"Discord screenshare hack: lying about %d.%d.%d",major,minor,subminor);
-			return false;
-		}
-	}
-	
-	return _availability_version_check(count,versions);
+BOOL _availability_version_check(int, int*);
+BOOL fake_avc(int count, int* versions) {
+    dispatch_once(&enableDiscordHackOnce, ^() {
+        enableDiscordHack = [process containsString:@"/Discord.app/Contents/"];
+        if (enableDiscordHack) {
+            trace(@"Discord screenshare hack: enabled");
+        }
+    });
+
+    if (enableDiscordHack && count == 1) {
+        int major = (versions[1] >> 16) & 0xffff;
+        int minor = (versions[1] >> 8) & 0xff;
+        int subminor = versions[1] & 0xff;
+
+        if (major > 10 || minor > 13) {
+            trace(@"Discord screenshare hack: lying about %d.%d.%d", major, minor, subminor);
+            return false;
+        }
+    }
+
+    return _availability_version_check(count, versions);
 }
 
-DYLD_INTERPOSE(fake_avc,_availability_version_check)
+DYLD_INTERPOSE(fake_avc, _availability_version_check)

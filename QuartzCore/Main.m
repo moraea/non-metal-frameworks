@@ -18,23 +18,21 @@ NSString* process;
 #import "Videos.m"
 #endif
 
-__attribute__((constructor))
-void load()
-{
-	traceLog=true;
-	tracePrint=false;
-	swizzleLog=false;
-	
-	process=NSProcessInfo.processInfo.arguments[0];
+__attribute__((constructor)) void load() {
+    traceLog = true;
+    tracePrint = false;
+    swizzleLog = false;
 
-	catalystSetup();
-	miscSetup();
-	
+    process = NSProcessInfo.processInfo.arguments[0];
+
+    catalystSetup();
+    miscSetup();
+
 #if defined(CAT) || defined(MOJ)
-	animationsSetup();
+    animationsSetup();
 #endif
-	
+
 #ifdef CAT
-	glyphsSetup();
+    glyphsSetup();
 #endif
 }
