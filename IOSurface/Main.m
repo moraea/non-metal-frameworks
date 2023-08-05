@@ -8,17 +8,15 @@
 
 size_t IOSurfaceGetPropertyMaximu$(CFStringRef);
 
-size_t IOSurfaceGetPropertyMaximum(CFStringRef property)
-{
-	size_t real=IOSurfaceGetPropertyMaximu$(property);
-	if(real==INT_MAX)
-	{
-		// TODO: actually fetch the value somehow?
-		// returned by working IOSurface on Zoe, but could vary on different GPUs
-		
-		return 0x2000;
-	}
-	return real;
+size_t IOSurfaceGetPropertyMaximum(CFStringRef property) {
+    size_t real = IOSurfaceGetPropertyMaximu$(property);
+    if (real == INT_MAX) {
+        // TODO: actually fetch the value somehow?
+        // returned by working IOSurface on Zoe, but could vary on different GPUs
+
+        return 0x2000;
+    }
+    return real;
 }
 
 #endif
