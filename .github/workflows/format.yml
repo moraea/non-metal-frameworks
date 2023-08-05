@@ -15,3 +15,4 @@ jobs:
       uses: jidicula/clang-format-action@v4.11.0
       with:
         clang-format-version: '16'
+        include-regex: '^.*\.(((c|m|C)(c|m|pp|mm|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))$'
