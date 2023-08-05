@@ -8,10 +8,15 @@ on:
 jobs:
   format:
     name: Check code style
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
     - uses: cpp-linter/cpp-linter-action@v2
       with:
         style: file
-        extensions: "c,h,m,C,H,cpp,mm,hpp,cc,hh,c++,h++,cxx,hxx"
+        extensions: 'c,h,m,C,H,cpp,mm,hpp,cc,hh,c++,h++,cxx,hxx'
+        tidy-checks: '-*'
+        version: ''
+        files-changed-only: ${{ github.event_name == 'pull_request' }}
+        step-summary: true
+
