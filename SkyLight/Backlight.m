@@ -6,7 +6,8 @@
 
 BOOL CBALCKeyboardFeatureAvailable();
 
-BOOL keyboardBetaValue;dispatch_once_t keyboardBetaOnce;
+BOOL keyboardBetaValue;
+dispatch_once_t keyboardBetaOnce;
 BOOL keyboardBeta() {
     dispatch_once(&keyboardBetaOnce, ^() {
         keyboardBetaValue = [NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_BacklightHack"];
