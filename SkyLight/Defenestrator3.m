@@ -600,7 +600,7 @@ void SLSTransactionEnsureSpaceSwitchToActiveProcess(void* rdi_trans)
 
 void SLSAddWindowToWindowOrderingGroup(int edi_cid,int esi_wid,int edx_relativeWid,int ecx_above);
 
-void SLSTransactionAddWindowToWindowOrderingGroup(void* rdi_trans,int esi_wid,int edx_relativeWid,int ecx_above)
+void SLSTransactionAddWindowToWindowOrderingGroup(void* rdi_trans,int edx_relativeWid,int ecx_above,int esi_wid)
 {
 	pushCommitBlock(rdi_trans,^()
 	{

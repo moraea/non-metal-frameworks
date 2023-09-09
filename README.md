@@ -99,6 +99,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-9-9
+- fix popup sheet windows
+
 ### 2023-6-16
 - fix white artifacts with downgraded QuartzCore
 
@@ -247,7 +250,6 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- fix popup sheet windows
 - update unresponsive catalyst buttons fix for Sonoma
 - improve loginwindow clock
 - reimplement appkit menubar
