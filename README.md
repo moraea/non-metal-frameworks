@@ -99,6 +99,9 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-9-19
+- fix blank Safari windows with downgraded QuartzCore
+
 ### 2023-9-9
 - fix popup sheet windows
 
@@ -250,10 +253,10 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- update unresponsive catalyst buttons fix for Sonoma
+- update unresponsive Catalyst buttons fix for Sonoma
 - improve loginwindow clock
-- reimplement appkit menubar
-- fix menubar2 dock server
+- reimplement AppKit menubar
+- fix MenuBar2 dock server
 - reimplement WindowManager communication
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore

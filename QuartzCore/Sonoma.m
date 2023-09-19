@@ -1,6 +1,3 @@
-// TODO: the White Stuff Problem
-// like the HD3000 Problem, this is "fixable" by changing colorspace to sRGB/Unknown Display
-
 // monochrome widgets
 
 extern const NSString* kCAFilterColorMatrix;
@@ -48,4 +45,20 @@ int CAImageQueueSetMediaTiming(void* rdi_queue,int esi,void* rdx_surface,int ecx
 int CAImageQueueSetMediaTimingClamped(void* rdi_queue,int esi,void* rdx,int ecx,int r8d,void* r9_function,double xmm0,void* stack)
 {
 	return CAImageQueueSetMediaTiming(rdi_queue,esi,rdx,ecx,r9_function,stack,xmm0);
+}
+
+// Safari blank
+
+// softlinked; doesn't crash, but doesn't work
+// no/stub CAIOSurfaceCreate
+
+// returned object must be retain-able, and must be settable as CALayer.contents
+// 14's QC implements a CF type
+// but the actual IOSurface _already_ meets those requirements
+// just need to retain it to prevent UAF since the arg is released, Create rule
+
+id CAIOSurfaceCreate(IOSurface* rdi)
+{
+	rdi.retain;
+	return rdi;
 }
