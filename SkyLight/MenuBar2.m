@@ -380,6 +380,14 @@ void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observe
 	}
 }
 
+id (*real_EWC)(id,SEL,id);
+id fake_EWC(id self,SEL sel,id coder)
+{
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"DO IT" object:nil userInfo:nil deliverImmediately:true];
+	
+	return real_EWC(self,sel,coder);;
+}
+
 void menuBar2UnconditionalSetup()
 {
 	if(earlyBoot)
@@ -394,6 +402,12 @@ void menuBar2UnconditionalSetup()
 	
 	if(!useMenuBar2())
 	{
+		return;
+	}
+	
+	if([process containsString:@"WallpaperAgent.app"])
+	{
+		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,fake_EWC,&real_EWC);
 		return;
 	}
 	
@@ -417,7 +431,10 @@ void menuBar2UnconditionalSetup()
 			});
 		}];
 		
-		menuBar2DockRecalculate2();
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
+		{
+			menuBar2DockRecalculate2();
+		});
 		
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceReduceTransparencyStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceIncreaseContrastStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
