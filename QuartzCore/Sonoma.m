@@ -1,3 +1,5 @@
+#define CLOCK_HACK_ALPHA 0.6
+
 // monochrome widgets
 
 extern const NSString* kCAFilterColorMatrix;
@@ -15,14 +17,20 @@ NSObject* fake_filterWithType(id meta,SEL sel,NSString* type)
 	return real_filterWithType(meta,sel,type);
 }
 
-// example for EduCovas - hooking to print the filters
-
-void (*debugReal_setFilters)(CALayer*,SEL,NSArray*);
-void debugFake_setFilters(CALayer* self,SEL sel,NSArray* filters)
+void (*clockSetMaskReal)(CALayer*,SEL,CALayer*);
+void clockSetMaskFake(CALayer* self,SEL sel,CALayer* mask)
 {
-	trace(@"debug hook - setFilters: self %@ filters %@ stack trace %@",self,filters,NSThread.callStackSymbols);
+	if(mask&&[NSStringFromClass(self.class) isEqual:@"CABackdropLayer"]&&[[self sublayers] count]==0)
+	{
+		CALayer* white=[CALayer layer];
+		[white setFrame:CGRectMake(0,0,999,999)];
+		CGColorRef color=CGColorCreateGenericRGB(1,1,1,CLOCK_HACK_ALPHA);
+		[white setBackgroundColor:color];
+		CFRelease(color);
+		[self addSublayer:white];
+	}
 	
-	debugReal_setFilters(self,sel,filters);
+	clockSetMaskReal(self,sel,mask);
 }
 
 void sonomaSetup()
@@ -32,9 +40,10 @@ void sonomaSetup()
 		swizzleImp(@"CAFilter",@"filterWithType:",false,fake_filterWithType,&real_filterWithType);
 	}
 	
-	// example
-	
-	// swizzleImp(@"CALayer",@"setFilters:",true,debugFake_setFilters,&debugReal_setFilters);
+	if([process containsString:@"SecurityAgentHelper"]||[process containsString:@"loginwindow"])
+	{
+		swizzleImp(@"CALayer",@"setMask:",true,clockSetMaskFake,&clockSetMaskReal);
+	}
 }
 
 // fix speed up QuickTime videos

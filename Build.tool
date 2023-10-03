@@ -248,6 +248,10 @@ return 0x0'
 
 	if [[ -e Build/QuartzCore.patched ]]
 	then
+		# TODO: yikes
+		
+		cp $binaries/10.15*/QuartzCore.json Build/QuartzCore.patched.json || true
+
 		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
 
 		touch Build/$major/note_used_${qc}_qc.txt
