@@ -260,7 +260,7 @@ void menuBar2DockRecalculate2()
 		}
 		
 		NSString* name=info[(NSString*)kCGWindowName];
-		if(![name containsString:@"Desktop Picture"])
+		if(![name containsString:@"Wallpaper"]&&![name containsString:@"Desktop Picture"])
 		{
 			continue;
 		}
@@ -408,6 +408,16 @@ void menuBar2UnconditionalSetup()
 				menuBar2DockRecalculate2();
 			});
 		}];
+		
+		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"DO IT" object:nil queue:nil usingBlock:^(NSNotification* note)
+		{
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
+			{
+				menuBar2DockRecalculate2();
+			});
+		}];
+		
+		menuBar2DockRecalculate2();
 		
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceReduceTransparencyStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceIncreaseContrastStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);

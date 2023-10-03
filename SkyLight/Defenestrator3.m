@@ -665,6 +665,11 @@ void SLSPostCoordinatedDistributedNotification(int edi_cid,int esi_note,void* rd
 	SLSPostCoordinatedDistributedNotification(edi_cid,esi_note,rcx_block);
 }*/
 
+// hack for MB2 server
+
+dispatch_once_t checkWallpaperOnce;
+BOOL isWallpaper;
+
 // hack for blank wallpaper
 
 CAContext* (*real_contextWithCGSConnection)(id,SEL,int,NSDictionary*);
@@ -676,6 +681,16 @@ CAContext* fake_contextWithCGSConnection(id meta,SEL sel,int cid,NSDictionary* o
 		// TODO: this shouldn't be necessary. where is WallpaperAgent getting the cid?
 		
 		cid=SLSMainConnectionID();
+	}
+	
+	dispatch_once(&checkWallpaperOnce,^()
+	{
+		isWallpaper=[process containsString:@"WallpaperImageExtension"];
+	});
+	
+	if(isWallpaper)
+	{
+		[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"DO IT" object:nil userInfo:nil deliverImmediately:true];
 	}
 	
 	return real_contextWithCGSConnection(meta,sel,cid,options);
