@@ -1,4 +1,4 @@
-#define CLOCK_HACK_ALPHA 0.6
+#define CLOCK_HACK_ALPHA 0.5
 
 // monochrome widgets
 
