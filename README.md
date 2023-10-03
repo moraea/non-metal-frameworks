@@ -99,6 +99,12 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-10-3
+- mimic the correct lock screen clock tint
+- fix MenuBar2 server
+- workaround window focus glitch
+- fix catalyst buttons
+
 ### 2023-9-19
 - fix blank Safari windows with downgraded QuartzCore
 
