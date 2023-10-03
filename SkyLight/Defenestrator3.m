@@ -583,8 +583,6 @@ void SLSTransactionSetMenuBars(void* rdi_trans,NSMutableArray<NSDictionary*>* rs
 	// TODO: doesn't currently work. for now, use the Carbon (HIToolbox) path
 	// defaults write -g NSEnableAppKitMenus -bool false
 	
-	// TODO: even with that, the MB2 server doesn't work
-	
 	SLSSetMenuBars(SLSMainConnectionID(),rsi_perbar,rdx_global);
 }
 
@@ -736,10 +734,21 @@ void* SLSTransactionSetWindowTags(int rdi_trans,int esi_wid,long rdx,int ecx,int
 	}
 }
 
-void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
+// void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
+// void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
 
-void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
+int SLPSSetFrontProcessWithOptions(long* rdi,int esi,long rdx);
+
+int SLSSetFrontProcessWithInfo(long* rdi,int esi,long rdx,NSDictionary* rcx)
 {
+	// TODO: this is much more complex, rcx has various keys, and supposed to skip the SLPS path entirely if ANY are present
+	// however it seems we can get away with just this 1 check to "fix" the window unfocusing glitch
+	
+	if(!((NSNumber*)rcx[@"kSLSSetFrontProcessApplicationHasVisibleWindows"]).boolValue)
+	{
+		return 0;
+	}
+	
 	return SLPSSetFrontProcessWithOptions(rdi,esi,rdx);
 }
 
