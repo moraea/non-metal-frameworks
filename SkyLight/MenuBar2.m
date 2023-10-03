@@ -5,6 +5,7 @@
 #define MENUBAR_DARK_FORMAT @"Amy.MenuBar2.DarkText.%d"
 #define MENUBAR_DARK_NOTE @"Amy.MenuBar2.DarkTextChanged"
 #define MENUBAR_KEY_BETA @"Amy.MenuBar2Beta"
+#define MENUBAR_NOTE_2 @"DO IT"
 
 // forward Rim.m
 
@@ -295,7 +296,10 @@ void menuBar2DockRecalculate2()
 		
 		long longWid=wid;
 		CFArrayRef array=CFArrayCreate(NULL,(const void**)&longWid,1,NULL);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 		CGImageRef screenshot=CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
+#pragma clang diagnostic pop
 		if(!screenshot)
 		{
 			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
@@ -383,9 +387,19 @@ void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observe
 id (*real_EWC)(id,SEL,id);
 id fake_EWC(id self,SEL sel,id coder)
 {
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"DO IT" object:nil userInfo:nil deliverImmediately:true];
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_NOTE_2 object:nil userInfo:nil deliverImmediately:true];
 	
 	return real_EWC(self,sel,coder);;
+}
+
+void recalculateAfterFade()
+{
+	// TODO: handle the fade time in auto changing wallpapers... not ideal
+			
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
+	{
+		menuBar2DockRecalculate2();
+	});
 }
 
 void menuBar2UnconditionalSetup()
@@ -407,34 +421,27 @@ void menuBar2UnconditionalSetup()
 	
 	if([process containsString:@"WallpaperAgent.app"])
 	{
-		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,fake_EWC,&real_EWC);
+		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,(IMP)fake_EWC,(IMP*)&real_EWC);
 		return;
 	}
 	
 	if([process containsString:@"Dock.app/Contents/MacOS/Dock"])
 	{
+		// Ventura
+		
 		[NSNotificationCenter.defaultCenter addObserverForName:@"desktoppicturechanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			// TODO: handle the fade time in auto changing wallpapers... not ideal
-			
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
-			{
-				menuBar2DockRecalculate2();
-			});
+			recalculateAfterFade();
 		}];
 		
-		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"DO IT" object:nil queue:nil usingBlock:^(NSNotification* note)
+		// Sonoma
+		
+		[NSDistributedNotificationCenter.defaultCenter addObserverForName:MENUBAR_NOTE_2 object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
-			{
-				menuBar2DockRecalculate2();
-			});
+			recalculateAfterFade();
 		}];
 		
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW,MENUBAR_WALLPAPER_DELAY*NSEC_PER_SEC),dispatch_get_main_queue(),^()
-		{
-			menuBar2DockRecalculate2();
-		});
+		recalculateAfterFade();
 		
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceReduceTransparencyStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBar2DockReduceTransparencyCallback,CFSTR("AXInterfaceIncreaseContrastStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);

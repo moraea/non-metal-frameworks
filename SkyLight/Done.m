@@ -1,7 +1,5 @@
 // fix a number of unresponsive Catalyst buttons
-
 // TODO: still does not solve the root issue
-// note - requires this branch's updated QC wrapper if using ≤ Cat QC
 
 void (*real_setContextId)(CALayer*,SEL,int);
 void fake_setContextId(CALayer* self,SEL sel,int hostedContextID)
@@ -20,8 +18,6 @@ void fake_setContextId(CALayer* self,SEL sel,int hostedContextID)
 
 void doneSetup()
 {
-	// swizzleImp(@"UIWindow",@"_windowWithContextId:",false,(IMP)fake_WWCI,(IMP*)&real_WWCI);
-	
 	swizzleImp(@"CALayerHost",@"setContextId:",true,(IMP)fake_setContextId,(IMP*)&real_setContextId);
 }
 
@@ -36,8 +32,6 @@ void contextV2Callback(int edi_type,long* rsi,int edx)
 	int contextID=*rsi;
 	int flag=(*rsi)>>0x20;
 	
-	// trace(@"contextV2Callback %x %x %x (%x blocks)",contextID,flag,edx,contextV2Blocks.count);
-	
 	for(ContextV2Block block in contextV2Blocks)
 	{
 		block(contextID,flag);
@@ -46,7 +40,6 @@ void contextV2Callback(int edi_type,long* rsi,int edx)
 
 void SLSInstallRemoteContextNotificationHandlerV2(NSString* rdi_key,ContextV2Block rsi_block)
 {
-	// trace(@"SLSInstallRemoteContextNotificationHandlerV2 %@ %p",rdi_key,rsi_block);
 	ContextV2Block heapBlock=[rsi_block copy];
 	dispatch_once(&contextV2Once,^()
 	{

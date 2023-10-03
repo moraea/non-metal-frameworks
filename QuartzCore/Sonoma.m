@@ -11,7 +11,7 @@ NSObject* fake_filterWithType(id meta,SEL sel,NSString* type)
 {
 	if([type isEqual:kCAFilterVibrantColorMatrix])
 	{
-		type=kCAFilterColorMatrix;
+		type=(NSString*)kCAFilterColorMatrix;
 	}
 	
 	return real_filterWithType(meta,sel,type);
@@ -37,12 +37,12 @@ void sonomaSetup()
 {
 	if([process containsString:@"NotificationCenter.app"])
 	{
-		swizzleImp(@"CAFilter",@"filterWithType:",false,fake_filterWithType,&real_filterWithType);
+		swizzleImp(@"CAFilter",@"filterWithType:",false,(IMP)fake_filterWithType,(IMP*)&real_filterWithType);
 	}
 	
 	if([process containsString:@"SecurityAgentHelper"]||[process containsString:@"loginwindow"])
 	{
-		swizzleImp(@"CALayer",@"setMask:",true,clockSetMaskFake,&clockSetMaskReal);
+		swizzleImp(@"CALayer",@"setMask:",true,(IMP)clockSetMaskFake,(IMP*)&clockSetMaskReal);
 	}
 }
 
