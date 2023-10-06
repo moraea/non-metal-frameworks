@@ -744,7 +744,7 @@ int SLSSetFrontProcessWithInfo(long* rdi,int esi,long rdx,NSDictionary* rcx)
 	// TODO: this is much more complex, rcx has various keys, and supposed to skip the SLPS path entirely if ANY are present
 	// however it seems we can get away with just this 1 check to "fix" the window unfocusing glitch
 	
-	if(!((NSNumber*)rcx[@"kSLSSetFrontProcessApplicationHasVisibleWindows"]).boolValue)
+	if(!((NSNumber*)rcx[@"kSLSSetFrontProcessIgnoringOtherApps"]).boolValue)
 	{
 		return 0;
 	}
