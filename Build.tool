@@ -244,6 +244,11 @@ return 0x0'
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol _CARequiresColorMatching
 return 0x0'
+		echo 'applying CAMetalLayer init hack'
+		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+set 0xdf51
+return 0x0'
+
 	fi
 
 	if [[ -e Build/QuartzCore.patched ]]
