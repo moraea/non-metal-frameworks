@@ -752,4 +752,16 @@ int SLSSetFrontProcessWithInfo(long* rdi,int esi,long rdx,NSDictionary* rcx)
 	return SLPSSetFrontProcessWithOptions(rdi,esi,rdx);
 }
 
+//idk if this is correct but works on my machine
+
+void SLSSetMenuBarCompanionWindow(int edi_cid,int esi,int rdx,double xmm0);
+
+void SLSTransactionSetMenuBarCompanionWindow(void* rdi_trans,int esi,int rdx,double xmm0)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSSetMenuBarCompanionWindow(SLSMainConnectionID(),esi,rdx,xmm0);
+	});
+}
+
 // END FUNCTIONS FROM EDUCOVAS
