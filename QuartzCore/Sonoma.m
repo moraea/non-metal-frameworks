@@ -33,6 +33,13 @@ void clockSetMaskFake(CALayer* self,SEL sel,CALayer* mask)
 	clockSetMaskReal(self,sel,mask);
 }
 
+// Workaround Weather app crash
+
+BOOL Fakeinit()
+{
+	return 0;
+}
+
 void sonomaSetup()
 {
 	if([process containsString:@"NotificationCenter.app"])
@@ -43,6 +50,11 @@ void sonomaSetup()
 	if([process containsString:@"SecurityAgentHelper"]||[process containsString:@"loginwindow"])
 	{
 		swizzleImp(@"CALayer",@"setMask:",true,(IMP)clockSetMaskFake,(IMP*)&clockSetMaskReal);
+	}
+	
+	if([process isEqualToString:@"/System/Applications/Weather.app/Contents/MacOS/Weather"])
+	{
+		swizzleImp(@"CAMetalLayer",@"init",true,(IMP)Fakeinit,NULL);
 	}
 }
 
