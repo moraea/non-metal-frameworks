@@ -35,7 +35,7 @@ void clockSetMaskFake(CALayer* self,SEL sel,CALayer* mask)
 
 // Workaround Weather app crash
 
-BOOL Fakeinit()
+long Fakeinit()
 {
 	return 0;
 }
