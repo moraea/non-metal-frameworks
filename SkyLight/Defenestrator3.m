@@ -109,10 +109,19 @@ void pushFuckedBlock(CommitBlock block)
 	[heapBlock release];
 }
 
+NSLock* commitLock=nil;
+dispatch_once_t commitLockOnce;
+
 // TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
+	dispatch_once(&commitLockOnce,^()
+	{
+		commitLock=NSLock.alloc.init;
+	});
+	commitLock.lock;
+	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
@@ -131,6 +140,8 @@ void SLSTransactionCommit(void* rdi,int esi)
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
+	
+	commitLock.unlock;
 }
 
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
