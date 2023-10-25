@@ -126,17 +126,21 @@ void SLSTransactionCommit(void* rdi,int esi)
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
 	{
-		for(CommitBlock block in blocks)
+		NSArray<CommitBlock>* blocksTemp=blocks.copy;
+		for(CommitBlock block in blocksTemp)
 		{
 			block();
 		}
+		blocksTemp.release;
 		commitBlocks[key]=nil;
 	}
 	
-	for(CommitBlock block in fuckedBlocks)
+	NSArray<CommitBlock>* fuckedTemp=fuckedBlocks.copy;
+	for(CommitBlock block in fuckedTemp)
 	{
 		block();
 	}
+	fuckedTemp.release;
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
