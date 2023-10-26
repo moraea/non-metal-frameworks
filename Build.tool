@@ -270,7 +270,7 @@ then
 else
 	clear
 	echo "#############\n# Build For #\n#############"
-	select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
+	select opt in "Big Sur" "Monterey" "Ventura" "Sonoma" "Exit"; do
     case $opt in
     	"Big Sur")
 			target=11
@@ -282,6 +282,10 @@ else
 			;;
     	"Ventura")
 			target=13
+			break
+			;;
+    	"Sonoma")
+			target=14
 			break
 			;;
 	    "Exit")
