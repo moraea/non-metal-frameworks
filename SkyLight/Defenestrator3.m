@@ -212,9 +212,7 @@ void defenestratorRegisterUpdate(DefenestratorBlock block)
 	[updateBlocks addObject:heapBlock];
 	[heapBlock release];
 }
-#if MAJOR==14
-void defenestrator3Setup(); // TODO
-#endif
+
 void defenestratorSetup()
 {
 	wrappers=NSMutableDictionary.alloc.init;
@@ -226,7 +224,9 @@ void defenestratorSetup()
 	destructionBlocks=NSMutableArray.alloc.init;
 	updateBlocks=NSMutableArray.alloc.init;
 	
+#if MAJOR==14
 	defenestrator3Setup();
+#endif
 }
 
 @implementation Wrapper
