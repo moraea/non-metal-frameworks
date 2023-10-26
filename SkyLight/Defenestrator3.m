@@ -109,28 +109,43 @@ void pushFuckedBlock(CommitBlock block)
 	[heapBlock release];
 }
 
+NSLock* commitLock=nil;
+dispatch_once_t commitLockOnce;
+
 // TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
+	dispatch_once(&commitLockOnce,^()
+	{
+		commitLock=NSLock.alloc.init;
+	});
+	commitLock.lock;
+	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
 	{
-		for(CommitBlock block in blocks)
+		NSArray<CommitBlock>* blocksTemp=blocks.copy;
+		for(CommitBlock block in blocksTemp)
 		{
 			block();
 		}
+		blocksTemp.release;
 		commitBlocks[key]=nil;
 	}
 	
-	for(CommitBlock block in fuckedBlocks)
+	NSArray<CommitBlock>* fuckedTemp=fuckedBlocks.copy;
+	for(CommitBlock block in fuckedTemp)
 	{
 		block();
 	}
+	fuckedTemp.release;
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
+	
+	commitLock.unlock;
 }
 
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
@@ -583,8 +598,6 @@ void SLSTransactionSetMenuBars(void* rdi_trans,NSMutableArray<NSDictionary*>* rs
 	// TODO: doesn't currently work. for now, use the Carbon (HIToolbox) path
 	// defaults write -g NSEnableAppKitMenus -bool false
 	
-	// TODO: even with that, the MB2 server doesn't work
-	
 	SLSSetMenuBars(SLSMainConnectionID(),rsi_perbar,rdx_global);
 }
 
@@ -736,11 +749,34 @@ void* SLSTransactionSetWindowTags(int rdi_trans,int esi_wid,long rdx,int ecx,int
 	}
 }
 
-void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
+// void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
+// void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
 
-void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
+int SLPSSetFrontProcessWithOptions(long* rdi,int esi,long rdx);
+
+int SLSSetFrontProcessWithInfo(long* rdi,int esi,long rdx,NSDictionary* rcx)
 {
+	// TODO: this is much more complex, rcx has various keys, and supposed to skip the SLPS path entirely if ANY are present
+	// however it seems we can get away with just this 1 check to "fix" the window unfocusing glitch
+	
+	if(!((NSNumber*)rcx[@"kSLSSetFrontProcessIgnoringOtherApps"]).boolValue)
+	{
+		return 0;
+	}
+	
 	return SLPSSetFrontProcessWithOptions(rdi,esi,rdx);
+}
+
+//idk if this is correct but works on my machine
+
+void SLSSetMenuBarCompanionWindow(int edi_cid,int esi,int rdx,double xmm0);
+
+void SLSTransactionSetMenuBarCompanionWindow(void* rdi_trans,int esi,int rdx,double xmm0)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSSetMenuBarCompanionWindow(SLSMainConnectionID(),esi,rdx,xmm0);
+	});
 }
 
 // END FUNCTIONS FROM EDUCOVAS

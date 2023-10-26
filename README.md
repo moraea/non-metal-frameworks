@@ -99,6 +99,12 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2023-10-3
+- mimic the correct lock screen clock tint
+- fix MenuBar2 server
+- workaround window focus glitch
+- fix catalyst buttons
+
 ### 2023-9-19
 - fix blank Safari windows with downgraded QuartzCore
 
@@ -253,10 +259,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
-- update unresponsive Catalyst buttons fix for Sonoma
-- improve loginwindow clock
 - reimplement AppKit menubar
-- fix MenuBar2 dock server
 - reimplement WindowManager communication
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore

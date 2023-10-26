@@ -1,5 +1,6 @@
 #import "Utils.h"
 @import IOSurface;
+@import CoreGraphics;
 
 NSString* process;
 
