@@ -40,11 +40,32 @@ long Fakeinit()
 	return 0;
 }
 
+// Force full color desktop widgets
+
+id (*r)(NSUserDefaults*,SEL,NSString*);
+
+id f(NSUserDefaults* self,SEL selector,NSString* key)
+{
+	if(![key isEqual:@"widgetAppearance"])
+	{
+		return r(self,selector,key);
+	}
+	
+	trace(@"it %@",NSThread.callStackSymbols);
+	
+	return @1;
+}
+
 void sonomaSetup()
 {
 	if([process containsString:@"NotificationCenter.app"])
 	{
 		swizzleImp(@"CAFilter",@"filterWithType:",false,(IMP)fake_filterWithType,(IMP*)&real_filterWithType);
+
+		if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_ColorWidgetDisabled"]!=1)
+		{
+			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,f,&r);
+		}
 	}
 	
 	if([process containsString:@"SecurityAgentHelper"]||[process containsString:@"loginwindow"])
