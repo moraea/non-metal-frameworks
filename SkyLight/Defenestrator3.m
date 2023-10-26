@@ -769,4 +769,14 @@ void SLSTransactionSetMenuBarCompanionWindow(void* rdi_trans,int esi,int rdx,dou
 	});
 }
 
+void SLSSpaceFinishedResizeForRect(int edi_cid,int esi,double xmm0,double xmm1);
+
+void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm0,double xmm1)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSSpaceFinishedResizeForRect(SLSMainConnectionID(),esi,xmm0,xmm1);
+	});
+}
+
 // END FUNCTIONS FROM EDUCOVAS
