@@ -213,6 +213,8 @@ void defenestratorRegisterUpdate(DefenestratorBlock block)
 	[heapBlock release];
 }
 
+void defenestrator3Setup(); // TODO
+
 void defenestratorSetup()
 {
 	wrappers=NSMutableDictionary.alloc.init;
