@@ -682,6 +682,7 @@ CAContext* fake_contextWithCGSConnection(id meta,SEL sel,int cid,NSDictionary* o
 
 // Sonoma-specific stuff
 
+#if MAJOR==14
 void defenestrator3Setup()
 {
 	if(earlyBoot)
@@ -717,6 +718,7 @@ void defenestrator3Setup()
 		});
 	}
 }
+#endif
 
 // BEGIN FUNCTIONS FROM EDUCOVAS
 
