@@ -16,10 +16,6 @@ BOOL isWindowServer;
 // TODO: Defenestrator2c is removed (otherwise its nostub lines would be seen)
 // this must be fixed in either Build.tool or Stubber itself
 
-#if MAJOR==13
-#error this branch can't build for Ventura currently!!!
-#endif
-
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
