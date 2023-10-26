@@ -28,6 +28,16 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- patch for downgraded QuartzCore crashes in Ventura
 	- CABL/CAPL blur hack research and code
 	- producing and testing builds for OCLP
+	- Sonoma research and shim development (ongoing)
+		- identification of many functions responsible for:
+			- window grouping/ordering
+			- setting the frontmost process
+			- setting window tags (attributes)
+			- SkyLight notifications
+		- implmentation of shims for some of the above
+		- identification of windowing functionality dependent on WindowManager interfaces
+		- QuartzCore filter research and fallback idea (fixes monochrome widgets)
+		- QuartzCore patch for white UI elements
 	- countless other code contributions, insights, and testing
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
@@ -45,15 +55,16 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
     - LegacyRVPL for rapid testing of new framework shims/patches
 		- preserves snapshots and delta OTAs for developer convenience
 	- Ventura SkyLight transactions/softlinks research
-	- Ventura WindowManager research
+	- Ventura/Sonoma WindowManager research
 	- Objective-C and dynamic linker cache research
+	- Sonoma research and shim development (ongoing)
 	- countless other macOS insights, explanations, and help
 - [ASentientBot](https://asentientbot.github.io)
 	- most build scripts and stubbing/binpatching/swizzling utils
     - misc fixes (defenestrator-on window contents, menu bar contents and styling, sidebar glyphs, user input, sessions, Dock collisions, display sleep, accessibility zoom, greyscale, occlusion detection, CABL/CAPL hacks, Cycle Through Windows, wait cursor, unresponsive Catalyst/SwiftUI buttons, sshd/cryptexd, permissions, various crashes)
 	- downgraded QuartzCore fixes (animations, Catalyst issues, Siri issues, black videos)
 	- app-specific hacks (Photos, Discord, Safari, Books, Logic)
-	- Ventura SkyLight transactions/softlinks shims (many based on EduCovas's research, see above)
+	- misc Ventura/Sonoma shims (**many based on Edu's research**, see above)
 	- various other code and research
 - [khronokernel](https://github.com/khronokernel)
     - OpenCore Legacy Patcher development and leadership
@@ -87,6 +98,30 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 Thank you as well to other contributors, moderators, and testers on [Unsupported Macs Discord](https://discord.gg/XbbWAsE), [OCLP Discord](https://discord.gg/rqdPgH8xSN), and [MacRumors Forums](https://forums.macrumors.com). Please contact us or open an issue if we forgot to mention you!
 
 ## changes
+
+### 2023-10-3
+- mimic the correct lock screen clock tint
+- fix MenuBar2 server
+- workaround window focus glitch
+- fix catalyst buttons
+
+### 2023-9-19
+- fix blank Safari windows with downgraded QuartzCore
+
+### 2023-9-9
+- fix popup sheet windows
+
+### 2023-6-16
+- fix white artifacts with downgraded QuartzCore
+
+### 2023-6-14
+- preliminary Sonoma support
+	- build script update (requires `non-metal-common:sonoma`); SkyLight libSystem symbols hack
+	- essential SkyLight transactions shims (**as usual, credit EduCovas for most research and significant parts of the shims!!**)
+	- WSCA tweaks (`SLSNewWindowWithOpaqueShapeAndContext`, permit layer changing, Dock-specific surface size hack 🤦🏻‍♀️, WallpaperAgent connection ID hack)
+	- _menubar is currently broken with the new AppKit path_, force Carbon path with `defaults write -g NSEnableAppKitMenus -bool false`
+	- monochrome widgets fix
+	- _QuartzCore downgrade currently causes white artifacts_, workaround is to set display profile to sRGB/Unknown Display (as for HD 3000 problem)
 
 ### 2023-6-2
 - rewrite MenuBar2; improve stability and implement Reduce Transparency/Increase Contrast handling
@@ -224,6 +259,7 @@ Previous history is available in the [old repository](https://github.com/ASentie
 ## todo
 Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [here](https://github.com/dortania/OpenCore-Legacy-Patcher/issues/108#issuecomment-810634088).
 
+- reimplement AppKit menubar
 - reimplement WindowManager communication
 - investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore

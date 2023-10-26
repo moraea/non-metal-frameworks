@@ -78,7 +78,7 @@ void SLSTransactionSystemStatusBarSetSelectedContentFrame(unsigned long rdi_tran
 {
 	if(useMenuBar2())
 	{
-		menuBar2SetRightSideSelection(rdi_transaction,esi_windowID,stack_rect);
+		menuBar2SetRightSideSelection((void*)rdi_transaction,esi_windowID,stack_rect);
 		return;
 	}
 	

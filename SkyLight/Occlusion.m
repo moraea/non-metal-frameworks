@@ -28,14 +28,14 @@ void fake__setWindowNumber(id self,SEL selector,unsigned long windowID)
 
 +(instancetype)assertion
 {
-	trace(@"SLSecureCursorAssertion assertion");
+	// trace(@"SLSecureCursorAssertion assertion");
 	
 	return SLSecureCursorAssertion.alloc.init.autorelease;
 }
 
 -(BOOL)isValid
 {
-	trace(@"SLSecureCursorAssertion isValid");
+	// trace(@"SLSecureCursorAssertion isValid");
 	
 	return true;
 }

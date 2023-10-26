@@ -15,14 +15,15 @@ NSDictionary* getHidParams()
 	NSDictionary* result=IORegistryEntryCreateCFProperty(service,CFSTR("HIDParameters"),kCFAllocatorDefault,0);
 	IOObjectRelease(service);
 	
-	trace(@"getHidParams IORegistryEntryCreateCFProperty %@",result);
+	// trace(@"getHidParams IORegistryEntryCreateCFProperty %@",result);
 	
 	return result.autorelease;
 }
 
 void setHidParams(NSDictionary* params)
 {
-	trace(@"setHidParams IOHIDEventSystemSetProperty %d %@",IOHIDEventSystemSetProperty(eventSystem,CFSTR("HIDParameters"),params),params);
+	// trace(@"setHidParams IOHIDEventSystemSetProperty %d %@",IOHIDEventSystemSetProperty(eventSystem,CFSTR("HIDParameters"),params),params);
+	IOHIDEventSystemSetProperty(eventSystem,CFSTR("HIDParameters"),params);
 }
 
 void hiddSetup()
@@ -42,7 +43,8 @@ void hiddSetup()
 				return;
 			}
 			
-			trace(@"IOHIDEventSystemOpen %ld",IOHIDEventSystemOpen(eventSystem,NULL,NULL,NULL,0));
+			// trace(@"IOHIDEventSystemOpen %ld",IOHIDEventSystemOpen(eventSystem,NULL,NULL,NULL,0));
+			IOHIDEventSystemOpen(eventSystem,NULL,NULL,NULL,0);
 			
 			setHidParams(getHidParams());
 			

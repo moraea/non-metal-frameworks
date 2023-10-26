@@ -13,9 +13,12 @@ BOOL isWindowServer;
 #import "Appearance.m"
 #import "Backlight.m"
 
+// TODO: Defenestrator2c is removed (otherwise its nostub lines would be seen)
+// this must be fixed in either Build.tool or Stubber itself
+
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
-#import "Defenestrator2c.m"
+#import "Defenestrator3.m"
 #else
 #import "Defenestrator.m"
 #endif

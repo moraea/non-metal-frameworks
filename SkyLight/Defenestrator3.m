@@ -3,6 +3,7 @@
 @property(assign) int wid;
 @property(assign) int sid;
 @property(assign) CAContext* context;
+@property(assign) CALayer* trackedLayer;
 
 -(instancetype)initWithWid:(int)wid context:(CAContext*)context;
 
@@ -108,28 +109,43 @@ void pushFuckedBlock(CommitBlock block)
 	[heapBlock release];
 }
 
+NSLock* commitLock=nil;
+dispatch_once_t commitLockOnce;
+
 // TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
+	dispatch_once(&commitLockOnce,^()
+	{
+		commitLock=NSLock.alloc.init;
+	});
+	commitLock.lock;
+	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
 	if(blocks)
 	{
-		for(CommitBlock block in blocks)
+		NSArray<CommitBlock>* blocksTemp=blocks.copy;
+		for(CommitBlock block in blocksTemp)
 		{
 			block();
 		}
+		blocksTemp.release;
 		commitBlocks[key]=nil;
 	}
 	
-	for(CommitBlock block in fuckedBlocks)
+	NSArray<CommitBlock>* fuckedTemp=fuckedBlocks.copy;
+	for(CommitBlock block in fuckedTemp)
 	{
 		block();
 	}
+	fuckedTemp.release;
 	fuckedBlocks.removeAllObjects;
 	
 	SLSTransactionCommi$(rdi,esi);
+	
+	commitLock.unlock;
 }
 
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
@@ -197,6 +213,8 @@ void defenestratorRegisterUpdate(DefenestratorBlock block)
 	[heapBlock release];
 }
 
+void defenestrator3Setup(); // TODO
+
 void defenestratorSetup()
 {
 	wrappers=NSMutableDictionary.alloc.init;
@@ -207,6 +225,10 @@ void defenestratorSetup()
 	creationBlocks=NSMutableArray.alloc.init;
 	destructionBlocks=NSMutableArray.alloc.init;
 	updateBlocks=NSMutableArray.alloc.init;
+	
+#if MAJOR==14
+	defenestrator3Setup();
+#endif
 }
 
 @implementation Wrapper
@@ -226,7 +248,13 @@ void defenestratorSetup()
 	_sid=sid;
 	_context=context.retain;
 	
-	[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+	[context addObserver:self forKeyPath:@"layer" options:0 context:NULL];
+	
+	if(context.layer)
+	{
+		[context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+		_trackedLayer=context.layer;
+	}
 	
 	dispatch_once(&defenestratorOnce,^()
 	{
@@ -264,6 +292,20 @@ void defenestratorSetup()
 
 -(void)observeValueForKeyPath:(NSString*)path ofObject:(NSObject*)object change:(NSDictionary*)change context:(void*)context
 {
+	// sometimes context.layer now gets changed (Dock)
+	// so we have to do extra bookkeeping to avoid KVO crashes...
+	
+	if([path isEqual:@"layer"])
+	{
+		if(_trackedLayer)
+		{
+			[_trackedLayer removeObserver:self forKeyPath:@"bounds"];
+		}
+		
+		[_context.layer addObserver:self forKeyPath:@"bounds" options:0 context:NULL];
+		_trackedLayer=_context.layer;
+	}
+	
 	self.queueUpdate;
 }
 
@@ -274,11 +316,14 @@ void defenestratorSetup()
 		block(self);
 	}
 	
-	[self.context.layer removeObserver:self forKeyPath:@"bounds"];
+	[self.context removeObserver:self forKeyPath:@"layer"];
+	
+	if(_trackedLayer)
+	{
+		[_trackedLayer removeObserver:self forKeyPath:@"bounds"];
+	}
 	
 	self.context.release;
-	
-	// TODO: any other cleanup?
 }
 
 @end
@@ -495,20 +540,243 @@ void SLSTransactionWait(void* rdi)
 	semaphore.release;*/
 }
 
-// still softlinked 13.1 DP3
-// TODO: may not be exhaustive
+// disabled (Ventura)
 
-// nostub SLSTransactionSetMenuBars
-// nostub SLSTransactionSetSurfaceColorSpace
-// nostub SLSTransactionSpaceFinishedResizeForRect
-// nostub SLSTransactionSetMenuBarCompanionWindow
-// nostub SLSTransactionEnsureSpaceSwitchToActiveProcess
-// nostub SLSTransactionSystemStatusBarSetItemPrivacyIndicator
-// nostub SLSTransactionReorderWindows
-// nostub SLSTransactionAddWindowToWindowOrderingGroup
-// nostub SLSTransactionRemoveWindowFromWindowOrderingGroup
-// nostub SLSTransactionClearWindowOrderingGroup
-// nostub SLSTransactionOrderWindowGroupFrontConditionally
-// nostub SLSTransactionGetTransactionID
-// nostub SLSTransactionSetWindowTags
-// nostub SLSTransactionRemoveSurfaces
+// no/stub SLSTransactionSetMenuBars
+// no/stub SLSTransactionSetSurfaceColorSpace
+// no/stub SLSTransactionSpaceFinishedResizeForRect
+// no/stub SLSTransactionSetMenuBarCompanionWindow
+// no/stub SLSTransactionEnsureSpaceSwitchToActiveProcess
+// no/stub SLSTransactionSystemStatusBarSetItemPrivacyIndicator
+// no/stub SLSTransactionReorderWindows
+// no/stub SLSTransactionAddWindowToWindowOrderingGroup
+// no/stub SLSTransactionRemoveWindowFromWindowOrderingGroup
+// no/stub SLSTransactionClearWindowOrderingGroup
+// no/stub SLSTransactionOrderWindowGroupFrontConditionally
+// no/stub SLSTransactionGetTransactionID
+// no/stub SLSTransactionSetWindowTags
+// no/stub SLSTransactionRemoveSurfaces
+
+// Sonoma DP1 softlinks (AppKit)
+
+// nostub SLSStatusBarCopyItemLayout
+// nostub SLSTransactionSystemStatusBarResetLayout
+// nostub SLSTransactionSystemStatusBarSetLayoutIndex
+// nostub SLSTransactionClearWindowCornerRadius
+// nostub SLSTransactionSetWindowBoundsPath
+
+// TODO: workaround, Renamer-ed for Defenestrator1
+
+unsigned int SLSShapeWindowInWindowCoordinates(unsigned int edi_connectionID,unsigned int esi_windowID,char* rdx_region,unsigned int ecx,unsigned int r8d,unsigned int r9d,unsigned int stack)
+{
+	return SLSShapeWindowInWindowCoordinate$(edi_connectionID,esi_windowID,rdx_region,ecx,r8d,r9d,stack);
+}
+
+// forward WindowFlags.m
+
+unsigned int SLSNewWindowWithOpaqueShape(unsigned int edi_connectionID,unsigned int esi,char* rdx_region,char* rcx_region,unsigned int r8d,char* r9,unsigned long stack1_windowID,unsigned long stack2,double xmm0,double xmm1);
+
+// existed for a while but only used in Dock as of Sonoma
+
+void* SLSNewWindowWithOpaqueShapeAndContext(int edi_cid,int esi_5,void* rdx_region,void* rcx_region,int r8d_1,void* r9,double xmm0,double xmm1,int stack_0x40,int* stack_widOut,CAContext* stack_context)
+{
+	int myWid=0;
+	SLSNewWindowWithOpaqueShape(edi_cid,esi_5,rdx_region,rcx_region,r8d_1,r9,stack_0x40,(unsigned long)&myWid,xmm0,xmm1);
+	SLSSetWindowLayerContext(edi_cid,myWid,stack_context);
+	
+	*stack_widOut=myWid;
+	
+	return NULL;
+}
+
+void SLSEnsureSpaceSwitchToActiveProcess();
+
+void SLSTransactionEnsureSpaceSwitchToActiveProcess(void* rdi_trans)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSEnsureSpaceSwitchToActiveProcess();
+	});
+}
+
+void SLSAddWindowToWindowOrderingGroup(int edi_cid,int esi_wid,int edx_relativeWid,int ecx_above);
+
+void SLSTransactionAddWindowToWindowOrderingGroup(void* rdi_trans,int edx_relativeWid,int ecx_above,int esi_wid)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSAddWindowToWindowOrderingGroup(SLSMainConnectionID(),esi_wid,edx_relativeWid,ecx_above);
+	});
+}
+
+void SLSTransactionOrderWindowGroup(void* rdi_trans,int esi_wid,int edx_op,int ecx_relativeWid);
+
+void SLSOrderFrontConditionally(int edi_cid,int esi_wid,void* rdx_timestamp);
+
+void SLSTransactionOrderWindowGroupFrontConditionally(void* rdi_trans,int esi_wid,void* rdx_timestamp)
+{
+	// TODO: should use the other function (per Ventura softlink) but doesn't work?
+	
+	SLSTransactionOrderWindowGroup(rdi_trans,esi_wid,1,0);
+	
+	/*pushCommitBlock(rdi_trans,^()
+	{
+		SLSOrderFrontConditionally(SLSMainConnectionID(),esi_wid,rdx_timestamp);
+	});*/
+}
+
+void SLSRemoveFromOrderingGroup(int edi_cid,int esi_wid);
+
+void SLSTransactionRemoveWindowFromWindowOrderingGroup(void* rdi_trans,int esi_wid)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSRemoveFromOrderingGroup(SLSMainConnectionID(),esi_wid);
+	});
+}
+
+void SLSClearWindowOrderingGroup(int edi_cid,int esi_wid);
+
+void SLSTransactionClearWindowOrderingGroup(void* rdi_trans,int esi_wid)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSClearWindowOrderingGroup(SLSMainConnectionID(),esi_wid);
+	});
+}
+
+void SLSReorderWindows(int edi_cid);
+
+void SLSTransactionReorderWindows(void* rdi_trans)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSReorderWindows(SLSMainConnectionID());
+	});
+}
+
+void SLSPostCoordinatedDistributedNotification(int edi_cid,int esi_note,void* rdx_block);
+
+// softlinked in loginwindow
+
+// nostub SLSPostCoordinatedDistributedNotificationFenced
+
+/*void SLSPostCoordinatedDistributedNotificationFenced(int edi_cid,int esi_note,int edx_port,void* rcx_block)
+{
+	SLSPostCoordinatedDistributedNotification(edi_cid,esi_note,rcx_block);
+}*/
+
+// hack for blank wallpaper
+
+CAContext* (*real_contextWithCGSConnection)(id,SEL,int,NSDictionary*);
+
+CAContext* fake_contextWithCGSConnection(id meta,SEL sel,int cid,NSDictionary* options)
+{
+	if(cid==0)
+	{
+		// TODO: this shouldn't be necessary. where is WallpaperAgent getting the cid?
+		
+		cid=SLSMainConnectionID();
+	}
+	
+	return real_contextWithCGSConnection(meta,sel,cid,options);
+}
+
+// Sonoma-specific stuff
+
+#if MAJOR==14
+void defenestrator3Setup()
+{
+	if(earlyBoot)
+	{
+		return;
+	}
+	
+	swizzleImp(@"CAContext",@"contextWithCGSConnection:options:",false,(IMP)fake_contextWithCGSConnection,(IMP*)&real_contextWithCGSConnection);
+	
+	// TODO: the infamous Dock Hack, kill asap...
+	// at least it's not hardcoded 1440x900 and uses The Defenestrator API, right? 🤷🏻‍♀️
+	// some sort of WSCA listening issue (not WM) that doesn't affect AppKit apps
+	
+	if([process containsString:@"Dock.app/Contents/MacOS/Dock"])
+	{
+		defenestratorRegisterOnce(^()
+		{
+			defenestratorRegisterUpdate(^(NSObject<DefenestratorWrapper>* wrapper)
+			{
+				CGRect rect=wrapper.context.layer.bounds;
+				
+				if(rect.size.width<1||rect.size.height<1)
+				{
+					trace(@"Dock size hack %@",NSStringFromRect(rect));
+					
+					int display=CGMainDisplayID();
+					
+					rect.size=CGSizeMake(CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
+					
+					SLSSetSurfaceBounds(SLSMainConnectionID(),wrapper.wid,wrapper.sid,rect);
+				}
+			});
+		});
+	}
+}
+#endif
+
+// BEGIN FUNCTIONS FROM EDUCOVAS
+
+void* SLSSetWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
+void* SLSClearWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
+
+void* SLSTransactionSetWindowTags(int rdi_trans,int esi_wid,long rdx,int ecx,int r8d_bool)
+{
+	if(r8d_bool==0)
+	{
+		return SLSSetWindowTags(SLSMainConnectionID(),esi_wid,rdx,ecx);
+	}
+	else
+	{
+		return SLSClearWindowTags(SLSMainConnectionID(),esi_wid,rdx,ecx);
+	}
+}
+
+// void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
+// void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
+
+int SLPSSetFrontProcessWithOptions(long* rdi,int esi,long rdx);
+
+int SLSSetFrontProcessWithInfo(long* rdi,int esi,long rdx,NSDictionary* rcx)
+{
+	// TODO: this is much more complex, rcx has various keys, and supposed to skip the SLPS path entirely if ANY are present
+	// however it seems we can get away with just this 1 check to "fix" the window unfocusing glitch
+	
+	if(!((NSNumber*)rcx[@"kSLSSetFrontProcessIgnoringOtherApps"]).boolValue)
+	{
+		return 0;
+	}
+	
+	return SLPSSetFrontProcessWithOptions(rdi,esi,rdx);
+}
+
+//idk if this is correct but works on my machine
+
+void SLSSetMenuBarCompanionWindow(int edi_cid,int esi,int rdx,double xmm0);
+
+void SLSTransactionSetMenuBarCompanionWindow(void* rdi_trans,int esi,int rdx,double xmm0)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSSetMenuBarCompanionWindow(SLSMainConnectionID(),esi,rdx,xmm0);
+	});
+}
+
+void SLSSpaceFinishedResizeForRect(int edi_cid,int esi,double xmm0,double xmm1);
+
+void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm0,double xmm1)
+{
+	pushCommitBlock(rdi_trans,^()
+	{
+		SLSSpaceFinishedResizeForRect(SLSMainConnectionID(),esi,xmm0,xmm1);
+	});
+}
+
+// END FUNCTIONS FROM EDUCOVAS

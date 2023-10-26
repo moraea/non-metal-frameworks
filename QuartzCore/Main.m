@@ -1,4 +1,6 @@
 #import "Utils.h"
+@import IOSurface;
+@import CoreGraphics;
 
 NSString* process;
 
@@ -16,6 +18,10 @@ NSString* process;
 #ifdef MOJ
 #import "Siri.m"
 #import "Videos.m"
+#endif
+
+#if MAJOR==14
+#import "Sonoma.m"
 #endif
 
 __attribute__((constructor))
@@ -36,5 +42,9 @@ void load()
 	
 #ifdef CAT
 	glyphsSetup();
+#endif
+
+#if MAJOR==14
+	sonomaSetup();
 #endif
 }

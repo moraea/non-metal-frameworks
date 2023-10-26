@@ -29,7 +29,12 @@ function build
 	
 	mainIn="$prefixOut/${name}Wrapper.m"
 
-	Stubber "$oldIn" "$newIn" "$PWD" "$mainIn"
+	# TODO: stopgap for dlopening issues until Stubber 3
+
+	hackNew="${newIn}.json"
+	hackOld="${oldIn}.json"
+
+	Stubber "$oldIn" "$newIn" "$PWD" "$mainIn" "$hackNew" "$hackOld"
 
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
@@ -39,7 +44,18 @@ function build
 		extraArgs=-DSENTIENT_PATCHER
 	fi
 	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs
-	
+
+	# TODO: automatically handle in Stubber? move elsewhere? edit imports and binpatch?
+	# idk. this works for now...
+
+	if [[ ($name = SkyLight) && ($major -ge 14) ]]
+	then
+		clang -fmodules -dynamiclib -Xlinker -reexport_library -Xlinker /usr/lib/libSystem.B.dylib LibSystemWrapper.m -o "$prefixOut/LibSystemWrapper.dylib"
+		codesign -fs - "$prefixOut/LibSystemWrapper.dylib"
+
+		install_name_tool -change /usr/lib/libSystem.B.dylib /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/LibSystemWrapper.dylib "$oldOut"
+	fi
+
 	codesign -f -s - "$oldOut"
 	codesign -f -s - "$mainOut"
 }
@@ -145,7 +161,7 @@ function runWithTargetVersion
 	major=$1
 	echo begin $major
 
-	if test "$major" -eq 13
+	if test "$major" -ge 13
 	then
 		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
 	fi
@@ -216,12 +232,19 @@ function runWithTargetVersion
 			;;
 	esac
 
-	if [[ "$major" = 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
+	if [[ "$major" -ge 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
 	then
 		echo 'applying _CASSynchronize hack'
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol __CASSynchronize
 return 0x0'
+
+	if [[ "$major" -ge 14 ]]
+		echo 'applying _CARequiresColorMatching hack'
+		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+symbol _CARequiresColorMatching
+return 0x0'
+
 	fi
 
 		echo 'applying _CARequiresColorMatching hack'
@@ -231,6 +254,10 @@ return 0x0'
 
 	if [[ -e Build/QuartzCore.patched ]]
 	then
+		# TODO: yikes
+		
+		cp $binaries/10.15*/QuartzCore.json Build/QuartzCore.patched.json || true
+
 		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
 
 		touch Build/$major/note_used_${qc}_qc.txt
@@ -248,7 +275,7 @@ then
 else
 	clear
 	echo "#############\n# Build For #\n#############"
-	select opt in "Big Sur" "Monterey" "Ventura" "Exit"; do
+	select opt in "Big Sur" "Monterey" "Ventura" "Sonoma" "Exit"; do
     case $opt in
     	"Big Sur")
 			target=11
@@ -260,6 +287,10 @@ else
 			;;
     	"Ventura")
 			target=13
+			break
+			;;
+    	"Sonoma")
+			target=14
 			break
 			;;
 	    "Exit")

@@ -7,7 +7,7 @@ BOOL rimBetaDisabled()
 	dispatch_once(&rimBetaDisabledOnce,^()
 	{
 		rimBetaDisabledValue=[NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_RimBetaDisabled"];
-		if([process containsString:@"Folx.app"]||[process containsString:@"Blackmagic Disk Speed Test.app"]||[process containsString:@".prefPane"]||[process containsString:@"Siri.app"]||[process containsString:@"PrivateFrameworks"]||[process containsString:@"Simulator.app"])
+		if([process containsString:@"Folx.app"]||[process containsString:@"Blackmagic Disk Speed Test.app"]||[process containsString:@".prefPane"]||[process containsString:@"Siri.app"]||[process containsString:@"PrivateFrameworks"]||[process containsString:@"Simulator.app"]||[process containsString:@"NotificationCenter.app"])
 		{
 			rimBetaDisabledValue=1;
 		}
@@ -19,7 +19,8 @@ void addFakeRim(unsigned int windowID)
 {
 	CALayer* layer=wrapperForWindow(windowID).context.layer;
 	layer.borderWidth=1;
-	layer.cornerRadius=10;
+	// Looks bad with AppKit menubar and in some other places
+	// layer.cornerRadius=10;
 	CGColorRef color=CGColorCreateGenericRGB(1.0,1.0,1.0,0.2);
 	layer.borderColor=color;
 	CFRelease(color);

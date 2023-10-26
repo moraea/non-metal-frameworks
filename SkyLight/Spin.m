@@ -36,7 +36,7 @@ void updateCursor()
 		inputs[2]=frame%SPIN_COUNT+1;
 	}
 	
-	IOConnectCallMethod(handle,13,inputs,3,NULL,0,NULL,NULL,NULL,NULL);
+	IOConnectCallMethod(handle,13,(const uint64_t*)inputs,3,NULL,0,NULL,NULL,NULL,NULL);
 }
 
 void spinStart()
