@@ -589,7 +589,7 @@ void* SLSNewWindowWithOpaqueShapeAndContext(int edi_cid,int esi_5,void* rdx_regi
 
 // forward MenuBar.m
 
-unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_array,NSMutableDictionary* rdx_dict);
+/*unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_array,NSMutableDictionary* rdx_dict);
 
 // AppKit-based left menubar
 
@@ -599,7 +599,7 @@ void SLSTransactionSetMenuBars(void* rdi_trans,NSMutableArray<NSDictionary*>* rs
 	// defaults write -g NSEnableAppKitMenus -bool false
 	
 	SLSSetMenuBars(SLSMainConnectionID(),rsi_perbar,rdx_global);
-}
+}*/
 
 void SLSEnsureSpaceSwitchToActiveProcess();
 
