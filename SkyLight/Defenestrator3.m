@@ -587,20 +587,6 @@ void* SLSNewWindowWithOpaqueShapeAndContext(int edi_cid,int esi_5,void* rdx_regi
 	return NULL;
 }
 
-// forward MenuBar.m
-
-unsigned int SLSSetMenuBars(unsigned int edi_connectionID,NSMutableArray* rsi_array,NSMutableDictionary* rdx_dict);
-
-// AppKit-based left menubar
-
-void S/LSTransactionSetMenuBars(void* rdi_trans,NSMutableArray<NSDictionary*>* rsi_perbar,NSMutableDictionary* rdx_global)
-{
-	// TODO: doesn't currently work. for now, use the Carbon (HIToolbox) path
-	// defaults write -g NSEnableAppKitMenus -bool false
-	
-	SLSSetMenuBars(SLSMainConnectionID(),rsi_perbar,rdx_global);
-}
-
 void SLSEnsureSpaceSwitchToActiveProcess();
 
 void SLSTransactionEnsureSpaceSwitchToActiveProcess(void* rdi_trans)
