@@ -68,6 +68,24 @@ typedef dispatch_block_t CommitBlock;
 NSMutableDictionary<NSNumber*,NSMutableArray<CommitBlock>*>* commitBlocks;
 NSMutableArray<CommitBlock>* fuckedBlocks;
 
+NSLock* arraysLock=nil;
+dispatch_once_t arraysLockOnce;
+
+void lockArrays()
+{
+	dispatch_once(&arraysLockOnce,^()
+	{
+		arraysLock=NSLock.alloc.init;
+	});
+	
+	arraysLock.lock;
+}
+
+void unlockArrays()
+{
+	arraysLock.unlock;
+}
+
 // D2C - associates a block with a transaction, to be run at commit time
 // this guarantees visual syncronization as is expected with transactions
 // and can be used to implement SLSTransaction* softlinks
@@ -82,6 +100,8 @@ void pushCommitBlock(void* transaction,CommitBlock block)
 		return;
 	}
 	
+	lockArrays();
+	
 	CommitBlock heapBlock=[block copy];
 	NSNumber* key=[NSNumber numberWithLong:(long)transaction];
 	if(!commitBlocks[key])
@@ -90,6 +110,8 @@ void pushCommitBlock(void* transaction,CommitBlock block)
 	}
 	[commitBlocks[key] addObject:heapBlock];
 	[heapBlock release];
+	
+	unlockArrays();
 }
 
 // D2C - hack for cases when we don't have a transaction pointer
@@ -104,23 +126,20 @@ void pushFuckedBlock(CommitBlock block)
 		return;
 	}
 	
+	lockArrays();
+	
 	CommitBlock heapBlock=[block copy];
 	[fuckedBlocks addObject:heapBlock];
 	[heapBlock release];
+	
+	unlockArrays();
 }
-
-NSLock* commitLock=nil;
-dispatch_once_t commitLockOnce;
 
 // TODO: move back to SLSTransactionCommitUsingMethod?
 
 void SLSTransactionCommit(void* rdi,int esi)
 {
-	dispatch_once(&commitLockOnce,^()
-	{
-		commitLock=NSLock.alloc.init;
-	});
-	commitLock.lock;
+	lockArrays();
 	
 	NSNumber* key=[NSNumber numberWithLong:(long)rdi];
 	NSArray<CommitBlock>* blocks=commitBlocks[key];
@@ -145,43 +164,12 @@ void SLSTransactionCommit(void* rdi,int esi)
 	
 	SLSTransactionCommi$(rdi,esi);
 	
-	commitLock.unlock;
+	unlockArrays();
 }
 
 void SLSTransactionCommitUsingMethod(void* rdi,int esi)
 {
 	SLSTransactionCommit(rdi,esi);
-}
-
-// TODO: added to test something, can remove
-
-void clearAllBlocks()
-{
-	commitBlocks.removeAllObjects;
-	fuckedBlocks.removeAllObjects;
-}
-
-void forceRunAllBlocks()
-{
-	int count=0;
-	for(NSArray<CommitBlock>* blocks in commitBlocks.allValues)
-	{
-		for(CommitBlock block in blocks)
-		{
-			count++;
-			block();
-		}
-	}
-	
-	for(CommitBlock block in fuckedBlocks)
-	{
-		count++;
-		block();
-	}
-	
-	clearAllBlocks();
-	
-	trace(@"forcibly ran %d D2C blocks (why are you doing this?)",count);
 }
 
 NSMutableArray<dispatch_block_t>* onceBlocks;
