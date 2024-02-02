@@ -68,7 +68,7 @@ void sonomaSetup()
 		}
 	}
 	
-	if([process containsString:@"SecurityAgentHelper"]||[process containsString:@"loginwindow"])
+	if([process containsString:@"SecurityAgent"]||[process containsString:@"loginwindow"])
 	{
 		swizzleImp(@"CALayer",@"setMask:",true,(IMP)clockSetMaskFake,(IMP*)&clockSetMaskReal);
 	}

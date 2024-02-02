@@ -19,8 +19,7 @@ void addFakeRim(unsigned int windowID)
 {
 	CALayer* layer=wrapperForWindow(windowID).context.layer;
 	layer.borderWidth=1;
-	// Looks bad with AppKit menubar and in some other places
-	// layer.cornerRadius=10;
+	layer.cornerRadius=10;
 	CGColorRef color=CGColorCreateGenericRGB(1.0,1.0,1.0,0.2);
 	layer.borderColor=color;
 	CFRelease(color);
