@@ -19,6 +19,7 @@ BOOL isWindowServer;
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
+#import "BServices.m"
 #else
 #import "Defenestrator.m"
 #endif
@@ -114,5 +115,6 @@ __attribute__((constructor)) void load()
 	blursSetupNew();
 	safariHackSetup();
 	logicHackSetup();
+	bservicesSetup();
 #endif
 }
