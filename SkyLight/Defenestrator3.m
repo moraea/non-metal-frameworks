@@ -684,6 +684,21 @@ CAContext* fake_contextWithCGSConnection(id meta,SEL sel,int cid,NSDictionary* o
 
 // Sonoma-specific stuff
 
+void dockHackDisplayReconfigured(CGDirectDisplayID display,CGDisplayChangeSummaryFlags flags,void* userInfo)
+{
+	if((flags&kCGDisplaySetModeFlag)!=0)
+	{
+		trace(@"Dock Hack: reconfigured %ld x %ld",CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
+		
+		for(Wrapper* wrapper in wrappers.allValues)
+		{
+			trace(@"Dock Hack: force window update %@",wrapper);
+			
+			wrapper.queueUpdate;
+		}
+	}
+}
+
 #if MAJOR==14
 void defenestrator3Setup()
 {
@@ -702,6 +717,8 @@ void defenestrator3Setup()
 	{
 		defenestratorRegisterOnce(^()
 		{
+			CGDisplayRegisterReconfigurationCallback(dockHackDisplayReconfigured,NULL);
+			
 			defenestratorRegisterUpdate(^(NSObject<DefenestratorWrapper>* wrapper)
 			{
 				CGRect rect=wrapper.context.layer.bounds;
