@@ -99,6 +99,11 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
+### 2024-02-3
+- fix loginwindow hack forn 14.4
+- improve Sonoma Dock hack
+- workaround loginwindow shutdown crashes
+
 ### 2023-10-3
 - mimic the correct lock screen clock tint
 - fix MenuBar2 server
@@ -261,7 +266,6 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 
 - reimplement AppKit menubar
 - reimplement WindowManager communication
-- investigate frozen indeterminate `NSProgressIndicator`s in wxWidgets apps?
 - fix stuttering/out-of-order frames when seeking in videos with Mojave QuartzCore
 - fix blank Wabbitemu, Anka VM windows with Mojave QuartzCore
 - fix beachball with hardware cursor (workaround: downgrade `IOHIDFamily` to Catalina and edit WindowServer's sandbox file to allow `HIDWaitCursorFrameInterval`)
@@ -270,6 +274,5 @@ Also see [here](https://github.com/moraea/non-metal-frameworks/projects/1) and [
 - investigate slow compositing in all browsers (at least partially fixed with Mojave QuartzCore)
 - investigate broken WebGL in some browsers (workaround: use Chrome's `ignore-gpu-blocklist`)
 - fix Maps
-- fix Photo Booth (workaround: use Big Sur version)
 - fix Migration Assistant
 - fix "Move to Display"
