@@ -25,9 +25,24 @@ void menuBar2WriteDark(BOOL value,int display)
 	SLSSetDictionaryForCurrentSession(dict);
 }
 
-BOOL menuBar2ReadDark(int display)
+BOOL keepTransparencyValue;
+dispatch_once_t keepTransparencyOnce;
+BOOL menuBar2KeepTransparency()
 {
 	if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+	{
+		dispatch_once(&keepTransparencyOnce,^()
+		{
+			keepTransparencyValue=[NSUserDefaults.standardUserDefaults boolForKey:@"MB2_KeepTransparency"];
+		});
+	
+		return keepTransparencyValue;
+	}
+}
+
+BOOL menuBar2ReadDark(int display)
+{
+	if(!menuBar2KeepTransparency())
 	{
 		// SLSGetAppearanceThemeLegacy true = dark
 		
@@ -166,7 +181,7 @@ void menuBar2SendCached()
 		
 		CGContextClearRect(fakeContext,realRect);
 		
-		if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+		if(!menuBar2KeepTransparency())
 		{
 			CALayer* greyLayer=CALayer.layer;
 			greyLayer.bounds=realRect;
@@ -376,7 +391,7 @@ void menuBar2DockReduceTransparencyCallback(CFNotificationCenterRef center,void*
 
 void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observer,CFNotificationName name,const void* object,CFDictionaryRef userInfo)
 {
-	if(_AXInterfaceGetReduceTransparencyEnabled()||_AXInterfaceGetIncreaseContrastEnabled())
+	if(!menuBar2KeepTransparency())
 	{
 		trace(@"MenuBar2 (server): forwarding appearance toggle to clients because Reduce Transparency/Increase Contrast is on");
 		
