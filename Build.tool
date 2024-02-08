@@ -220,14 +220,17 @@ function runWithTargetVersion
 	case "$qc" in
 		MOJ)
 			lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
+			cp $binaries/10.14.6*/QuartzCore.json Build/QuartzCore.patched.json || true
 			;;
 		CAT)
 			cp $binaries/10.15.7*/QuartzCore Build/QuartzCore.patched
+			cp $binaries/10.15.7*/QuartzCore.json Build/QuartzCore.patched.json || true
 			;;
 		BS)
 			if [[ ! "$major" -eq 11 ]]
 			then
 				cp $binaries/11.*/QuartzCore Build/QuartzCore.patched
+				cp $binaries/11.*/QuartzCore.json Build/QuartzCore.patched.json || true
 			fi
 			;;
 	esac
@@ -247,17 +250,13 @@ return 0x0'
 
 	fi
 
-		echo 'applying _CARequiresColorMatching hack'
-		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
+	echo 'applying _CARequiresColorMatching hack'
+	Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol _CARequiresColorMatching
 return 0x0'
 
 	if [[ -e Build/QuartzCore.patched ]]
 	then
-		# TODO: yikes
-		
-		cp $binaries/10.15*/QuartzCore.json Build/QuartzCore.patched.json || true
-
 		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
 
 		touch Build/$major/note_used_${qc}_qc.txt
