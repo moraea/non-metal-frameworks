@@ -89,6 +89,14 @@ int CAImageQueueSetMediaTimingClamped(void* rdi_queue,int esi,void* rdx,int ecx,
 {
 	return CAImageQueueSetMediaTiming(rdi_queue,esi,rdx,ecx,r9_function,stack,xmm0);
 }
+
+#else
+
+int CAImageQueueSetMediaTimingClamped()
+{
+	return 0;
+}
+
 #endif
 
 // Safari blank
