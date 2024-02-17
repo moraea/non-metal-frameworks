@@ -16,10 +16,12 @@ BOOL isWindowServer;
 // TODO: Defenestrator2c is removed (otherwise its nostub lines would be seen)
 // this must be fixed in either Build.tool or Stubber itself
 
+#if MAJOR==14
+#import "BServices.m"
+#endif
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
-#import "BServices.m"
 #else
 #import "Defenestrator.m"
 #endif
@@ -48,6 +50,7 @@ BOOL isWindowServer;
 #import "Spin.m"
 #import "Done.m"
 #import "Preflight.m"
+#import "TS2.m"
 
 #if MAJOR==11
 #import "Photos.m"
@@ -101,7 +104,7 @@ __attribute__((constructor)) void load()
 	appearanceSetup();
 	pluginsSetup();
 	trackpadSetup();
-	
+	ts2Setup();
 	doneSetup();
 	
 #if MAJOR==11
@@ -115,6 +118,8 @@ __attribute__((constructor)) void load()
 	blursSetupNew();
 	safariHackSetup();
 	logicHackSetup();
+#endif
+#if MAJOR==14
 	bservicesSetup();
 #endif
 }
