@@ -36,6 +36,11 @@ BOOL blurBeta()
 
 -(void)updateBackdrop
 {
+	// TODO: lol, lmao
+	
+	int cid=SLSMainConnectionID();
+	SLSSetSurfaceLayerBackingOptions(cid,_wrapper.wid,_wrapper.sid,1.05,-1,-1);
+	
 	// TODO: exit early if unchanged activeBlurs and bounds
 	
 	self.removeBackdrop;

@@ -131,7 +131,7 @@ NSArray* SLSHWCaptureWindowLis$InRect(int edi_cid,int* rsi_list,int edx_count,un
 
 int SLSMoveWindowOnMatchingDisplayChangedSeed(int edi,int esi,void* rdx,int ecx);
 void SLSWindowSetActiveShadowLegacy(int edi,int esi);
-void SLSSetSurfaceLayerBackingOptions(int edi,int esi,int edx,double xmm0,double xmm1,double xmm2);
+void SLSSetSurfaceLayerBackingOptions(int edi_cid,int esi_wid,int edx_sid,float xmm0_flattenDelay,float xmm1,float xmm2);
 void SLSSetWindowEventShape(int edi,int esi,void* rdx);
 void SLSSetWindowRegionsLegacy(int edi,void* rsi,void* rdx,void* rcx,void* r8);
 void SLSSetWindowHasMainAppearance(int edi,int esi,int edx);
