@@ -166,3 +166,5 @@ NSArray<NSDictionary*>* SLSCopyManagedDisplaySpaces(int edi_cid);
 int SLSGetDisplayForUUID(CFUUIDRef rdi_uuid);
 int SLSGetDisplaysWithRect(CGRect* rdi_rect,int esi_count,int* rdx_listOut,int* rcx_countOut);
 int SLSGetWindowBounds(int edi_cid,int esi_wid,CGRect* rdx_rectOut);
+
+int SLSSetSurfaceProperty(int edi_cid,int esi_wid,int edx_sid,NSString* rcx_key,id r8_value);

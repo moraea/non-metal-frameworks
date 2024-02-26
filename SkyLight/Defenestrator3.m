@@ -355,7 +355,7 @@ void SLSTransactionSetWindowActiveShadowLegacy(void* rdi,int esi,int edx)
 
 // TODO: check return value
 
-void SLSTransactionSetSurfaceLayerBackingOptions(void* rdi,int esi,int edx,double xmm0,double xmm1,double xmm2)
+void SLSTransactionSetSurfaceLayerBackingOptions(void* rdi,int esi,int edx,float xmm0,float xmm1,float xmm2)
 {
 	pushCommitBlock(rdi,^()
 	{

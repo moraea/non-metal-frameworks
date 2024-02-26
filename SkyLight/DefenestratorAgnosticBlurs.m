@@ -36,10 +36,30 @@ BOOL blurBeta()
 
 -(void)updateBackdrop
 {
-	// TODO: lol, lmao
+	// TODO: tests
 	
 	int cid=SLSMainConnectionID();
-	SLSSetSurfaceLayerBackingOptions(cid,_wrapper.wid,_wrapper.sid,1.05,-1,-1);
+	
+	// sets FlattenDelay in the Flagers Log
+	// flattens spontaneously, not just on closing
+	// SLSSetSurfaceLayerBackingOptions(cid,_wrapper.wid,_wrapper.sid,0.1,-1,-1);
+	
+	void* emptyRegion=NULL;
+	CGRect emptyRect=CGRectMake(0,0,0,0);
+	CGSNewRegionWithRect(&emptyRect,&emptyRegion);
+	
+	// doesn't affect LayerOpaqueShape
+	// SLSSetWindowOpaqueShape(cid,_wrapper.wid,emptyRegion);
+	
+	// does set inheritOpaqueShape = 1, but doesn't affect LayerOpaqueShape
+	// SLSSetSurfaceProperty(cid,_wrapper.wid,_wrapper.sid,@"InheritOpaqueShape",@true);
+	
+	// cursed AppKit
+	// LayerOpaqueShape now reflects Finder sidebar like in BS
+	// and the SLSWindowBackdropCreateWithLevelAndTintColor is not needed...
+	// id akWindow=[[NSClassFromString(@"NSApplication") sharedApplication] windowWithWindowNumber:_wrapper.wid];
+	// [akWindow setOpaque:false];
+	// [akWindow setBackgroundColor:[NSClassFromString(@"NSColor") clearColor]];
 	
 	// TODO: exit early if unchanged activeBlurs and bounds
 	
