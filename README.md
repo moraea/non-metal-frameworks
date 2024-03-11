@@ -38,7 +38,10 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- identification of windowing functionality dependent on WindowManager interfaces
 		- QuartzCore filter research and fallback idea (fixes monochrome widgets)
 		- QuartzCore patch for white UI elements
-	- countless other code contributions, insights, and testing
+		- workarounds for loginwindow issues in 14.4 (ongoing)
+		- fix for screen recording on TeraScale 2
+		- setting to keep transparent MenuBar2 with Reduce Transparency/Increase Contrast (`defaults write -g MB2_KeepTransparency -bool true`)
+	- countless other code contributions, insights, testing, and maintenance
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
     - QuartzCore downgrade idea
 	- swipe between pages workaround code
@@ -48,7 +51,7 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 	- TeraScale 2 insights
 	- OpenCL downgrade
 	- Night Shift prefpane fix code
-	- Shim to selectively reenable transparency with reduce transparency enabled (ex. `defaults write com.apple.dock Moraea_EnableTransparency 1`)
+	- shim to selectively reenable transparency with Reduce Transparency/Increase Contrast enabled (ex. `defaults write com.apple.dock Moraea_EnableTransparency 1`)
 	- AppKit `issetugid` workaround help
 	- countless other code contributions, insights, and testing
 - [Flagers](https://github.com/flagersgit)
@@ -100,7 +103,7 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 ## changes
 
 ### 2024-02-3
-- fix loginwindow hack forn 14.4
+- fix loginwindow hack for 14.4
 - improve Sonoma Dock hack
 - workaround loginwindow shutdown crashes
 
