@@ -38,6 +38,8 @@ BOOL menuBar2KeepTransparency()
 	
 		return keepTransparencyValue;
 	}
+	
+	return true;
 }
 
 BOOL menuBar2ReadDark(int display)
