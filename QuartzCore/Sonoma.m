@@ -64,7 +64,7 @@ void sonomaSetup()
 
 		if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_ColorWidgetDisabled"]!=1)
 		{
-			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,f,&r);
+			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,(IMP)f,(IMP*)&r);
 		}
 	}
 	

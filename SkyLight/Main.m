@@ -17,7 +17,7 @@ BOOL isWindowServer;
 // this must be fixed in either Build.tool or Stubber itself
 
 #if MAJOR==14
-#import "BServices.m"
+#import "loginwindow.m"
 #endif
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
@@ -120,6 +120,6 @@ __attribute__((constructor)) void load()
 	logicHackSetup();
 #endif
 #if MAJOR==14
-	bservicesSetup();
+	loginwindowSetup();
 #endif
 }

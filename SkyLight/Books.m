@@ -25,7 +25,7 @@ void books_fake_start(NSObject* self,SEL sel)
 	
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW,0.1*NSEC_PER_SEC),dispatch_get_main_queue(),^()
 		{
-			int wid=[window windowNumber];
+			int wid=(int)[window windowNumber];
 			NSArray* images=SLSHWCaptureWindowList(SLSMainConnectionID(),&wid,1,0);
 			window.release;
 			
