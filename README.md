@@ -39,7 +39,6 @@ Most users will want to just use [OCLP](https://dortania.github.io/OpenCore-Lega
 		- QuartzCore filter research and fallback idea (fixes monochrome widgets)
 		- QuartzCore patch for white UI elements
 		- workarounds for loginwindow issues in 14.4 (ongoing)
-		- fix for screen recording on TeraScale 2
 		- setting to keep transparent MenuBar2 with Reduce Transparency/Increase Contrast (`defaults write -g MB2_KeepTransparency -bool true`)
 	- countless other code contributions, insights, testing, and maintenance
 - [ASentientHedgehog](https://moosethegoose2213.github.io)
