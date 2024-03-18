@@ -111,7 +111,9 @@ __attribute__((constructor)) void load()
 	photosSetup();
 #endif
 #if MAJOR>=12
+#if MAJOR<14
 	cycleSetup();
+#endif
 	booksHackSetup();
 #endif
 #if MAJOR>=13
@@ -120,6 +122,6 @@ __attribute__((constructor)) void load()
 	logicHackSetup();
 #endif
 #if MAJOR==14
-	loginwindowSetup();
+//	loginwindowSetup();
 #endif
 }
