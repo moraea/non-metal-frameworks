@@ -101,7 +101,10 @@ Thank you as well to other contributors, moderators, and testers on [Unsupported
 
 ## changes
 
-### 2024-02-3
+### 2024-4-18
+- resolve 14.4 session issue due to Amy's bad code from 2022 🤦🏻‍♀️
+
+### 2024-2-3
 - fix loginwindow hack for 14.4
 - improve Sonoma Dock hack
 - workaround loginwindow shutdown crashes

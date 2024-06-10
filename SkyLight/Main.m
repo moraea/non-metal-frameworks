@@ -13,12 +13,6 @@ BOOL isWindowServer;
 #import "Appearance.m"
 #import "Backlight.m"
 
-// TODO: Defenestrator2c is removed (otherwise its nostub lines would be seen)
-// this must be fixed in either Build.tool or Stubber itself
-
-#if MAJOR==14
-#import "loginwindow.m"
-#endif
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
@@ -111,15 +105,14 @@ __attribute__((constructor)) void load()
 	photosSetup();
 #endif
 #if MAJOR>=12
+#if MAJOR<14
 	cycleSetup();
+#endif
 	booksHackSetup();
 #endif
 #if MAJOR>=13
 	blursSetupNew();
 	safariHackSetup();
 	logicHackSetup();
-#endif
-#if MAJOR==14
-	loginwindowSetup();
 #endif
 }
