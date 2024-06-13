@@ -498,14 +498,7 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 
 void uninvertScreenshots(NSArray* result)
 {
-	for(id image in result)
-	{
-		// TODO: generate a new image?
-		// to avoid this cursed in-place patching
-		
-		int* flags=(int*)(((char*)image)+0xa8);
-		*flags=0x2002;
-	}
+	return;
 }
 
 // TODO: return
@@ -547,11 +540,11 @@ void SLSTransactionWait(void* rdi)
 
 // Sonoma DP1 softlinks (AppKit)
 
-// nostub SLSStatusBarCopyItemLayout
-// nostub SLSTransactionSystemStatusBarResetLayout
-// nostub SLSTransactionSystemStatusBarSetLayoutIndex
-// nostub SLSTransactionClearWindowCornerRadius
-// nostub SLSTransactionSetWindowBoundsPath
+// no/stub SLSStatusBarCopyItemLayout
+// no/stub SLSTransactionSystemStatusBarResetLayout
+// no/stub SLSTransactionSystemStatusBarSetLayoutIndex
+// no/stub SLSTransactionClearWindowCornerRadius
+// no/stub SLSTransactionSetWindowBoundsPath
 
 // TODO: workaround, Renamer-ed for Defenestrator1
 

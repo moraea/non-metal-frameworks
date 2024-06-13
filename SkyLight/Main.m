@@ -63,7 +63,7 @@ BOOL isWindowServer;
 #import "NightShift.m"
 #endif
 
-#define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd"]
+#define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog"]
 
 __attribute__((constructor)) void load()
 {
