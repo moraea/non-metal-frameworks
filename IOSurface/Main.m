@@ -22,3 +22,30 @@ size_t IOSurfaceGetPropertyMaximum(CFStringRef property)
 }
 
 #endif
+
+@interface _IOSurfaceDebugDescription:NSObject
+@end
+@interface _IOSurfaceDebugDescription(Stub)
+@end
+@implementation _IOSurfaceDebugDescription(Stub)
+
+-(id)pixelFormatString
+{
+	return nil;
+}
+
+-(id)dirtySize
+{
+	return nil;
+}
+
+-(id)residentSize
+{
+	return nil;
+}
+
+-(id)traceID
+{
+	return nil;
+}
+@end
