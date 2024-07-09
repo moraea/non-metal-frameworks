@@ -70,7 +70,7 @@ void cycleSetup()
 				// trace(@"Cycle: handling %@",event);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-method-access"
-#if MAJOR<=12
+#if __MAC_OS_X_VERSION_MIN_REQUIRED <= 120000
 				[[NSApplication sharedApplication] _cycleWindowsReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];
 #else
 				[[NSApplication sharedApplication] _cycleWindowsBypassingWindowManagerReversed:!!(event.modifierFlags&NSEventModifierFlagShift)];

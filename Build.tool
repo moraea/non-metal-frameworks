@@ -3,303 +3,265 @@
 set -e
 cd "$(dirname "$0")"
 
-PATH+=:"$PWD/Build/non-metal-common/Build"
-
-function build
-{
-	oldIn="$1"
-	newIn="$2"
-	mainInstall="$3"
-
-	prefixOut="Build/$major/$4"
-	mkdir -p "$prefixOut"
-	
-	name="$(basename "$mainInstall")"
-	mainNameOut="$name"
-	oldNameOut="${name}Old.dylib"
-	
-	prefixInstall="$(dirname "$mainInstall")"
-	oldInstall="$prefixInstall/$oldNameOut"
-	
-	mainOut="$prefixOut/$mainNameOut"
-	oldOut="$prefixOut/$oldNameOut"
-	
-	cp "$oldIn" "$oldOut"
-	install_name_tool -id "$oldInstall" "$oldOut"
-	
-	mainIn="$prefixOut/${name}Wrapper.m"
-
-	# TODO: stopgap for dlopening issues until Stubber 3
-
-	hackNew="${newIn}.json"
-	hackOld="${oldIn}.json"
-
-	Stubber "$oldIn" "$newIn" "$PWD" "$mainIn" "$hackNew" "$hackOld"
-
-	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
-	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
-
-	if test -n "$SENTIENT_PATCHER"
-	then
-		extraArgs=-DSENTIENT_PATCHER
-	fi
-	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs
-
-	# TODO: automatically handle in Stubber? move elsewhere? edit imports and binpatch?
-	# idk. this works for now...
-
-	if [[ ($name = SkyLight) && ($major -ge 14) ]]
-	then
-		clang -fmodules -dynamiclib -Xlinker -reexport_library -Xlinker /usr/lib/libSystem.B.dylib LibSystemWrapper.m -o "$prefixOut/LibSystemWrapper.dylib"
-		codesign -fs - "$prefixOut/LibSystemWrapper.dylib"
-
-		install_name_tool -change /usr/lib/libSystem.B.dylib /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/LibSystemWrapper.dylib "$oldOut"
-	fi
-
-	codesign -f -s - "$oldOut"
-	codesign -f -s - "$mainOut"
+versionToPreprocessor() {
+    local VERSION=$1
+    local PREPROCESSOR_VERSION=""
+    
+    IFS='.' read -r -A VERSION_TUPLE <<< "$VERSION"
+    for component in "${VERSION_TUPLE[@]}"; do
+        PREPROCESSOR_VERSION+=$(printf %02d $component)
+    done
+    printf $PREPROCESSOR_VERSION
 }
 
-binaries=Build/non-metal-binaries
+build() {
+	COMPILER_FLAGS=()
 
-lipo -thin x86_64 $binaries/10.14.6*/SkyLight -output Build/SkyLight.patched
-
-Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSNewWindowWithOpaqueShape _SLSSetMenuBars _SLSCopyDevicesDictionary _SLSCopyCoordinatedDistributedNotificationContinuationBlock _SLSShapeWindowInWindowCoordinates _SLSEventTapCreate _SLSWindowSetShadowProperties _SLSSetWindowType _SLSHWCaptureWindowList
-
-Binpatcher Build/SkyLight.patched Build/SkyLight.patched '
-# the transparency hack
-set 0x216bb0
-nop 0x4
-
-# menubar height (22.0 --> 24.0)
-set 0xb93c4
-write 0x38
-
-# WSBackdropGetCorrectedColor remove 0x17 (MenuBarDark) material background (floats RGBA)
-set 0x26ef60
-write 0x00000000000000000000000000000000
-
-# force 0x17 for light, inactive
-set 0xb6ccb
-write 0x17
-set 0xb6cd8
-write 0x17
-set 0xb6cde
-write 0x17
-
-# override blend mode
-# 0: works
-# 1: invisible light
-# 2: invisible dark
-# 3+: corrupt
-set 0xb6d72
-write 0x00
-set +0x3
-nop 0x4
-
-# hide backstop
-# TODO: weird
-set 0xb8789
-nop 0x2
-set 0xb879f
-nop 0x8
-set 0xb87de
-nop 0x2
-
-# prevent prefpane crash
-# TODO: look at this again now that we have SLSInstallRemoteContextNotificationHandlerV2 shim
-symbol ___SLSRemoveRemoteContextNotificationHandler_block_invoke
-return 0x0
-
-# disable entitlement check
-symbol __ZL26debug_connection_permittedv
-return 0x1
-
-# Fabio rim tweak
-# https://github.com/ASentientBot/monterey/issues/3
-# set 0xf4360
-# write 0xff
-# set 0xf47e7
-# write 0xff
-
-# Menubar background
-# warning: almost certainly breaks CAPL and defenestrator-off!
-
-# override blur radius (cannibalizes stack canary)
-set 0x21677c
-write 0xbe80000000
-nop 0x5
-set 0x21687e
-nop 0x2
-
-# disable saturation (GLSL)
-# set 0x294e62
-# write 0x2f2f
-# set 0x29625a
-# write 0x2f2f
-
-# disable saturation (identity matrix)
-# set 0x26ed60
-# write 0x0000803f000000000000000000000000000000000000803f000000000000000000000000000000000000803f00000000
-
-# default saturation 1.2
-set 0x26ed60
-write 0xfe27943f888112be68a36cbc0000000080332ebd6949873f68a36cbc0000000080332ebd888112be53c0973f00000000
-'
-
-lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
-
-Binpatcher Build/CoreDisplay.patched Build/CoreDisplay.patched '
-# TODO: AGDC hack
-set 0x7e53f
-write 0xe9c5feffff'
-
-Renamer $binaries/10.15.7*/IOSurface Build/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
-
-function runWithTargetVersion
-{
-	major=$1
-	echo begin $major
-
-	if test "$major" -ge 13
-	then
-		Renamer Build/SkyLight.patched Build/SkyLight.patched _SLSTransactionCommit
-	fi
-
-	rm -rf Build/$major
-	mkdir Build/$major
-
-	build Build/SkyLight.patched $binaries/$major.*/SkyLight /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight Common -F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framework CoreBrightness
-	build Build/CoreDisplay.patched $binaries/$major.*/CoreDisplay /System/Library/Frameworks/CoreDisplay.framework/Versions/A/CoreDisplay Common
-	build Build/IOSurface.cat.patched $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Zoe -DCAT
-	build $binaries/10.14.6*/IOSurface $binaries/$major.*/IOSurface /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface Cass2 -DMOJ
-	build $binaries/10.13.6*/IOAccelerator $binaries/$major.*/IOAccelerator /System/Library/PrivateFrameworks/IOAccelerator.framework/Versions/A/IOAccelerator Cass2
-
-	# TODO: MOJ/CAT/BS (downgrade version) vs 11/12/13 (target version) a bit confusing?
-
-	if test -n "$AUTO_QC"
-	then
-		case "$AUTO_QC" in
-			10.14)
-				qc=MOJ
-				;;
-			10.15)
-				qc=CAT
-				;;
-			11)
-				qc=BS
-				;;
-		esac
-	else
-		clear
-		echo "###################################\n# choose the QuartzCore downgrade #\n###################################"
-		select opt in "Mojave" "Catalina" "Big Sur" "Skip"; do
-			case $opt in
-				"Mojave")
-					qc=MOJ
-					break
-					;;
-				"Catalina")
-					qc=CAT
-					break
-					;;
-				"Big Sur")
-					qc=BS
-					break
-					;;
-				"Skip")
-					exit
-					;;
-				*)
-					   echo "This is not an option, please try again"
-					  ;;
-				  esac
-				done
-	fi
-
-	case "$qc" in
-		MOJ)
-			lipo -thin x86_64 $binaries/10.14.6*/QuartzCore -output Build/QuartzCore.patched
-			cp $binaries/10.14.6*/QuartzCore.json Build/QuartzCore.patched.json || true
-			;;
-		CAT)
-			cp $binaries/10.15.7*/QuartzCore Build/QuartzCore.patched
-			cp $binaries/10.15.7*/QuartzCore.json Build/QuartzCore.patched.json || true
-			;;
-		BS)
-			if [[ ! "$major" -eq 11 ]]
-			then
-				cp $binaries/11.*/QuartzCore Build/QuartzCore.patched
-				cp $binaries/11.*/QuartzCore.json Build/QuartzCore.patched.json || true
-			fi
-			;;
+	while [[ $# -gt 0 ]]; do
+	case $1 in 
+		-fw|--framework)
+		FRAMEWORK="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-ob|-db|--downgradeBinary)
+		DOWNGRADE_BINARY="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-nb|--newBinary)
+		NEW_BINARY="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-in|--installName)
+		INSTALL_NAME="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-od|--outDir)
+		OUTDIR="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		*)
+		# Save the rest of the arguments as compiler flags
+		COMPILER_FLAGS+=("$1")
+		shift # past argument
+		;;
 	esac
+	done
 
-	if [[ "$major" -ge 13 && ("$qc" = MOJ || "$qc" = CAT) ]]
-	then
-		echo 'applying _CASSynchronize hack'
-		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol __CASSynchronize
-return 0x0'
+	if [[ -z "$FRAMEWORK" ]]; then
+		echo "No framework specified."
+		exit 1
+	fi
+	FRAMEWORK_NAME=${FRAMEWORK##*/}
 
-	if [[ "$major" -ge 14 ]]
-		echo 'applying _CARequiresColorMatching hack'
-		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol _CARequiresColorMatching
-return 0x0'
-
+	if [[ -z "$DOWNGRADE_BINARY" ]]; then
+		echo "No downgrade binary specified."
+		exit 1
 	fi
 
-	echo 'applying _CARequiresColorMatching hack'
-	Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol _CARequiresColorMatching
-return 0x0'
-
-	if [[ -e Build/QuartzCore.patched ]]
-	then
-		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc
-
-		touch Build/$major/note_used_${qc}_qc.txt
-	else
-		clear
-		echo "#######################\n# Skipping QuartzCore #\n#######################"
-		sleep 2
+	if [[ -z "$NEW_BINARY" ]]; then
+		echo "No new binary specified."
+		exit 1
 	fi
+
+	if [[ -z "$INSTALL_NAME" ]]; then
+		echo "No install name specified."
+		exit 1
+	fi
+
+	if [[ -z "$OUTDIR" ]]; then
+		echo "No output directory specified."
+		exit 1
+	fi
+	
+	mkdir -p "$OUTDIR/$major/$FRAMEWORK_NAME"
+
+	cp -c "$DOWNGRADE_BINARY" "$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Old.dylib"
+	install_name_tool -id "${INSTALL_NAME}Old.dylib" "$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Old.dylib"
+
+	WRAPPER=$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Wrapper.m
+	# Is stubber overriden via an environment variable?
+	if [[ -z "$STUBBER_BIN" ]]; then
+		STUBBER_BIN="stubber"
+	fi
+	$STUBBER_BIN -sop "$WRAPPER" -odp "$DOWNGRADE_BINARY" -ndp "$NEW_BINARY" -shim "$FRAMEWORK/src/Main.m" \
+		-dynamiclib -fmodules -I$OUTDIR/moraea-common/Utils -D__MAC_OS_X_VERSION_MIN_REQUIRED=$major"0000" $COMPILER_FLAGS
+	                                                        # ^ Required as libclang doesn't accept -mmacosx-version-min.
+
+	CURRENT_VERSION="$(otool -l "$NEW_BINARY" | grep -m 1 'current version' | cut -d ' ' -f 9)"
+	COMPATIBILITY_VERSION="$(otool -l "$NEW_BINARY" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
+	# FIXME: force x86_64 clang to resolve issue with modules not being found.
+	arch -x86_64 clang -dynamiclib -fmodules -Wno-unused-getter-return-value -Wno-objc-missing-super-calls \
+		-mmacosx-version-min=$major -compatibility_version "$COMPATIBILITY_VERSION" -current_version "$CURRENT_VERSION" \
+		-install_name "$INSTALL_NAME" -Xlinker -reexport_library -Xlinker "$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Old.dylib" \
+		-include "$WRAPPER" "$FRAMEWORK/src/Main.m" -o "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME" -Xlinker -no_warn_inits $COMPILER_FLAGS
+	# arch -x86_64 clang -Xclang -ast-dump=json -fsyntax-only -fmodules -Wno-unused-getter-return-value -Wno-objc-missing-super-calls \
+	# 	-mmacosx-version-min=$major -include "$WRAPPER" "$FRAMEWORK/src/Main.m" $COMPILER_FLAGS > "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME.ast.json"
+	codesign -fs - "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME"
+	codesign -fs - "$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Old.dylib"
 }
 
-if test -n "$AUTO_TARGET"
-then
-	echo 'skipping target version prompt'
-	target="$AUTO_TARGET"
-else
-	clear
-	echo "#############\n# Build For #\n#############"
-	select opt in "Big Sur" "Monterey" "Ventura" "Sonoma" "Exit"; do
-    case $opt in
-    	"Big Sur")
-			target=11
-			break
-			;;
-    	"Monterey")
-			target=12
-			break
-			;;
-    	"Ventura")
-			target=13
-			break
-			;;
-    	"Sonoma")
-			target=14
-			break
-			;;
-	    "Exit")
-	      exit
-	      ;;
-	    *)
-	      echo "This is not an option, please try again"
-	      ;;
-	  esac
-	done
-fi
+main() {
+	POSITIONAL_ARGS=()
 
-runWithTargetVersion "$target"
+	AVAILABLE_FRAMEWORK_SHIMS=()
+	for folder in ${0:a:h}/frameworks/*; do
+		if [[ -d $folder ]]; then
+			AVAILABLE_FRAMEWORK_SHIMS+="$folder"
+		fi
+	done
+
+	ALLOWED_VERSION_TARGETS=("11" "12" "13" "14" "15")
+
+	while [[ $# -gt 0 ]]; do
+	case $1 in
+		-h|--help)
+		echo "Usage: Build.tool --versionTargets [11 | 12 | 13 | 14 | 15] --binaries [moraea-sources] --outdir [path] -t [moraea-common] [framework specific arguments]"
+		exit 0
+		;;
+		-v|--versionTarget|--versionTargets)
+		SELECTED_VERSION_TARGETS=(${(@s/ /)2})
+		for version in "${SELECTED_VERSION_TARGETS[@]}"; do
+			if [[ ! " ${ALLOWED_VERSION_TARGETS[@]} " =~ " ${version} " ]]; then
+				echo "Invalid version target: $version. Allowed values (any combination of): ${ALLOWED_VERSION_TARGETS[@]}"
+				exit 1
+			fi
+		done
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-f|--frameworkShimsToBuild)
+		SELECTED_FRAMEWORKS=(${(@s/ /)2})
+		FRAMEWORKS_TO_BUILD=()
+		for framework in "${SELECTED_FRAMEWORKS[@]}"; do
+			if [[ ! " ${AVAILABLE_FRAMEWORK_SHIMS[@]##*/} " =~ " ${framework##*/} " ]]; then
+				echo "Invalid framework shim: ${framework##*/}. Allowed values (any combination of): ${AVAILABLE_FRAMEWORK_SHIMS[@]##*/}"
+				exit 1
+			fi
+		done
+		for available_framework in $AVAILABLE_FRAMEWORK_SHIMS; do
+			if [[ " ${SELECTED_FRAMEWORKS[@]##*/} " =~ " ${available_framework##*/} " ]]; then
+				FRAMEWORKS_TO_BUILD+="$available_framework"
+			fi
+		done
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-b|--binaries)
+		BINARIES="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-o|--outdir)
+		OUTDIR="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-t|--toolchain)
+		TOOLCHAIN="$2"
+		shift # Increment key index
+		shift # Increment value index
+		;;
+		-*|--*)
+		# Pass unknown arguments to the frameworks to handle
+		# framework specific arguments. (e.g. QC Downgrade)
+		# If no framework can handle the argument, exit with an error.
+		ARG_HANDLED=NO
+		for framework in $AVAILABLE_FRAMEWORK_SHIMS; do
+			if [[ -e $framework/argparse.tool ]]; then
+				source $framework/argparse.tool --outdir $OUTDIR --framework ${framework##*/} $1 $2
+				if [[ $? -eq 1 ]]; then # Exit status 1 is an option with input
+					shift # Increment key index
+					shift # Increment value index
+					ARG_HANDLED=YES
+				elif [[ $? -eq 2 ]]; then # Exit status 2 is a boolean argument
+					shift # Increment key index
+					ARG_HANDLED=YES
+				else
+					continue
+				fi
+			fi
+		done
+		if [[ $ARG_HANDLED == NO ]]; then
+			echo "Unknown argument: $1"
+			exit 1
+		fi
+		;;
+		*)
+		POSITIONAL_ARGS+=("$1") # save positional arg
+		shift # past argument
+		;;
+	esac
+	done
+
+	set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+	## Default values
+	# Handle target version omission
+	if [[ -z "$SELECTED_VERSION_TARGETS" ]]; then
+		SELECTED_VERSION_TARGETS=( "${$(sw_vers -productVersion):0:2}" )
+		echo "No target version specified. Defaulting to booted macOS version: $SELECTED_VERSION_TARGETS..."
+	fi
+	# Handle target framework omission
+	if [[ -z "$SELECTED_FRAMEWORKS" ]]; then
+		FRAMEWORKS_TO_BUILD=($AVAILABLE_FRAMEWORK_SHIMS)
+		echo "No framework shim(s) specified. Defaulting to building all available frameworks..."
+	fi
+	# Handle repository path omission
+	if [[ -z "$BINARIES" ]]; then
+		BINARIES="${0:a:h}/moraea-sources"
+		echo "No repository path specified. Defaulting to \"$BINARIES\"..."
+	fi
+	if [[ ! -d "$BINARIES" ]]; then
+		echo "Repository path does not exist. Exiting..."
+		exit 1
+	fi
+
+	# Handle output directory omission
+	if [[ -z "$OUTDIR" ]]; then
+		OUTDIR="${0:a:h}/Build"
+		echo "No output directory specified. Defaulting to \"$OUTDIR\"..."
+	fi
+	# Handle toolchain omission
+	if [[ -z "$TOOLCHAIN" ]]; then
+		TOOLCHAIN="${0:a:h}/moraea-common"
+		echo "No toolchain specified. Defaulting to \"$TOOLCHAIN\"..."
+	fi
+	
+
+	## Ensure directory structure
+	# Create output directory if it doesn't exist
+	if [[ ! -d $OUTDIR ]]; then
+		mkdir -p $OUTDIR
+	fi
+	# Build and configure the toolchain
+	$TOOLCHAIN/Build.tool -o $OUTDIR/moraea-common -s $TOOLCHAIN -f
+	export C_INCLUDE_PATH="$C_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
+	export OBJC_INCLUDE_PATH="$OBJC_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
+	export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
+	export OBJCPLUS_INCLUDE_PATH="$OBJCPLUS_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
+	export PATH="$PATH:$OUTDIR/moraea-common"
+
+
+	## The main event!
+	# Build the frameworks
+	for major in $SELECTED_VERSION_TARGETS; do
+		for framework in $FRAMEWORKS_TO_BUILD; do
+			echo "Building ${framework##*/} shim for macOS $major..."
+			# Preprocess the old binary with binary patches.
+			# This will also write to downgradeSources.data the needed downgrades.
+			$framework/preprocess.tool -b $BINARIES -o $OUTDIR -f $framework -m $major
+			DOWNGRADE_SOURCES=(${(@s/\n/)$(cat $OUTDIR/Temp/${framework##*/}/downgradeSources.data)})
+			for downgrade in $DOWNGRADE_SOURCES; do
+				build --framework $framework --downgradeBinary $downgrade --newBinary $BINARIES/$major.*/${framework##*/} --installName $(cat $framework/installName.data) $(cat $OUTDIR/Temp/${framework##*/}/compilerFlags.data)
+			done
+		done
+	done
+	
+}
+
+main "$@"

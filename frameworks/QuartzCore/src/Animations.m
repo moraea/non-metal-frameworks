@@ -1,7 +1,7 @@
 // Control Center fade out
 // TODO: check necessary
 
-#if MAJOR>=12
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
 
 @interface CAPresentationModifierGroup(Shim)
 @end
@@ -22,7 +22,7 @@
 
 // system-wide animations (e.g. Finder desktop stacks)
 
-#if defined(CAT) || defined(MOJ)
+#if FRAMEWORK_DOWNGRADE >= 101400 && FRAMEWORK_DOWNGRADE <= 101599
 
 BOOL brightnessHack;
 

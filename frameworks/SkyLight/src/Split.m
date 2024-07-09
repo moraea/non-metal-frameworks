@@ -3,7 +3,7 @@
 // oddly, just returning 1 seems to work, even on arbitrary spaces
 // TODO: should probably still implement properly
 
-#if MAJOR>=12
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
 
 long SLSWindowGetBestSpace(int edi_wid,int esi)
 {

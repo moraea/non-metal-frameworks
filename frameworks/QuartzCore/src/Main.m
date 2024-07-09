@@ -10,17 +10,17 @@ NSString* process;
 #import "Catalyst.m"
 #import "Misc.m"
 
-#ifdef CAT
+#if FRAMEWORK_DOWNGRADE == 101507
 #import "Glyphs.m"
 #import "Siri.m"
 #endif
 
-#ifdef MOJ
+#if FRAMEWORK_DOWNGRADE == 101406
 #import "Siri.m"
 #import "Videos.m"
 #endif
 
-#if MAJOR==14
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
 #import "Sonoma.m"
 #endif
 
@@ -36,15 +36,15 @@ void load()
 	catalystSetup();
 	miscSetup();
 	
-#if defined(CAT) || defined(MOJ)
+#if FRAMEWORK_DOWNGRADE >= 101400 && FRAMEWORK_DOWNGRADE <= 101599
 	animationsSetup();
 #endif
 	
-#ifdef CAT
+#if FRAMEWORK_DOWNGRADE == 101507
 	glyphsSetup();
 #endif
 
-#if MAJOR==14
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
 	sonomaSetup();
 #endif
 }

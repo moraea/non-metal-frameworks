@@ -214,7 +214,7 @@ void defenestratorSetup()
 	destructionBlocks=NSMutableArray.alloc.init;
 	updateBlocks=NSMutableArray.alloc.init;
 	
-#if MAJOR==14
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
 	defenestrator3Setup();
 #endif
 }
@@ -547,11 +547,11 @@ void SLSTransactionWait(void* rdi)
 
 // Sonoma DP1 softlinks (AppKit)
 
-// nostub SLSStatusBarCopyItemLayout
-// nostub SLSTransactionSystemStatusBarResetLayout
-// nostub SLSTransactionSystemStatusBarSetLayoutIndex
-// nostub SLSTransactionClearWindowCornerRadius
-// nostub SLSTransactionSetWindowBoundsPath
+nostub(SLSStatusBarCopyItemLayout)
+nostub(SLSTransactionSystemStatusBarResetLayout)
+nostub(SLSTransactionSystemStatusBarSetLayoutIndex)
+nostub(SLSTransactionClearWindowCornerRadius)
+nostub(SLSTransactionSetWindowBoundsPath)
 
 // TODO: workaround, Renamer-ed for Defenestrator1
 
@@ -647,7 +647,7 @@ void SLSPostCoordinatedDistributedNotification(int edi_cid,int esi_note,void* rd
 
 // softlinked in loginwindow
 
-// nostub SLSPostCoordinatedDistributedNotificationFenced
+nostub(SLSPostCoordinatedDistributedNotificationFenced)
 
 /*void SLSPostCoordinatedDistributedNotificationFenced(int edi_cid,int esi_note,int edx_port,void* rcx_block)
 {
@@ -687,7 +687,7 @@ void dockHackDisplayReconfigured(CGDirectDisplayID display,CGDisplayChangeSummar
 	}
 }
 
-#if MAJOR==14
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 140000
 void defenestrator3Setup()
 {
 	if(earlyBoot)

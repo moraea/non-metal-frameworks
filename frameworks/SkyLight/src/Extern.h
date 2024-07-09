@@ -110,7 +110,7 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 // IOKit
 
-#if MAJOR == 11
+#if __MAC_OS_X_VERSION_MIN_REQUIRED == 110000
 
 #define kIOMainPortDefault kIOMasterPortDefault
 
@@ -118,7 +118,7 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 // renamed only for Ventura
 
-#if MAJOR>=13
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 130000
 void SLSTransactionCommi$(void* rdi,int esi);
 #endif
 

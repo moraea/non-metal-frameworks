@@ -13,13 +13,7 @@ BOOL isWindowServer;
 #import "Appearance.m"
 #import "Backlight.m"
 
-// TODO: Defenestrator2c is removed (otherwise its nostub lines would be seen)
-// this must be fixed in either Build.tool or Stubber itself
-
-#if MAJOR==14
-#import "loginwindow.m"
-#endif
-#if MAJOR>=13
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 130000
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
 #else
@@ -52,14 +46,14 @@ BOOL isWindowServer;
 #import "Preflight.m"
 #import "TS2.m"
 
-#if MAJOR==11
+#if __MAC_OS_X_VERSION_MIN_REQUIRED == 110000
 #import "Photos.m"
 #endif
-#if MAJOR>=12
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
 #import "Cycle.m"
 #import "Books.m"
 #endif
-#if MAJOR>=13
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 130000
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
 #import "Logic.m"
@@ -107,19 +101,18 @@ __attribute__((constructor)) void load()
 	ts2Setup();
 	doneSetup();
 	
-#if MAJOR==11
+#if __MAC_OS_X_VERSION_MIN_REQUIRED == 110000
 	photosSetup();
 #endif
-#if MAJOR>=12
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 140000
 	cycleSetup();
+#endif
 	booksHackSetup();
 #endif
-#if MAJOR>=13
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 130000
 	blursSetupNew();
 	safariHackSetup();
 	logicHackSetup();
-#endif
-#if MAJOR==14
-	loginwindowSetup();
 #endif
 }

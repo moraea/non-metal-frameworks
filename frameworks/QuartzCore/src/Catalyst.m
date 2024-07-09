@@ -13,7 +13,7 @@ BOOL fake_addCommitHandler(CATransaction* self,SEL sel,void* rdx_block,int ecx_p
 	return true;
 }
 
-#ifdef MOJ
+#if FRAMEWORK_DOWNGRADE >= 101507
 
 // fix upside-down AppKit layers in UIKit apps
 
@@ -111,7 +111,7 @@ void catalystSetup()
 {
 	swizzleImp(@"CATransaction",@"addCommitHandler:forPhase:",false,(IMP)fake_addCommitHandler,(IMP*)&real_addCommitHandler);
 	
-#ifdef MOJ
+#if FRAMEWORK_DOWNGRADE >= 101406
 	swizzleImp(@"CALayer",@"setDelegate:",true,(IMP)fake_setDelegate,(IMP*)&real_setDelegate);
 	swizzleImp(@"CALayer",@"dealloc",true,(IMP)fake_dealloc,(IMP*)&real_dealloc);
 	

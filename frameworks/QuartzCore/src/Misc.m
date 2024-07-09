@@ -3,7 +3,7 @@
 // private, can't use a category to add missing selectors
 // TODO: generate via Stubber, make public, or SOMETHING better than this...
 
-#if defined(CAT) || defined(MOJ)
+#if FRAMEWORK_DOWNGRADE >= 101400 && FRAMEWORK_DOWNGRADE <= 101599
 
 void doNothing()
 {
@@ -53,7 +53,7 @@ void fake_setScale(id self,SEL selector,double value)
 	real_setScale(self,selector,value);
 }
 
-#ifdef BS
+#if FRAMEWORK_DOWNGRADE >= 110000 && FRAMEWORK_DOWNGRADE <= 119999
 void (*real_setFilters)(id,SEL,NSArray*);
 
 void fake_setFilters(id self,SEL selector,NSArray* filters)
@@ -90,10 +90,10 @@ void miscSetup()
 {
 	blurScaleHack();
 	
-#if defined(CAT) || defined(MOJ)
+#if FRAMEWORK_DOWNGRADE >= 101400 && FRAMEWORK_DOWNGRADE <= 101599
 	fixCAContextImpl();
 #endif
-#ifdef BS
+#if FRAMEWORK_DOWNGRADE >= 110000 && FRAMEWORK_DOWNGRADE <= 119999
 	blurFilterHack();
 #endif
 }
