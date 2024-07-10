@@ -3,17 +3,6 @@
 set -e
 cd "$(dirname "$0")"
 
-versionToPreprocessor() {
-    local VERSION=$1
-    local PREPROCESSOR_VERSION=""
-    
-    IFS='.' read -r -A VERSION_TUPLE <<< "$VERSION"
-    for component in "${VERSION_TUPLE[@]}"; do
-        PREPROCESSOR_VERSION+=$(printf %02d $component)
-    done
-    printf $PREPROCESSOR_VERSION
-}
-
 build() {
 	COMPILER_FLAGS=()
 
@@ -107,6 +96,7 @@ build() {
 
 main() {
 	POSITIONAL_ARGS=()
+    UNRECOGNIZED_ARGS=()
 
 	AVAILABLE_FRAMEWORK_SHIMS=()
 	for folder in ${0:a:h}/frameworks/*; do
@@ -123,7 +113,7 @@ main() {
 		echo "Usage: Build.tool --versionTargets [11 | 12 | 13 | 14 | 15] --binaries [moraea-sources] --outdir [path] -t [moraea-common] [framework specific arguments]"
 		exit 0
 		;;
-		-v|--versionTarget|--versionTargets)
+		--versionTarget|--versionTargets)
 		SELECTED_VERSION_TARGETS=(${(@s/ /)2})
 		for version in "${SELECTED_VERSION_TARGETS[@]}"; do
 			if [[ ! " ${ALLOWED_VERSION_TARGETS[@]} " =~ " ${version} " ]]; then
@@ -167,29 +157,9 @@ main() {
 		shift # Increment value index
 		;;
 		-*|--*)
-		# Pass unknown arguments to the frameworks to handle
-		# framework specific arguments. (e.g. QC Downgrade)
-		# If no framework can handle the argument, exit with an error.
-		ARG_HANDLED=NO
-		for framework in $AVAILABLE_FRAMEWORK_SHIMS; do
-			if [[ -e $framework/argparse.tool ]]; then
-				source $framework/argparse.tool --outdir $OUTDIR --framework ${framework##*/} $1 $2
-				if [[ $? -eq 1 ]]; then # Exit status 1 is an option with input
-					shift # Increment key index
-					shift # Increment value index
-					ARG_HANDLED=YES
-				elif [[ $? -eq 2 ]]; then # Exit status 2 is a boolean argument
-					shift # Increment key index
-					ARG_HANDLED=YES
-				else
-					continue
-				fi
-			fi
-		done
-		if [[ $ARG_HANDLED == NO ]]; then
-			echo "Unknown argument: $1"
-			exit 1
-		fi
+        UNRECOGNIZED_ARGS+=("$1" "$2")
+        shift # Increment key index
+        shift # Increment value index
 		;;
 		*)
 		POSITIONAL_ARGS+=("$1") # save positional arg
@@ -198,9 +168,7 @@ main() {
 	esac
 	done
 
-	set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
-
-	## Default values
+    ## Default values
 	# Handle target version omission
 	if [[ -z "$SELECTED_VERSION_TARGETS" ]]; then
 		SELECTED_VERSION_TARGETS=( "${$(sw_vers -productVersion):0:2}" )
@@ -231,9 +199,8 @@ main() {
 		TOOLCHAIN="${0:a:h}/moraea-common"
 		echo "No toolchain specified. Defaulting to \"$TOOLCHAIN\"..."
 	fi
-	
 
-	## Ensure directory structure
+    ## Ensure directory structure
 	# Create output directory if it doesn't exist
 	if [[ ! -d $OUTDIR ]]; then
 		mkdir -p $OUTDIR
@@ -245,7 +212,45 @@ main() {
 	export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
 	export OBJCPLUS_INCLUDE_PATH="$OBJCPLUS_INCLUDE_PATH:$OUTDIR/moraea-common/Utils"
 	export PATH="$PATH:$OUTDIR/moraea-common"
+    
+    set -- "${UNRECOGNIZED_ARGS[@]}" # handle unrecognized arguments
 
+	while [[ $# -gt 0 ]]; do
+	case $1 in
+        -*|--*)
+        # Pass unknown arguments to the frameworks to handle
+        # framework specific arguments. (e.g. QC Downgrade)
+        # If no framework can handle the argument, exit with an error.
+        set +e
+        ARG_HANDLED=NO
+        for framework in $FRAMEWORKS_TO_BUILD; do
+            if [[ -e $framework/argparse.tool ]]; then
+                echo "Passing $1 argument with $2 value to ${framework##*/} shim..."
+                
+                $framework/argparse.tool --outdir $OUTDIR --framework ${framework##*/} $1 $2
+                if [[ $? -eq 2 ]]; then # Exit status 1 is an option with input
+                    shift # Increment key index
+                    shift # Increment value index
+                    ARG_HANDLED=YES
+                elif [[ $? -eq 1 ]]; then # Exit status 2 is a boolean argument
+                    shift # Increment key index
+                    ARG_HANDLED=YES
+                else
+                    echo "${framework##*/} shim did not handle the argument."
+                    continue
+                fi
+            fi
+        done
+        set -e
+        if [[ $ARG_HANDLED == "NO" ]]; then
+            echo "Unknown argument: $1"
+            exit 1
+        fi
+        ;;
+    esac
+    done
+    
+    set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 	## The main event!
 	# Build the frameworks

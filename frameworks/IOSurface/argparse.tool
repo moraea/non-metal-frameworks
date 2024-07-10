@@ -36,8 +36,8 @@ argparse() {
 
     while [[ $# -gt 0 ]]; do
     case $1 in 
-        --qcDowngrade)
-        local ALLOWED_VALUES=("10.14" "10.15" "11")
+        --iosurfaceDowngrade)
+        local ALLOWED_VALUES=("10.14" "10.15")
         if [[ ! " ${ALLOWED_VALUES[@]} " =~ " $2 " ]]; then
             echo "Invalid value for $1. Allowed values: ${ALLOWED_VALUES[@]}"
             exit 1

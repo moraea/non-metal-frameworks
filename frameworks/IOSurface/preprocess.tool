@@ -25,11 +25,18 @@ case $1 in
 esac
 done
 
+source $OUTDIR/moraea-common/Gadgets/versionToPreprocessor.zsh
+
 mkdir -p $OUTDIR/Temp/IOSurface
 
-Renamer $BINARIES/10.15.7*/IOSurface $OUTDIR/Temp/IOSurface/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
+DOWNGRADE_VERSION_WITH_DOTS=$(cat $OUTDIR/Temp/IOSurface/buildSettings.iosurfaceDowngrade.data)
+DOWNGRADE_PADDED_VERSION=$(versionToPreprocessor $DOWNGRADE_VERSION_WITH_DOTS)
 
-printf "$OUTDIR/Temp/IOSurface/IOSurface.cat.patched" > $OUTDIR/Temp/IOSurface/downgradeSources.data
-printf "-DCAT" > $OUTDIR/Temp/IOSurface/compilerFlags.data
-# $(realpath $BINARIES/10.14.6*/IOSurface)" > $OUTDIR/Temp/IOSurface/downgradeSources.data
-# FIXME: switch to plists to allow for better pipeline
+if [[ $DOWNGRADE_VERSION_WITH_DOTS == "10.15" ]]; then
+    Renamer $BINARIES/10.15.7*/IOSurface $OUTDIR/Temp/IOSurface/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
+    printf "$OUTDIR/Temp/IOSurface/IOSurface.cat.patched" > $OUTDIR/Temp/IOSurface/downgradeSources.data
+    printf "-DFRAMEWORK_DOWNGRADE=$DOWNGRADE_PADDED_VERSION" > $OUTDIR/Temp/IOSurface/compilerFlags.data
+elif [[ $DOWNGRADE_VERSION_WITH_DOTS == "10.14" ]]; then
+    realpath $BINARIES/10.14.6*/IOSurface > $OUTDIR/Temp/IOSurface/downgradeSources.data
+    printf "-DFRAMEWORK_DOWNGRADE=$DOWNGRADE_PADDED_VERSION" > $OUTDIR/Temp/IOSurface/compilerFlags.data
+fi

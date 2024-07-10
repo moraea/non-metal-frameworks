@@ -25,12 +25,26 @@ case $1 in
 esac
 done
 
+source $OUTDIR/moraea-common/Gadgets/versionToPreprocessor.zsh
+
 mkdir -p $OUTDIR/Temp/QuartzCore
 
-# Handle no selected QuartzCore downgrade
-if [[ -z "$QC_DOWNGRADE" ]]; then
-    echo "No QuartzCore downgrade specified. Skipping QuartzCore."
-    printf '' > $OUTDIR/Temp/QuartzCore/downgradeSources.data
-    printf "" > $OUTDIR/Temp/QuartzCore/compilerFlags.data
-    exit 0
+DOWNGRADE_VERSION_WITH_DOTS=$(cat $OUTDIR/Temp/QuartzCore/buildSettings.qcDowngrade.data)
+DOWNGRADE_PADDED_VERSION=$(versionToPreprocessor $DOWNGRADE_VERSION_WITH_DOTS)
+
+cp $(realpath $BINARIES/$DOWNGRADE_VERSION_WITH_DOTS*/QuartzCore) $OUTDIR/Temp/QuartzCore/QuartzCore.patched
+
+if [[ $MAJOR -ge 13 && ($DOWNGRADE_PADDED_VERSION -lt 110000) ]]; then
+    echo "QuartzCore: Applying _CASSynchronize hack"
+    Binpatcher $OUTDIR/Temp/QuartzCore/QuartzCore.patched $OUTDIR/Temp/QuartzCore/QuartzCore.patched '
+symbol __CASSynchronize
+return 0x0'
+
+    echo "QuartzCore: Applying _CARequiresColorMatching hack"
+    Binpatcher $OUTDIR/Temp/QuartzCore/QuartzCore.patched $OUTDIR/Temp/QuartzCore/QuartzCore.patched '
+symbol _CARequiresColorMatching
+return 0x0'
 fi
+
+printf $OUTDIR/Temp/QuartzCore/QuartzCore.patched > $OUTDIR/Temp/QuartzCore/downgradeSources.data
+printf "-DFRAMEWORK_DOWNGRADE=$DOWNGRADE_PADDED_VERSION" > $OUTDIR/Temp/QuartzCore/compilerFlags.data
