@@ -87,7 +87,8 @@ build() {
     arch -x86_64 clang -dynamiclib -fmodules -Wno-unused-getter-return-value -Wno-objc-missing-super-calls \
         -mmacosx-version-min=$major -compatibility_version "$COMPATIBILITY_VERSION" -current_version "$CURRENT_VERSION" \
         -install_name "$INSTALL_NAME" -Xlinker -reexport_library -Xlinker "$OUTDIR/$major/$FRAMEWORK_NAME/${FRAMEWORK_NAME}Old.dylib" \
-        -include "$WRAPPER" "$FRAMEWORK/src/Main.m" -o "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME" -Xlinker -no_warn_inits $COMPILER_FLAGS
+        -include "$WRAPPER" "$FRAMEWORK/src/Main.m" -o "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME" -Xlinker -no_warn_inits \
+		-Xlinker -not_for_dyld_shared_cache $COMPILER_FLAGS
     # arch -x86_64 clang -Xclang -ast-dump=json -fsyntax-only -fmodules -Wno-unused-getter-return-value -Wno-objc-missing-super-calls \
     #     -mmacosx-version-min=$major -include "$WRAPPER" "$FRAMEWORK/src/Main.m" $COMPILER_FLAGS > "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME.ast.json"
     codesign -fs - "$OUTDIR/$major/$FRAMEWORK_NAME/$FRAMEWORK_NAME"
@@ -259,11 +260,14 @@ main() {
             echo "Building ${framework##*/} shim for macOS $major..."
             # Preprocess the old binary with binary patches.
             # This will also write to downgradeSources.data the needed downgrades.
-            $framework/preprocess.tool -b $BINARIES -o $OUTDIR -f $framework -m $major
+			$framework/preprocess.tool -b $BINARIES -o $OUTDIR -f $framework -m $major
             DOWNGRADE_SOURCES=(${(@s/\n/)$(cat $OUTDIR/Temp/${framework##*/}/downgradeSources.data)})
             for downgrade in $DOWNGRADE_SOURCES; do
                 build --framework $framework --downgradeBinary $downgrade --newBinary $BINARIES/$major.*/${framework##*/} --installName $(cat $framework/installName.data) $(cat $OUTDIR/Temp/${framework##*/}/compilerFlags.data)
             done
+			if [[ -f $framework/postprocess.tool ]]; then
+				$framework/postprocess.tool -b $BINARIES -o $OUTDIR -f $framework -m $major
+			fi
         done
     done
     
