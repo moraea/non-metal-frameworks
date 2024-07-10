@@ -32,6 +32,11 @@ mkdir -p $OUTDIR/Temp/IOSurface
 DOWNGRADE_VERSION_WITH_DOTS=$(cat $OUTDIR/Temp/IOSurface/buildSettings.iosurfaceDowngrade.data)
 DOWNGRADE_PADDED_VERSION=$(versionToPreprocessor $DOWNGRADE_VERSION_WITH_DOTS)
 
+if [[ -z $DOWNGRADE_VERSION_WITH_DOTS ]]; then
+    echo "IOSurface: No downgrade specified. Skipping."
+    exit 0
+fi
+
 if [[ $DOWNGRADE_VERSION_WITH_DOTS == "10.15" ]]; then
     Renamer $BINARIES/10.15.7*/IOSurface $OUTDIR/Temp/IOSurface/IOSurface.cat.patched _IOSurfaceGetPropertyMaximum
     printf "$OUTDIR/Temp/IOSurface/IOSurface.cat.patched" > $OUTDIR/Temp/IOSurface/downgradeSources.data

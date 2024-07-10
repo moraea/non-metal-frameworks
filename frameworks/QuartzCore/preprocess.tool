@@ -32,6 +32,11 @@ mkdir -p $OUTDIR/Temp/QuartzCore
 DOWNGRADE_VERSION_WITH_DOTS=$(cat $OUTDIR/Temp/QuartzCore/buildSettings.qcDowngrade.data)
 DOWNGRADE_PADDED_VERSION=$(versionToPreprocessor $DOWNGRADE_VERSION_WITH_DOTS)
 
+if [[ -z $DOWNGRADE_VERSION_WITH_DOTS ]]; then
+    echo "QuartzCore: No downgrade specified. Skipping."
+    exit 0
+fi
+
 cp $(realpath $BINARIES/$DOWNGRADE_VERSION_WITH_DOTS*/QuartzCore) $OUTDIR/Temp/QuartzCore/QuartzCore.patched
 
 if [[ $MAJOR -ge 13 && ($DOWNGRADE_PADDED_VERSION -lt 110000) ]]; then
