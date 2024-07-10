@@ -124,4 +124,5 @@ printf "-F /System/Library/PrivateFrameworks -framework AppleSystemInfo -framewo
 if [[ $MAJOR -ge 14 ]]; then
     clang -fmodules -dynamiclib -Xlinker -reexport_library -Xlinker /usr/lib/libSystem.B.dylib $FRAMEWORK/extras/LibSystemWrapper.m -o "$OUTDIR/$MAJOR/SkyLight/LibSystemWrapper.dylib"
     codesign -fs - "$OUTDIR/$MAJOR/SkyLight/LibSystemWrapper.dylib"
+    install_name_tool -change /usr/lib/libSystem.B.dylib /System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/LibSystemWrapper.dylib "$OUTDIR/$MAJOR/SkyLight/SkyLightOld.dylib"
 fi
