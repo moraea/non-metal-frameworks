@@ -1,7 +1,7 @@
 #define CLOCK_HACK_ALPHA 0.5
 
 // monochrome widgets
-
+#if FRAMEWORK_DOWNGRADE >= 101500
 extern const NSString* kCAFilterColorMatrix;
 extern const NSString* kCAFilterVibrantColorMatrix;
 
@@ -16,6 +16,7 @@ NSObject* fake_filterWithType(id meta,SEL sel,NSString* type)
 	
 	return real_filterWithType(meta,sel,type);
 }
+#endif
 
 void (*clockSetMaskReal)(CALayer*,SEL,CALayer*);
 void clockSetMaskFake(CALayer* self,SEL sel,CALayer* mask)
@@ -58,6 +59,7 @@ id f(NSUserDefaults* self,SEL selector,NSString* key)
 
 void sonomaSetup()
 {
+#if FRAMEWORK_DOWNGRADE >= 101500
 	if([process containsString:@"NotificationCenter.app"])
 	{
 		swizzleImp(@"CAFilter",@"filterWithType:",false,(IMP)fake_filterWithType,(IMP*)&real_filterWithType);
@@ -67,6 +69,7 @@ void sonomaSetup()
 			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,(IMP)f,(IMP*)&r);
 		}
 	}
+#endif
 	
 	if([process containsString:@"SecurityAgent"]||[process containsString:@"loginwindow"])
 	{
