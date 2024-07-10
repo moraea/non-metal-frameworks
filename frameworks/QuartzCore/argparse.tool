@@ -24,11 +24,11 @@ argparse() {
         SAVED_KWARGS+=("$1" "$2")
         shift # Increment key index
         shift # Increment value index
-		;;
-		*)
-		POSITIONAL_ARGS+=("$1") # save positional arg
-		shift # past argument
-		;;
+        ;;
+        *)
+        POSITIONAL_ARGS+=("$1") # save positional arg
+        shift # past argument
+        ;;
     esac
     done
 
