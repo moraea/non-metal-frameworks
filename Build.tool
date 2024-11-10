@@ -147,6 +147,8 @@ set 0x26ed60
 write 0xfe27943f888112be68a36cbc0000000080332ebd6949873f68a36cbc0000000080332ebd888112be53c0973f00000000
 '
 
+cp $binaries/10.14.6*/SkyLight.json Build/SkyLight.patched.json
+
 lipo -thin x86_64 $binaries/10.14.4*/CoreDisplay -output Build/CoreDisplay.patched
 
 Binpatcher Build/CoreDisplay.patched Build/CoreDisplay.patched '
