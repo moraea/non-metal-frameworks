@@ -21,3 +21,14 @@ long SLSDisplayGetCurrentVBLDeltaInNanoseconds()
 {
 	return 1.0/60*NSEC_PER_SEC;
 }
+
+// photos test.. in progress
+
+CADisplayLink* SLSGetDisplayLink(CGDirectDisplayID display,id target,SEL action)
+{
+	CADisplayLink* dummy=[CADisplayLink displayLinkWithDisplay:[NSClassFromString(@"CADisplay") mainDisplay] target:target selector:action];
+	
+	trace(@"SLSGetDisplayLink %d %@ %s -- %@ -- %@",display,target,action,dummy,NSThread.callStackSymbols);
+	
+	return dummy;
+}
