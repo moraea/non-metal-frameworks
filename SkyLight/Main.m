@@ -106,22 +106,26 @@ __attribute__((constructor)) void load()
 		ts2Setup();
 		doneSetup();
 	
-	#if MAJOR==11
+#if MAJOR==11
 		photosSetup();
-	#endif
-	#if MAJOR>=12
-	#if MAJOR<14
+#endif
+	
+#if MAJOR>=12
+#if MAJOR<14
 		cycleSetup();
-	#endif
+#endif
 		booksHackSetup();
-	#endif
-	#if MAJOR>=13
+#endif
+	
+#if MAJOR>=13
 		blursSetupNew();
 		safariHackSetup();
 		logicHackSetup();
-	#endif
-	#if MAJOR>=14
+#endif
+	
+#if MAJOR>=14
 		loginwindowSetup();
-	#endif
+		zoomHackSetup();
+#endif
 	}
 }
