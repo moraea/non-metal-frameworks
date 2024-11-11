@@ -22,13 +22,10 @@ long SLSDisplayGetCurrentVBLDeltaInNanoseconds()
 	return 1.0/60*NSEC_PER_SEC;
 }
 
-// photos test.. in progress
+// fix missing Photos previews on Sequoia
+// TODO: i can't see how to get a CADisplay's CGDirectDisplayID..?
 
 CADisplayLink* SLSGetDisplayLink(CGDirectDisplayID display,id target,SEL action)
 {
-	CADisplayLink* dummy=[CADisplayLink displayLinkWithDisplay:[NSClassFromString(@"CADisplay") mainDisplay] target:target selector:action];
-	
-	trace(@"SLSGetDisplayLink %d %@ %s -- %@ -- %@",display,target,action,dummy,NSThread.callStackSymbols);
-	
-	return dummy;
+	return [CADisplayLink displayLinkWithDisplay:CADisplay.mainDisplay target:target selector:action];
 }

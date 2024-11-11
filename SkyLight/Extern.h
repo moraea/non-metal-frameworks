@@ -108,6 +108,13 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 -(CAContext*)context;
 @end
 
+@interface CADisplay:NSObject
+
++(NSArray<CADisplay*>*)displays;
++(CADisplay*)mainDisplay;
+
+@end
+
 // IOKit
 
 #if MAJOR == 11
