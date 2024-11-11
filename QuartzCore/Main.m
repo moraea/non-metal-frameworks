@@ -20,7 +20,7 @@ NSString* process;
 #import "Videos.m"
 #endif
 
-#if MAJOR==14
+#if MAJOR>=14
 #import "Sonoma.m"
 #endif
 
@@ -46,7 +46,7 @@ void load()
 		glyphsSetup();
 	#endif
 
-	#if MAJOR==14
+	#if MAJOR>=14
 		sonomaSetup();
 	#endif
 	}

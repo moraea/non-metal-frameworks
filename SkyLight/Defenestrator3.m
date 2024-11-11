@@ -214,7 +214,7 @@ void defenestratorSetup()
 	destructionBlocks=NSMutableArray.alloc.init;
 	updateBlocks=NSMutableArray.alloc.init;
 	
-#if MAJOR==14
+#if MAJOR>=14
 	defenestrator3Setup();
 #endif
 }
@@ -680,7 +680,7 @@ void dockHackDisplayReconfigured(CGDirectDisplayID display,CGDisplayChangeSummar
 	}
 }
 
-#if MAJOR==14
+#if MAJOR>=14
 void defenestrator3Setup()
 {
 	if(earlyBoot)
