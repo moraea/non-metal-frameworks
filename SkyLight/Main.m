@@ -13,9 +13,6 @@ BOOL isWindowServer;
 #import "Appearance.m"
 #import "Backlight.m"
 
-#if MAJOR>=14
-#import "loginwindow.m"
-#endif
 #if MAJOR>=13
 #import "DefenestratorInterface.h"
 #import "Defenestrator3.m"
@@ -52,18 +49,20 @@ BOOL isWindowServer;
 #if MAJOR==11
 #import "Photos.m"
 #endif
+
 #if MAJOR>=12
 #import "Cycle.m"
 #import "Books.m"
 #endif
+
 #if MAJOR>=13
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
 #import "Logic.m"
 #endif
 
-#ifdef SENTIENT_PATCHER
-#import "NightShift.m"
+#if MAJOR>=14
+#import "loginwindow.m"
 #endif
 
 #define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog",@"/usr/sbin/gssd",@"/usr/libexec/sshd-session"]

@@ -7,6 +7,8 @@
 #define MENUBAR_KEY_BETA @"Amy.MenuBar2Beta"
 #define MENUBAR_NOTE_2 @"DO IT"
 
+CGImageRef (*soft_CGWindowListCreateImageFromArray)(CGRect,CFArrayRef,CGWindowImageOption);
+
 // forward Rim.m
 
 void SLSWindowSetShadowProperties(unsigned int,NSDictionary*);
@@ -313,10 +315,7 @@ void menuBar2DockRecalculate2()
 		
 		long longWid=wid;
 		CFArrayRef array=CFArrayCreate(NULL,(const void**)&longWid,1,NULL);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-		CGImageRef screenshot=CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
-#pragma clang diagnostic pop
+		CGImageRef screenshot=soft_CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
 		if(!screenshot)
 		{
 			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
@@ -435,6 +434,12 @@ void menuBar2UnconditionalSetup()
 	{
 		return;
 	}
+	
+	// we used to link this directly, but it's marked unavailable for 15+ in CGWindow.h
+	// because Foundation imports CoreGraphics, i don't how how to work around this with #define?
+	// im almost certainly missing something.. -A
+	
+	soft_CGWindowListCreateImageFromArray=dlsym(RTLD_DEFAULT,"CGWindowListCreateImageFromArray");
 	
 	if([process containsString:@"WallpaperAgent.app"])
 	{
