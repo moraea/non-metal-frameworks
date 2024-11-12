@@ -39,6 +39,11 @@ BOOL fake_curatedLibraryEnabled()
 	return true;
 }
 
+long kil()
+{
+	return 0;
+}
+
 void photosSetup()
 {
 	if(![process isEqualToString:@"/System/Applications/Photos.app/Contents/MacOS/Photos"])
@@ -49,4 +54,7 @@ void photosSetup()
 	swizzleImp(@"PXDataSectionManager",@"initWithChildDataSectionManagers:",true,(IMP)fake_initWithChildDataSectionManagers,(IMP*)&real_initWithChildDataSectionManagers);
 	
 	swizzleImp(@"IPXWorkspaceSettings",@"curatedLibraryEnabled",true,(IMP)fake_curatedLibraryEnabled,NULL);
+
+	// memories crash
+	swizzleImp(@"PXGViewTextureConverter",@"applyAdjustment:toTexture:options:",true,(IMP)kil,NULL);
 }
