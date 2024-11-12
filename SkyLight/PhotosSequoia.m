@@ -1,4 +1,4 @@
-#define photosHiddenTypes @[@"PXPhotosVirtualCollection",@"PXTransientCollectionIdentifierMap"]
+#define photosHiddenTypes @[@"PXTransientCollectionIdentifierMap"]
 
 NSObject* (*real_initWithChildDataSectionManagers)(NSObject*,SEL,NSArray*);
 
@@ -31,6 +31,14 @@ NSObject* fake_initWithChildDataSectionManagers(NSObject* self,SEL sel,NSArray* 
 	return real_initWithChildDataSectionManagers(self,sel,filtered);
 }
 
+BOOL fake_curatedLibraryEnabled()
+{
+	// supposed to check PXGView.supportLevel which checks Metal
+	// but we can just lie? what?
+	
+	return true;
+}
+
 void photosSetup()
 {
 	if(![process isEqualToString:@"/System/Applications/Photos.app/Contents/MacOS/Photos"])
@@ -39,4 +47,6 @@ void photosSetup()
 	}
 	
 	swizzleImp(@"PXDataSectionManager",@"initWithChildDataSectionManagers:",true,(IMP)fake_initWithChildDataSectionManagers,(IMP*)&real_initWithChildDataSectionManagers);
+	
+	swizzleImp(@"IPXWorkspaceSettings",@"curatedLibraryEnabled",true,(IMP)fake_curatedLibraryEnabled,NULL);
 }
