@@ -47,7 +47,7 @@ BOOL isWindowServer;
 #import "TS2.m"
 
 #if MAJOR==11
-#import "Photos.m"
+#import "PhotosBigSur.m"
 #endif
 
 #if MAJOR>=12
@@ -63,6 +63,10 @@ BOOL isWindowServer;
 
 #if MAJOR>=14
 #import "loginwindow.m"
+#endif
+
+#if MAJOR>=15
+#import "PhotosSequoia.m"
 #endif
 
 #define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog",@"/usr/sbin/gssd",@"/usr/libexec/sshd-session"]
@@ -125,6 +129,10 @@ __attribute__((constructor)) void load()
 #if MAJOR>=14
 		loginwindowSetup();
 		zoomHackSetup();
+#endif
+
+#if MAJOR>=15
+		photosSetup();
 #endif
 	}
 }

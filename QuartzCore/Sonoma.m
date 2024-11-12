@@ -51,8 +51,6 @@ id f(NSUserDefaults* self,SEL selector,NSString* key)
 		return r(self,selector,key);
 	}
 	
-	trace(@"it %@",NSThread.callStackSymbols);
-	
 	return @1;
 }
 
