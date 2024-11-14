@@ -20,12 +20,12 @@ NSObject* fake_filterWithType(id meta,SEL sel,NSString* type)
 void (*clockSetMaskReal)(CALayer*,SEL,CALayer*);
 void clockSetMaskFake(CALayer* self,SEL sel,CALayer* mask)
 {
-	if(mask&&[NSStringFromClass(self.class) isEqual:@"CABackdropLayer"]&&[[self sublayers] count]==0)
+	if(mask&&[NSStringFromClass(self.class) isEqual:@"CABackdropLayer"]&&self.sublayers.count==0)
 	{
-		CALayer* white=[CALayer layer];
-		[white setFrame:CGRectMake(0,0,999,999)];
+		CALayer* white=CALayer.layer;
+		white.frame=CGRectMake(0,0,999,999);
 		CGColorRef color=CGColorCreateGenericRGB(1,1,1,CLOCK_HACK_ALPHA);
-		[white setBackgroundColor:color];
+		white.backgroundColor=color;
 		CFRelease(color);
 		[self addSublayer:white];
 	}
@@ -42,13 +42,13 @@ long Fakeinit()
 
 // Force full color desktop widgets
 
-id (*r)(NSUserDefaults*,SEL,NSString*);
+id (*real_objectForKey)(NSUserDefaults*,SEL,NSString*);
 
-id f(NSUserDefaults* self,SEL selector,NSString* key)
+id fake_objectForKey(NSUserDefaults* self,SEL selector,NSString* key)
 {
 	if(![key isEqual:@"widgetAppearance"])
 	{
-		return r(self,selector,key);
+		return real_objectForKey(self,selector,key);
 	}
 	
 	return @1;
@@ -62,7 +62,7 @@ void sonomaSetup()
 
 		if([NSUserDefaults.standardUserDefaults boolForKey:@"Moraea_ColorWidgetDisabled"]!=1)
 		{
-			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,(IMP)f,(IMP*)&r);
+			swizzleImp(@"NSUserDefaults",@"objectForKey:",true,(IMP)fake_objectForKey,(IMP*)&real_objectForKey);
 		}
 	}
 	
@@ -105,7 +105,7 @@ int CAImageQueueSetMediaTimingClamped()
 // returned object must be retain-able, and must be settable as CALayer.contents
 // 14's QC implements a CF type
 // but the actual IOSurface _already_ meets those requirements
-// just need to retain it to prevent UAF since the arg is released, Create rule
+// just need to retain it to prevent UAF since the arg is released ("Create rule")
 
 id CAIOSurfaceCreate(IOSurface* rdi)
 {
