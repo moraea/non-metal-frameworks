@@ -67,6 +67,7 @@ BOOL isWindowServer;
 
 #if MAJOR>=15
 #import "PhotosSequoia.m"
+#import "NotificationCenterSequoia.m"
 #endif
 
 #define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog",@"/usr/sbin/gssd",@"/usr/libexec/sshd-session"]
@@ -133,6 +134,7 @@ __attribute__((constructor)) void load()
 
 #if MAJOR>=15
 		photosSetup();
+		notificationCenterSetup();
 #endif
 	}
 }
