@@ -6,7 +6,7 @@ NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned
 	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
 
 #if MAJOR>=13
-	uninvertScreenshots(result);
+	result=uninvertScreenshots(result);
 #endif
 	
 	return result;
@@ -34,7 +34,7 @@ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,un
 	NSArray* result=SLSHWCaptureWindowLis$InRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 
 #if MAJOR>=13
-	uninvertScreenshots(result);
+	result=uninvertScreenshots(result);
 #endif
 
 	return result;

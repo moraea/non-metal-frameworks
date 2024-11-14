@@ -494,11 +494,43 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 	s.release;*/
 }
 
-// CG inverted colors workaround
-
-void uninvertScreenshots(NSArray* result)
+NSArray* uninvertScreenshots(NSArray* images)
 {
-	return;
+	/*
+	
+	hw_capture_window_list_common sets kCGImageProviderIsARGB8888 when making CGImage
+	new CG doesn't check for this flag, so byte order is wrong
+	previously we had a hack to clobber CGImage flags in-place, but this was brittle and broke on Sequoia
+	this time, just use public APIs unless it's noticeably slower?
+	
+	*/
+	
+	NSMutableArray* newImages=NSMutableArray.alloc.init;
+	
+	for(long index=0;index<images.count;index++)
+	{
+		CGImageRef image=(CGImageRef)images[index];
+		
+		CGDataProviderRef data=CGImageGetDataProvider(image);
+		long width=CGImageGetWidth(image);
+		long height=CGImageGetHeight(image);
+		long bitsPerComponent=CGImageGetBitsPerComponent(image);
+		long bitsPerPixel=CGImageGetBitsPerPixel(image);
+		long bytesPerRow=CGImageGetBytesPerRow(image);
+		CGColorSpaceRef space=CGImageGetColorSpace(image);
+		BOOL interpolate=CGImageGetShouldInterpolate(image);
+		CGColorRenderingIntent intent=CGImageGetRenderingIntent(image);
+		
+		CGBitmapInfo fixedBitmapInfo=kCGImageAlphaFirst|kCGImageByteOrder32Little;
+		
+		CGImageRef newImage=CGImageCreate(width,height,bitsPerComponent,bitsPerPixel,bytesPerRow,space,fixedBitmapInfo,data,NULL,interpolate,intent);
+		[newImages addObject:(id)newImage];
+		CFRelease(newImage);
+	}
+	
+	images.release;
+	
+	return newImages;
 }
 
 // TODO: return
