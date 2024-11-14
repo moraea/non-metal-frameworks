@@ -701,11 +701,11 @@ void dockHackDisplayReconfigured(CGDirectDisplayID display,CGDisplayChangeSummar
 {
 	if((flags&kCGDisplaySetModeFlag)!=0)
 	{
-		trace(@"Dock Hack: reconfigured %ld x %ld",CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
+		// trace(@"Dock Hack: reconfigured %ld x %ld",CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
 		
 		for(Wrapper* wrapper in wrappers.allValues)
 		{
-			trace(@"Dock Hack: force window update %@",wrapper);
+			// trace(@"Dock Hack: force window update %@",wrapper);
 			
 			wrapper.queueUpdate;
 		}
@@ -752,8 +752,6 @@ void defenestrator3Setup()
 }
 #endif
 
-// BEGIN FUNCTIONS FROM EDUCOVAS
-
 void* SLSSetWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
 void* SLSClearWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
 
@@ -768,9 +766,6 @@ void* SLSTransactionSetWindowTags(int rdi_trans,int esi_wid,long rdx,int ecx,int
 		return SLSClearWindowTags(SLSMainConnectionID(),esi_wid,rdx,ecx);
 	}
 }
-
-// void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
-// void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
 
 int SLPSSetFrontProcessWithOptions(long* rdi,int esi,long rdx);
 
@@ -811,5 +806,3 @@ void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm
 
 // workaround safari exit full screen - softlink
 // nostub SLSTransactionAddPostDecodeAction
-
-// END FUNCTIONS FROM EDUCOVAS

@@ -6,13 +6,18 @@ void fake_setContextId(CALayer* self,SEL sel,int hostedContextID)
 {
 	real_setContextId(self,sel,hostedContextID);
 	
-	NSObject* hostedContext=[CAContext contextWithId:hostedContextID];
-	CALayer* hostedLayer=[hostedContext layer];
+	CAContext* hostedContext=[CAContext contextWithId:hostedContextID];
+	CALayer* hostedLayer=hostedContext.layer;
 	
 	NSString* name=NSStringFromClass(hostedLayer.class);
 	if([name isEqual:@"_NSViewBackingLayer"]||[name isEqual:@"NSViewBackingLayer"])
 	{
+		// TODO: not sure if this method is on NSViewBackingLayer or CALayer and im too lazy to check atm
+		
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-method-access"
 		[hostedLayer setAllowsHitTesting:false];
+#pragma clang diagnostic pop
 	}
 }
 

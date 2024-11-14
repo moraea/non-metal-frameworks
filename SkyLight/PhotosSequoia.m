@@ -1,5 +1,13 @@
 #define photosHiddenTypes @[@"PXTransientCollectionIdentifierMap"]
 
+@interface ThingWithCollection:NSObject
+-(NSObject*)collection;
+@end
+
+@interface ThingWithIdentifier:NSObject
+-(NSObject*)identifier;
+@end
+
 NSObject* (*real_initWithChildDataSectionManagers)(NSObject*,SEL,NSArray*);
 
 NSObject* fake_initWithChildDataSectionManagers(NSObject* self,SEL sel,NSArray* children)
@@ -12,10 +20,10 @@ NSObject* fake_initWithChildDataSectionManagers(NSObject* self,SEL sel,NSArray* 
 		
 		if([child respondsToSelector:@selector(collection)])
 		{
-			NSObject* collection=[child collection];
+			NSObject* collection=((ThingWithCollection*)child).collection;
 			if([collection respondsToSelector:@selector(identifier)])
 			{
-				if([photosHiddenTypes containsObject:[collection identifier]])
+				if([photosHiddenTypes containsObject:((ThingWithIdentifier*)collection).identifier])
 				{
 					hide=true;
 				}

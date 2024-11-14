@@ -1,14 +1,5 @@
 const char LOGIC_ATTACH_KEY;
 
-@interface NSViewLite:NSObject
--(NSArray*)subviews;
--(CGRect)frame;
--(void)setFrame:(CGRect)frame;
--(CALayer*)layer;
--(void)setWantsLayer:(BOOL)wants;
--(void)addSubview:(NSViewLite*)child;
-@end
-
 @interface CLgPlayheadLite:NSObject
 -(NSViewLite*)playheadView;
 @end
