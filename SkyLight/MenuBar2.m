@@ -419,12 +419,14 @@ void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observe
 	}
 }
 
-id (*real_EWC)(id,SEL,id);
-id fake_EWC(id self,SEL sel,id coder)
+id (*real_encodeWithCoder)(id,SEL,id);
+id fake_encodeWithCoder(id self,SEL sel,id coder)
 {
+	trace(@"MenuBar2 (server 2): changed wallpaper");
+	
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_NOTE_2 object:nil userInfo:nil deliverImmediately:true];
 	
-	return real_EWC(self,sel,coder);;
+	return real_encodeWithCoder(self,sel,coder);
 }
 
 void recalculateAfterFade()
@@ -460,25 +462,39 @@ void menuBar2UnconditionalSetup()
 	
 	soft_CGWindowListCreateImageFromArray=dlsym(RTLD_DEFAULT,"CGWindowListCreateImageFromArray");
 	
+	// ≥ Sonoma
+	
 	if([process containsString:@"WallpaperAgent.app"])
 	{
-		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,(IMP)fake_EWC,(IMP*)&real_EWC);
+		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,(IMP)fake_encodeWithCoder,(IMP*)&real_encodeWithCoder);
+		
 		return;
 	}
 	
-	if([process containsString:@"Dock.app/Contents/MacOS/Dock"])
+	if([process isEqual:@"/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock"])
 	{
-		// Ventura
+		// ≤ Ventura
 		
 		[NSNotificationCenter.defaultCenter addObserverForName:@"desktoppicturechanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
+			trace(@"MenuBar2 (server): changed wallpaper");
 			recalculateAfterFade();
 		}];
 		
-		// Sonoma
+		// ≥ Sonoma
 		
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:MENUBAR_NOTE_2 object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
+			trace(@"MenuBar2 (server): woken by server 2");
+			recalculateAfterFade();
+		}];
+		
+		// ≥ Sequoia
+		
+		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"com.apple.desktop.ready" object:nil queue:nil usingBlock:^(NSNotification* note)
+		{
+			trace(@"MenuBar2 (server): desktop ready");
+			
 			recalculateAfterFade();
 		}];
 		
