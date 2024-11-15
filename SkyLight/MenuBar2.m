@@ -144,8 +144,21 @@ void menuBar2SendCached()
 		
 		int realWid=((NSNumber*)bar[displayDark?kSLMenuBarImageWindowDarkKey:kSLMenuBarImageWindowLightKey]).intValue;
 		CGContextRef realContext=SLWindowContextCreate(SLSMainConnectionID(),realWid,0);
+		if(!realContext)
+		{
+			// trying to release this when NULL crashed talagent on ventura after OTA?
+			
+			trace(@"MenuBar2 (client): failed SLWindowContextCreate real, giving up");
+			return;
+		}
 		CGImageRef realImage=SLWindowContextCreateImage(realContext);
 		CFRelease(realContext);
+		
+		if(!realImage)
+		{
+			trace(@"MenuBar2 (client): failed SLWindowContextCreateImage real, giving up");
+			return;
+		}
 		
 		CGRect realRect=CGRectMake(0,0,CGImageGetWidth(realImage),CGImageGetHeight(realImage));
 		
@@ -165,6 +178,12 @@ void menuBar2SendCached()
 			SLSSetWindowOpacity(cid,fakeWid,false);
 			
 			fakeContext=SLWindowContextCreate(cid,fakeWid,NULL);
+			
+			if(!fakeContext)
+			{
+				trace(@"MenuBar2 (client): failed SLWindowContextCreate fake, giving up");
+				return;
+			}
 			
 			menuBar2Wids[key]=[NSNumber numberWithInt:fakeWid];
 			menuBar2Contexts[key]=(NSObject*)fakeContext;
