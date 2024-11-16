@@ -334,7 +334,13 @@ void menuBar2DockRecalculate2()
 		
 		long longWid=wid;
 		CFArrayRef array=CFArrayCreate(NULL,(const void**)&longWid,1,NULL);
+		
+#if MAJOR>=15
 		CGImageRef screenshot=soft_CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
+#else
+		CGImageRef screenshot=CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
+#endif
+
 		if(!screenshot)
 		{
 			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
