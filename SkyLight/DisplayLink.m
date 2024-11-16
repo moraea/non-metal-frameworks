@@ -27,5 +27,9 @@ long SLSDisplayGetCurrentVBLDeltaInNanoseconds()
 
 CADisplayLink* SLSGetDisplayLink(CGDirectDisplayID display,id target,SEL action)
 {
+#if MAJOR>=15
 	return [CADisplayLink displayLinkWithDisplay:CADisplay.mainDisplay target:target selector:action];
+#else
+	return nil;
+#endif
 }
