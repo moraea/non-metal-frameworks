@@ -118,11 +118,13 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 @end
 
+#if MAJOR>=15
 @interface CADisplayLink(Private)
 
 +(instancetype)displayLinkWithDisplay:(CADisplay*)display target:(id)target selector:(SEL)action;
 
 @end
+#endif
 
 @interface CATransaction(Private)
 
