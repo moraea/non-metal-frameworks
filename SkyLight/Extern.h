@@ -124,6 +124,12 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 @end
 
+@interface CATransaction(Private)
+
++(int)currentState;
+
+@end
+
 // IOKit
 
 #if MAJOR == 11
