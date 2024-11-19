@@ -34,6 +34,8 @@ void weatherSetup()
 {
 	if([process isEqual:@"/System/Applications/Weather.app/Contents/MacOS/Weather"])
 	{
+		// TODO: downgrading ImageIO actually fixes it; not sure the cause but it's definitely between that and IOSurface
+		
 		swizzleImp(@"CAMLLoader",@"loadCAMLFile:",true,(IMP)doNothing,NULL);
 	}
 }
