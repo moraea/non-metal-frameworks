@@ -24,6 +24,11 @@ void fake_viewDidAdvanceToRunPhase(NSObject* self,SEL sel,void* rdx)
 
 }
 
+long disable()
+{
+	return 0;
+}
+
 void safariHackSetup()
 {
 	// TODO: i don't think this is necessary on Sequoia? but it doesn't break it either..
@@ -31,5 +36,10 @@ void safariHackSetup()
 	if([process isEqual:@"/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/Contents/MacOS/Safari"])
 	{
 		swizzleImp(@"NSRemoteViewControllerAuxiliary",@"viewDidAdvanceToRunPhase:",true,(IMP)fake_viewDidAdvanceToRunPhase,(IMP*)&real_viewDidAdvanceToRunPhase);
+		
+		// disable hide distracting items animation
+#if MAJOR>=15
+		swizzleImp(@"WBSScribbleEffectView",@"_prewarmSceneAndEffect",false,(IMP)disable,NULL);
+#endif
 	}
 }
