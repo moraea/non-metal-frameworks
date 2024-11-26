@@ -24,12 +24,14 @@ void setAppearance()
 		{
 			SLSSetAppearanceThemeLegacy(NO);
 		}
+#if MAJOR<15
 		id idOfTransition=[Transition transition];
 		[idOfTransition postChangeNotification:0 completionHandler:^(){}];
 		[idOfTransition waitForTransitionWithCompletionHandler:^()
 		{
 			return;
 		}];
+#endif
 	});
 	#pragma clang diagnostic pop
 }
