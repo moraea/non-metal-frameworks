@@ -7,6 +7,8 @@
 #define MENUBAR_KEY_BETA @"Amy.MenuBar2Beta"
 #define MENUBAR_NOTE_2 @"DO IT"
 
+CGImageRef (*soft_CGWindowListCreateImageFromArray)(CGRect,CFArrayRef,CGWindowImageOption);
+
 // forward Rim.m
 
 void SLSWindowSetShadowProperties(unsigned int,NSDictionary*);
@@ -142,8 +144,21 @@ void menuBar2SendCached()
 		
 		int realWid=((NSNumber*)bar[displayDark?kSLMenuBarImageWindowDarkKey:kSLMenuBarImageWindowLightKey]).intValue;
 		CGContextRef realContext=SLWindowContextCreate(SLSMainConnectionID(),realWid,0);
+		if(!realContext)
+		{
+			// trying to release this when NULL crashed talagent on ventura after OTA?
+			
+			trace(@"MenuBar2 (client): failed SLWindowContextCreate real, giving up");
+			return;
+		}
 		CGImageRef realImage=SLWindowContextCreateImage(realContext);
 		CFRelease(realContext);
+		
+		if(!realImage)
+		{
+			trace(@"MenuBar2 (client): failed SLWindowContextCreateImage real, giving up");
+			return;
+		}
 		
 		CGRect realRect=CGRectMake(0,0,CGImageGetWidth(realImage),CGImageGetHeight(realImage));
 		
@@ -163,6 +178,12 @@ void menuBar2SendCached()
 			SLSSetWindowOpacity(cid,fakeWid,false);
 			
 			fakeContext=SLWindowContextCreate(cid,fakeWid,NULL);
+			
+			if(!fakeContext)
+			{
+				trace(@"MenuBar2 (client): failed SLWindowContextCreate fake, giving up");
+				return;
+			}
 			
 			menuBar2Wids[key]=[NSNumber numberWithInt:fakeWid];
 			menuBar2Contexts[key]=(NSObject*)fakeContext;
@@ -313,10 +334,13 @@ void menuBar2DockRecalculate2()
 		
 		long longWid=wid;
 		CFArrayRef array=CFArrayCreate(NULL,(const void**)&longWid,1,NULL);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+		
+#if MAJOR>=15
+		CGImageRef screenshot=soft_CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
+#else
 		CGImageRef screenshot=CGWindowListCreateImageFromArray(rect,array,kCGWindowImageDefault);
-#pragma clang diagnostic pop
+#endif
+
 		if(!screenshot)
 		{
 			trace(@"MenuBar2 (server): failed capturing screenshot for wid %d",wid);
@@ -401,12 +425,14 @@ void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observe
 	}
 }
 
-id (*real_EWC)(id,SEL,id);
-id fake_EWC(id self,SEL sel,id coder)
+id (*real_encodeWithCoder)(id,SEL,id);
+id fake_encodeWithCoder(id self,SEL sel,id coder)
 {
+	trace(@"MenuBar2 (server 2): changed wallpaper");
+	
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_NOTE_2 object:nil userInfo:nil deliverImmediately:true];
 	
-	return real_EWC(self,sel,coder);;
+	return real_encodeWithCoder(self,sel,coder);
 }
 
 void recalculateAfterFade()
@@ -436,25 +462,45 @@ void menuBar2UnconditionalSetup()
 		return;
 	}
 	
+	// we used to link this directly, but it's marked unavailable for 15+ in CGWindow.h
+	// because Foundation imports CoreGraphics, i don't how how to work around this with #define?
+	// im almost certainly missing something.. -A
+	
+	soft_CGWindowListCreateImageFromArray=dlsym(RTLD_DEFAULT,"CGWindowListCreateImageFromArray");
+	
+	// ≥ Sonoma
+	
 	if([process containsString:@"WallpaperAgent.app"])
 	{
-		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,(IMP)fake_EWC,(IMP*)&real_EWC);
+		swizzleImp(@"WallpaperIDXPC",@"encodeWithCoder:",true,(IMP)fake_encodeWithCoder,(IMP*)&real_encodeWithCoder);
+		
 		return;
 	}
 	
-	if([process containsString:@"Dock.app/Contents/MacOS/Dock"])
+	if([process isEqual:@"/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock"])
 	{
-		// Ventura
+		// ≤ Ventura
 		
 		[NSNotificationCenter.defaultCenter addObserverForName:@"desktoppicturechanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
+			trace(@"MenuBar2 (server): changed wallpaper");
 			recalculateAfterFade();
 		}];
 		
-		// Sonoma
+		// ≥ Sonoma
 		
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:MENUBAR_NOTE_2 object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
+			trace(@"MenuBar2 (server): woken by server 2");
+			recalculateAfterFade();
+		}];
+		
+		// ≥ Sequoia
+		
+		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"com.apple.desktop.ready" object:nil queue:nil usingBlock:^(NSNotification* note)
+		{
+			trace(@"MenuBar2 (server): desktop ready");
+			
 			recalculateAfterFade();
 		}];
 		

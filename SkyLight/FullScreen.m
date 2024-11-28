@@ -6,7 +6,7 @@ NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned
 	NSArray* result=SLSHWCaptureWindowLis$(edi_cid,rsi_list,edx_count,ecx_flags);
 
 #if MAJOR>=13
-	uninvertScreenshots(result);
+	result=uninvertScreenshots(result);
 #endif
 	
 	return result;
@@ -14,15 +14,12 @@ NSArray* SLSHWCaptureWindowList(int edi_cid,int* rsi_list,int edx_count,unsigned
 
 NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,CGRect stack)
 {
-	// trace(@"SLSHWCaptureWindowListInRect flags %x",ecx_flags);
-	
-	// TODO: hack, not sure why AppKit is messing up the flags
-	// works, but we might sometimes want others... look at this again soon
+	// TODO: hack, still don't fully understand what AppKit is doing here
 	
 	#define SHADOW 1
 	#define JUST_WINDOW 8
 	
-	if(ecx_flags&SHADOW)
+	if(ecx_flags&1)
 	{
 		ecx_flags=SHADOW|JUST_WINDOW;
 	}
@@ -34,7 +31,7 @@ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,un
 	NSArray* result=SLSHWCaptureWindowLis$InRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 
 #if MAJOR>=13
-	uninvertScreenshots(result);
+	result=uninvertScreenshots(result);
 #endif
 
 	return result;
@@ -42,12 +39,24 @@ NSArray* SLSHWCaptureWindowListInRect(int edi_cid,int* rsi_list,int edx_count,un
 
 NSArray* SLSHWCaptureWindowListInRectWithSeed(int edi_cid,int* rsi_list,int edx_count,unsigned int ecx_flags,int r8,CGRect stack)
 {
-	// i think *WithSeed is supposed to snapshot the window with the current in-progress transaction
-	// but i have no idea how to do that, and this works
-	// (otherwise the snapshot used for the animation looks a bit weird)
+	// supposed to snapshot an in-progress CATransaction
+	// still no idea how to do that, so just forcibly commit all (can be multiple nested)
 	
+#if MAJOR>=14
+	
+	while(CATransaction.currentState)
+	{
+		CATransaction.commit;
+	}
+	
+	// TODO: ew, but occasionally breaks without this
+	
+	[NSThread sleepForTimeInterval:0.01];
+	
+#else
 	CATransaction.commit;
 	CATransaction.flush;
+#endif
 	
 	return SLSHWCaptureWindowListInRect(edi_cid,rsi_list,edx_count,ecx_flags,stack);
 }

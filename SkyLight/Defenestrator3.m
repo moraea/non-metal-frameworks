@@ -214,7 +214,7 @@ void defenestratorSetup()
 	destructionBlocks=NSMutableArray.alloc.init;
 	updateBlocks=NSMutableArray.alloc.init;
 	
-#if MAJOR==14
+#if MAJOR>=14
 	defenestrator3Setup();
 #endif
 }
@@ -494,18 +494,43 @@ void SLSTransactionSetWindowTransform3D(void* rdi,int esi,char stack[0x80])
 	s.release;*/
 }
 
-// CG inverted colors workaround
-
-void uninvertScreenshots(NSArray* result)
+NSArray* uninvertScreenshots(NSArray* images)
 {
-	for(id image in result)
+	/*
+	
+	hw_capture_window_list_common sets kCGImageProviderIsARGB8888 when making CGImage
+	new CG doesn't check for this flag, so byte order is wrong
+	previously we had a hack to clobber CGImage flags in-place, but this was brittle and broke on Sequoia
+	this time, just use public APIs unless it's noticeably slower?
+	
+	*/
+	
+	NSMutableArray* newImages=NSMutableArray.alloc.init;
+	
+	for(long index=0;index<images.count;index++)
 	{
-		// TODO: generate a new image?
-		// to avoid this cursed in-place patching
+		CGImageRef image=(CGImageRef)images[index];
 		
-		int* flags=(int*)(((char*)image)+0xa8);
-		*flags=0x2002;
+		CGDataProviderRef data=CGImageGetDataProvider(image);
+		long width=CGImageGetWidth(image);
+		long height=CGImageGetHeight(image);
+		long bitsPerComponent=CGImageGetBitsPerComponent(image);
+		long bitsPerPixel=CGImageGetBitsPerPixel(image);
+		long bytesPerRow=CGImageGetBytesPerRow(image);
+		CGColorSpaceRef space=CGImageGetColorSpace(image);
+		BOOL interpolate=CGImageGetShouldInterpolate(image);
+		CGColorRenderingIntent intent=CGImageGetRenderingIntent(image);
+		
+		CGBitmapInfo fixedBitmapInfo=kCGImageAlphaFirst|kCGImageByteOrder32Little;
+		
+		CGImageRef newImage=CGImageCreate(width,height,bitsPerComponent,bitsPerPixel,bytesPerRow,space,fixedBitmapInfo,data,NULL,interpolate,intent);
+		[newImages addObject:(id)newImage];
+		CFRelease(newImage);
 	}
+	
+	images.release;
+	
+	return newImages;
 }
 
 // TODO: return
@@ -547,11 +572,11 @@ void SLSTransactionWait(void* rdi)
 
 // Sonoma DP1 softlinks (AppKit)
 
-// nostub SLSStatusBarCopyItemLayout
-// nostub SLSTransactionSystemStatusBarResetLayout
-// nostub SLSTransactionSystemStatusBarSetLayoutIndex
-// nostub SLSTransactionClearWindowCornerRadius
-// nostub SLSTransactionSetWindowBoundsPath
+// no/stub SLSStatusBarCopyItemLayout
+// no/stub SLSTransactionSystemStatusBarResetLayout
+// no/stub SLSTransactionSystemStatusBarSetLayoutIndex
+// no/stub SLSTransactionClearWindowCornerRadius
+// no/stub SLSTransactionSetWindowBoundsPath
 
 // TODO: workaround, Renamer-ed for Defenestrator1
 
@@ -676,18 +701,18 @@ void dockHackDisplayReconfigured(CGDirectDisplayID display,CGDisplayChangeSummar
 {
 	if((flags&kCGDisplaySetModeFlag)!=0)
 	{
-		trace(@"Dock Hack: reconfigured %ld x %ld",CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
+		// trace(@"Dock Hack: reconfigured %ld x %ld",CGDisplayPixelsWide(display),CGDisplayPixelsHigh(display));
 		
 		for(Wrapper* wrapper in wrappers.allValues)
 		{
-			trace(@"Dock Hack: force window update %@",wrapper);
+			// trace(@"Dock Hack: force window update %@",wrapper);
 			
 			wrapper.queueUpdate;
 		}
 	}
 }
 
-#if MAJOR==14
+#if MAJOR>=14
 void defenestrator3Setup()
 {
 	if(earlyBoot)
@@ -727,8 +752,6 @@ void defenestrator3Setup()
 }
 #endif
 
-// BEGIN FUNCTIONS FROM EDUCOVAS
-
 void* SLSSetWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
 void* SLSClearWindowTags(int edi_cid,int esi_wid,long rdx,int ecx);
 
@@ -743,9 +766,6 @@ void* SLSTransactionSetWindowTags(int rdi_trans,int esi_wid,long rdx,int ecx,int
 		return SLSClearWindowTags(SLSMainConnectionID(),esi_wid,rdx,ecx);
 	}
 }
-
-// void* SLPSSetFrontProcessWithOptions(void* rdi,int esi,void* rdx);
-// void* SLSSetFrontProcessWithInfo(void* rdi,int esi,void* rdx)
 
 int SLPSSetFrontProcessWithOptions(long* rdi,int esi,long rdx);
 
@@ -784,4 +804,5 @@ void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm
 	});
 }
 
-// END FUNCTIONS FROM EDUCOVAS
+// workaround safari exit full screen - softlink
+// nostub SLSTransactionAddPostDecodeAction

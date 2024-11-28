@@ -47,72 +47,94 @@ BOOL isWindowServer;
 #import "TS2.m"
 
 #if MAJOR==11
-#import "Photos.m"
+#import "PhotosBigSur.m"
 #endif
+
 #if MAJOR>=12
 #import "Cycle.m"
 #import "Books.m"
 #endif
+
 #if MAJOR>=13
 #import "DefenestratorAgnosticBlurs.m"
 #import "SafariHack.m"
 #import "Logic.m"
 #endif
 
-#ifdef SENTIENT_PATCHER
-#import "NightShift.m"
+#if MAJOR>=14
+#import "loginwindow.m"
 #endif
 
-#define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd"]
+#if MAJOR>=15
+#import "PhotosSequoia.m"
+#import "NotificationCenterSequoia.m"
+#endif
+
+#define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog",@"/usr/sbin/gssd",@"/usr/libexec/sshd-session"]
 
 __attribute__((constructor)) void load()
 {
-	process=NSProcessInfo.processInfo.arguments[0];
-	if([processDenylist containsObject:process])
+	@autoreleasepool
 	{
-		// entirely disable SL shims initializers for these processes
-		// this will completely break anything graphical!
+		process=NSProcessInfo.processInfo.arguments[0];
+		if([processDenylist containsObject:process])
+		{
+			// entirely disable SL shims initializers for these processes
+			// this will completely break anything graphical!
 		
-		return;
-	}
+			return;
+		}
 	
-	earlyBoot=getpid()<200;
-	isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
+		earlyBoot=getpid()<200;
+		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
 	
-	if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
-	{
-		trace(@"Zoe <3");
-		trace(@"\e[32mASentientBot, EduCovas, ASentientHedgehog");
-	}
+		if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
+		{
+			trace(@"Zoe <3");
+			trace(@"\e[32mASentientBot, EduCovas, ASentientHedgehog");
+		}
 	
-	traceLog=true;
-	tracePrint=false;
-	swizzleLog=false;
+		traceLog=true;
+		tracePrint=false;
+		swizzleLog=false;
 	
-	defenestratorSetup();
+		defenestratorSetup();
 
-	glyphsSetup();
-	hiddSetup();
-	menuBarSetup();
-	occlusionSetup();
-	appearanceSetup();
-	pluginsSetup();
-	trackpadSetup();
-	ts2Setup();
-	doneSetup();
+		glyphsSetup();
+		hiddSetup();
+		menuBarSetup();
+		occlusionSetup();
+		appearanceSetup();
+		pluginsSetup();
+		trackpadSetup();
+		ts2Setup();
+		doneSetup();
 	
 #if MAJOR==11
-	photosSetup();
+		photosSetup();
 #endif
+	
 #if MAJOR>=12
 #if MAJOR<14
-	cycleSetup();
+		cycleSetup();
 #endif
-	booksHackSetup();
+		booksHackSetup();
 #endif
+	
 #if MAJOR>=13
-	blursSetupNew();
-	safariHackSetup();
-	logicHackSetup();
+		blursSetupNew();
+		safariHackSetup();
+		logicHackSetup();
 #endif
+	
+#if MAJOR>=14
+		loginwindowSetup();
+		zoomHackSetup();
+#endif
+
+#if MAJOR>=15
+		photosSetup();
+		notificationCenterSetup();
+#endif
+	}
 }

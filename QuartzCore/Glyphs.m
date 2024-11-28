@@ -4,7 +4,7 @@
 void (*real_SCF)(CALayer*,SEL,NSObject*);
 void fake_SCF(CALayer* self,SEL sel,NSObject* filter)
 {
-	if(filter&&[filter respondsToSelector:@selector(name)]&&[[filter name] isEqualToString:@"vibrantColorMatrixSourceOver"])
+	if(filter&&[filter respondsToSelector:@selector(name)]&&[((CAFilter*)filter).name isEqualToString:@"vibrantColorMatrixSourceOver"])
 	{
 		filter=nil;
 	}

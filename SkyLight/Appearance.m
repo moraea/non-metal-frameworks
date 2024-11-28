@@ -26,10 +26,13 @@ void setAppearance()
 		}
 		id idOfTransition=[Transition transition];
 		[idOfTransition postChangeNotification:0 completionHandler:^(){}];
-		[idOfTransition waitForTransitionWithCompletionHandler:^()
+		
+		if([idOfTransition respondsToSelector:@selector(waitForTransitionWithCompletionHandler:)])
 		{
-			return;
-		}];
+			[idOfTransition waitForTransitionWithCompletionHandler:^()
+			{
+			}];
+		}
 	});
 	#pragma clang diagnostic pop
 }

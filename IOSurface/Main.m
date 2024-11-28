@@ -22,3 +22,64 @@ size_t IOSurfaceGetPropertyMaximum(CFStringRef property)
 }
 
 #endif
+
+NSString* process=nil;
+
+id doNothing()
+{
+	return nil;
+}
+
+void weatherSetup()
+{
+	if([process isEqual:@"/System/Applications/Weather.app/Contents/MacOS/Weather"])
+	{
+		// TODO: downgrading ImageIO actually fixes it; not sure the cause but it's definitely between that and IOSurface
+		
+		swizzleImp(@"CAMLLoader",@"loadCAMLFile:",true,(IMP)doNothing,NULL);
+	}
+}
+
+__attribute__((constructor)) void load()
+{
+	@autoreleasepool
+	{
+		traceLog=true;
+		tracePrint=false;
+		swizzleLog=false;
+		
+		process=NSProcessInfo.processInfo.arguments[0];
+		
+#if MAJOR>=15
+		weatherSetup();
+#endif
+	}
+}
+
+
+@interface _IOSurfaceDebugDescription:NSObject
+@end
+@interface _IOSurfaceDebugDescription(Stub)
+@end
+@implementation _IOSurfaceDebugDescription(Stub)
+
+-(id)pixelFormatString
+{
+	return nil;
+}
+
+-(id)dirtySize
+{
+	return nil;
+}
+
+-(id)residentSize
+{
+	return nil;
+}
+
+-(id)traceID
+{
+	return nil;
+}
+@end

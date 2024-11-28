@@ -21,3 +21,18 @@ long SLSDisplayGetCurrentVBLDeltaInNanoseconds()
 {
 	return 1.0/60*NSEC_PER_SEC;
 }
+
+// fix missing Photos previews on Sequoia
+// TODO: i can't see how to get a CADisplay's CGDirectDisplayID..?
+
+#if MAJOR>=15
+CADisplayLink* SLSGetDisplayLink(CGDirectDisplayID display,id target,SEL action)
+{
+	return [CADisplayLink displayLinkWithDisplay:CADisplay.mainDisplay target:target selector:action];
+}
+#else
+id SLSGetDisplayLink(CGDirectDisplayID display,id target,SEL action)
+{
+	return nil;
+}
+#endif

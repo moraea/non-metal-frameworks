@@ -20,18 +20,6 @@ ContextWrapper* wrapperForWindow(unsigned int windowID)
 	return contextWrappers[[NSNumber numberWithInt:windowID]];
 }
 
-// TODO: dumb but i can't link AppKit
-
-@interface NSWindowLite:NSObject
-@property(assign) unsigned int windowNumber;
-@end
-
-@interface NSVisualEffectViewLite:NSObject
-@property(assign) BOOL _shouldUseActiveAppearance;
-@property(assign) long blendingMode;
-@property(assign) NSWindowLite* window;
-@end
-
 #define NSVisualEffectBlendingModeBehindWindow 0
 
 void defenestratorSetup()

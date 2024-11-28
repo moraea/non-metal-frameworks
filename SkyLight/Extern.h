@@ -67,6 +67,8 @@ void SLSWindowBackdropDeactivate(char* rdi_backdrop);
 void SLSSetAppearanceThemeLegacy(BOOL);
 BOOL SLSGetAppearanceThemeSwitchesAutomatically();
 
+void SLSSetSessionSwitchCubeAnimation(BOOL);
+
 extern const NSString* kSLSBuiltInDevicesKey;
 extern const NSString* kSLSMouseDevicesKey;
 extern const NSString* kSLSGestureScrollDevicesKey;
@@ -101,11 +103,33 @@ void CoreDockGetOrientationAndPinning(unsigned long* orientationOut,unsigned lon
 
 +(NSArray<CAContext*>*)allContexts;
 +(instancetype)contextWithCGSConnection:(int)edx_connectionID options:(NSDictionary*)rcx_options;
++(id)contextWithId:(int)contextID;
 
 @end
 
 @interface CALayer(Private)
 -(CAContext*)context;
+@end
+
+@interface CADisplay:NSObject
+
++(NSArray<CADisplay*>*)displays;
++(CADisplay*)mainDisplay;
+
+@end
+
+#if MAJOR>=15
+@interface CADisplayLink(Private)
+
++(instancetype)displayLinkWithDisplay:(CADisplay*)display target:(id)target selector:(SEL)action;
+
+@end
+#endif
+
+@interface CATransaction(Private)
+
++(int)currentState;
+
 @end
 
 // IOKit
@@ -166,3 +190,51 @@ NSArray<NSDictionary*>* SLSCopyManagedDisplaySpaces(int edi_cid);
 int SLSGetDisplayForUUID(CFUUIDRef rdi_uuid);
 int SLSGetDisplaysWithRect(CGRect* rdi_rect,int esi_count,int* rdx_listOut,int* rcx_countOut);
 int SLSGetWindowBounds(int edi_cid,int esi_wid,CGRect* rdx_rectOut);
+
+// TODO: dumb but we can't link AppKit
+
+@class NSWindowLite;
+
+@interface NSViewLite:NSObject
+
+@property(assign) NSWindowLite* window;
+@property(assign) BOOL wantsLayer;
+@property(retain) CALayer* layer;
+@property(retain) NSArray* subviews;
+@property(assign) CGRect frame;
+
+-(void)addSubview:(NSViewLite*)child;
+
+@end
+
+@interface NSColorLite:NSObject
+
++(NSColorLite*)clearColor;
+
+@end
+
+@interface NSWindowLite:NSObject
+
+@property(assign) unsigned int windowNumber;
+@property(retain) NSViewLite* contentView;
+@property(assign) BOOL opaque;
+@property(retain) NSColorLite* backgroundColor;
+
+-(instancetype)initWithContentRect:(CGRect)contentRect styleMask:(long)style backing:(long)backingStoreType defer:(BOOL)flag;
+
+@end
+
+#define NSBackingStoreBuffered 2
+
+@interface NSVisualEffectViewLite:NSViewLite
+
+@property(assign) BOOL _shouldUseActiveAppearance;
+@property(assign) long blendingMode;
+
+@end
+
+@interface NSBitmapImageRepLite:NSObject
+
+-(instancetype)initWithCGImage:(CGImageRef)image;
+
+@end
