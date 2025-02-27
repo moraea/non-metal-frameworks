@@ -805,4 +805,4 @@ void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm
 }
 
 // workaround safari exit full screen - softlink
-// nostub SLSTransactionAddPostDecodeAction
+// no/stub SLSTransactionAddPostDecodeAction
