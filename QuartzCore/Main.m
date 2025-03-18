@@ -24,28 +24,27 @@ NSString* process;
 #import "Sonoma.m"
 #endif
 
-__attribute__((constructor))
-void load()
+__attribute__((constructor)) void load(int argCount,char** argList)
 {
 	@autoreleasepool
 	{
 		traceLog=true;
 		tracePrint=false;
 		swizzleLog=false;
-	
-		process=NSProcessInfo.processInfo.arguments[0];
-
+		
+		process=[NSString stringWithUTF8String:argList[0]].retain;
+		
 		catalystSetup();
 		miscSetup();
-	
+		
 	#if defined(CAT) || defined(MOJ)
 		animationsSetup();
 	#endif
-	
+		
 	#ifdef CAT
 		glyphsSetup();
 	#endif
-
+		
 	#if MAJOR>=14
 		sonomaSetup();
 	#endif

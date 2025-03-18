@@ -738,7 +738,7 @@ void defenestrator3Setup()
 				
 				if(rect.size.width<1||rect.size.height<1)
 				{
-					trace(@"Dock size hack %@",NSStringFromRect(rect));
+					// trace(@"Dock size hack %@",NSStringFromRect(rect));
 					
 					int display=CGMainDisplayID();
 					
@@ -806,3 +806,18 @@ void SLSTransactionSpaceFinishedResizeForRect(void* rdi_trans,int esi,double xmm
 
 // workaround safari exit full screen - softlink
 // no/stub SLSTransactionAddPostDecodeAction
+// softlink removed in 15.4, shim required to exit YouTube fullscreen in Safari
+
+void SLSTransactionAddPostDecodeAction(void* rdi_transaction,void (^rsi_block)(void* transaction))
+{
+	// trace(@"SLSTransactionAddPostDecodeAction %p %p %@",rdi_transaction,rsi_block,NSThread.callStackSymbols);
+	
+	void (^safeBlock)(void*)=[rsi_block copy];
+	
+	pushCommitBlock(rdi_transaction,^()
+	{
+		safeBlock(rdi_transaction);
+		
+		[safeBlock release];
+	});
+}

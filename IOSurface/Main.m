@@ -40,7 +40,7 @@ void weatherSetup()
 	}
 }
 
-__attribute__((constructor)) void load()
+__attribute__((constructor)) void load(int argCount,char** argList)
 {
 	@autoreleasepool
 	{
@@ -48,7 +48,7 @@ __attribute__((constructor)) void load()
 		tracePrint=false;
 		swizzleLog=false;
 		
-		process=NSProcessInfo.processInfo.arguments[0];
+		process=[NSString stringWithUTF8String:argList[0]].retain;
 		
 #if MAJOR>=15
 		weatherSetup();

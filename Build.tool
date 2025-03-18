@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 
-PATH+=:"$PWD/Build/non-metal-common/Build"
+PATH+=:"$PWD/Build/moraea-common/Build"
 
 function build
 {
@@ -39,7 +39,7 @@ function build
 	current="$(otool -l "$newIn" | grep -m 1 'current version' | cut -d ' ' -f 9)"
 	compatibility="$(otool -l "$newIn" | grep -m 1 'compatibility version' | cut -d ' ' -f 3)"
 
-	clang -dynamiclib -fmodules -I Build/non-metal-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs -Xlinker -not_for_dyld_shared_cache
+	clang -dynamiclib -fmodules -I Build/moraea-common/Utils -Wno-unused-getter-return-value -Wno-objc-missing-super-calls -mmacosx-version-min=$major -DMAJOR=$major -compatibility_version "$compatibility" -current_version "$current" -install_name "$mainInstall" -Xlinker -reexport_library -Xlinker "$oldOut" "$mainIn" -o "$mainOut" "${@:5}" -Xlinker -no_warn_inits $extraArgs -Xlinker -not_for_dyld_shared_cache
 
 	# TODO: automatically handle in Stubber? move elsewhere? edit imports and binpatch?
 	# idk. this works for now...
@@ -56,7 +56,7 @@ function build
 	codesign -f -s - "$mainOut"
 }
 
-binaries=Build/non-metal-binaries
+binaries=Build/moraea-sources
 
 lipo -thin x86_64 $binaries/10.14.6*/SkyLight -output Build/SkyLight.patched
 
@@ -239,20 +239,16 @@ function runWithTargetVersion
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol __CASSynchronize
 return 0x0'
+	fi
 
 	if [[ "$major" -ge 14 ]]
+	then
 		echo 'applying _CARequiresColorMatching hack'
 		Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
 symbol _CARequiresColorMatching
 return 0x0'
-
 	fi
-
-	echo 'applying _CARequiresColorMatching hack'
-	Binpatcher Build/QuartzCore.patched Build/QuartzCore.patched '
-symbol _CARequiresColorMatching
-return 0x0'
-
+	
 	if [[ -e Build/QuartzCore.patched ]]
 	then
 		build Build/QuartzCore.patched $binaries/$major.*/QuartzCore /System/Library/Frameworks/QuartzCore.framework/Versions/A/QuartzCore Common -D$qc

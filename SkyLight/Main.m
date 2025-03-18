@@ -72,11 +72,15 @@ BOOL isWindowServer;
 
 #define processDenylist @[@"/usr/sbin/sshd",@"/usr/libexec/cryptexd",@"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",@"/usr/sbin/cfprefsd",@"/usr/libexec/watchdog",@"/usr/sbin/gssd",@"/usr/libexec/sshd-session"]
 
-__attribute__((constructor)) void load()
+__attribute__((constructor)) void load(int argCount,char** argList)
 {
 	@autoreleasepool
 	{
-		process=NSProcessInfo.processInfo.arguments[0];
+		// note, changed in QuartzCore and IOSurface too
+		// process=NSProcessInfo.processInfo.arguments[0];
+		
+		process=[NSString stringWithUTF8String:argList[0]].retain;
+		
 		if([processDenylist containsObject:process])
 		{
 			// entirely disable SL shims initializers for these processes
@@ -86,8 +90,8 @@ __attribute__((constructor)) void load()
 		}
 	
 		earlyBoot=getpid()<200;
-		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
-	
+		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"]||[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"];
+		
 		if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
 		{
 			trace(@"Zoe <3");

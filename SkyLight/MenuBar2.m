@@ -398,7 +398,7 @@ void menuBar2DockRecalculate2()
 		float brightness=(LUMINANCE_RED*redMean+LUMINANCE_GREEN*greenMean+LUMINANCE_BLUE*blueMean)/0xff;
 		BOOL darkText=brightness>MENUBAR_WALLPAPER_THRESHOLD;
 		
-		trace(@"MenuBar2 (server): calculated brightness %f, display %d, dark text %d",brightness,display,darkText);
+		// trace(@"MenuBar2 (server): calculated brightness %f, display %d, dark text %d",brightness,display,darkText);
 		
 		menuBar2WriteDark(darkText,display);
 	}
@@ -428,7 +428,7 @@ void menuBar2DockAppearanceCallback(CFNotificationCenterRef center,void* observe
 id (*real_encodeWithCoder)(id,SEL,id);
 id fake_encodeWithCoder(id self,SEL sel,id coder)
 {
-	trace(@"MenuBar2 (server 2): changed wallpaper");
+	// trace(@"MenuBar2 (server 2): changed wallpaper");
 	
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_NOTE_2 object:nil userInfo:nil deliverImmediately:true];
 	
@@ -483,7 +483,7 @@ void menuBar2UnconditionalSetup()
 		
 		[NSNotificationCenter.defaultCenter addObserverForName:@"desktoppicturechanged" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			trace(@"MenuBar2 (server): changed wallpaper");
+			// trace(@"MenuBar2 (server): changed wallpaper");
 			recalculateAfterFade();
 		}];
 		
@@ -491,7 +491,7 @@ void menuBar2UnconditionalSetup()
 		
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:MENUBAR_NOTE_2 object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			trace(@"MenuBar2 (server): woken by server 2");
+			// trace(@"MenuBar2 (server): woken by server 2");
 			recalculateAfterFade();
 		}];
 		
@@ -499,7 +499,7 @@ void menuBar2UnconditionalSetup()
 		
 		[NSDistributedNotificationCenter.defaultCenter addObserverForName:@"com.apple.desktop.ready" object:nil queue:nil usingBlock:^(NSNotification* note)
 		{
-			trace(@"MenuBar2 (server): desktop ready");
+			// trace(@"MenuBar2 (server): desktop ready");
 			
 			recalculateAfterFade();
 		}];

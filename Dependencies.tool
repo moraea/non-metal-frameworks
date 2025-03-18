@@ -10,13 +10,12 @@ cd Build
 
 if test -n "$MORAEA_LOCAL_DEPENDENCIES"
 then
-	cp -R ../../non-metal-common .
-	cp -R ../../non-metal-binaries .
+	cp -R ../../moraea-common ../../moraea-sources .
 else
-	git clone https://github.com/moraea/non-metal-common
-	git clone https://github.com/moraea/non-metal-binaries
+	git clone https://github.com/moraea/moraea-common
+	git clone https://github.com/moraea/moraea-sources
 fi
 
-chflags hidden non-metal-common non-metal-binaries
+chflags hidden moraea-common moraea-sources
 
-non-metal-common/Build.tool
+moraea-common/Build.tool
