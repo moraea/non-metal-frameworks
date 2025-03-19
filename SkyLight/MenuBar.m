@@ -7,7 +7,7 @@ BOOL menuBarManualDark()
 
 BOOL menuBarAutoDarkEnabled()
 {
-	return [NSUserDefaults.standardUserDefaults boolForKey:@"Moraea.MenuBar2Beta"];
+	return [NSUserDefaults.standardUserDefaults boolForKey:@"Moraea.MenuBar2Beta"]||[NSUserDefaults.standardUserDefaults boolForKey:@"Amy.MenuBar2Beta"];
 }
 
 NSString* menuBarAutoDarkKeyWithDisplay(int display)
