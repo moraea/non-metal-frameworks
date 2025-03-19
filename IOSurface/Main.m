@@ -48,7 +48,13 @@ __attribute__((constructor)) void load(int argCount,char** argList)
 		tracePrint=false;
 		swizzleLog=false;
 		
-		process=[NSString stringWithUTF8String:argList[0]].retain;
+		NSObject.load;
+		
+		// TODO: still breaks in big sur (specifically sshd?) because Foundation's category with +load isn't visible yet? no idea how to fix that and we don't need it currently anyways, i give up
+
+#if MAJOR>=12
+		process=NSProcessInfo.processInfo.arguments[0];
+#endif
 		
 #if MAJOR>=15
 		weatherSetup();

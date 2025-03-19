@@ -32,7 +32,8 @@ __attribute__((constructor)) void load(int argCount,char** argList)
 		tracePrint=false;
 		swizzleLog=false;
 		
-		process=[NSString stringWithUTF8String:argList[0]].retain;
+		NSObject.load;
+		process=NSProcessInfo.processInfo.arguments[0];
 		
 		catalystSetup();
 		miscSetup();

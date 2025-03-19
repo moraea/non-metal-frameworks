@@ -87,7 +87,7 @@ BOOL blurBeta()
 	_windowID=windowID;
 	_context=context.retain;
 	
-	SLSAddSurface(connectionID,windowID,&_surfaceID);
+	SLSAddSurface(connectionID,windowID,(int*)&_surfaceID);
 	SLSBindSurface(connectionID,windowID,_surfaceID,4,0,context.contextId);
 	SLSOrderSurface(connectionID,windowID,_surfaceID,1,0);
 	
@@ -97,7 +97,7 @@ BOOL blurBeta()
 	self.updateSurfaceBounds;
 	
 	unsigned int windowIDCopy=windowID;
-	SLSRequestNotificationsForWindows(connectionID,&windowIDCopy,1);
+	SLSRequestNotificationsForWindows(connectionID,(int*)&windowIDCopy,1);
 	
 	return self;
 }

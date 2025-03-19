@@ -76,10 +76,8 @@ __attribute__((constructor)) void load(int argCount,char** argList)
 {
 	@autoreleasepool
 	{
-		// note, changed in QuartzCore and IOSurface too
-		// process=NSProcessInfo.processInfo.arguments[0];
-		
-		process=[NSString stringWithUTF8String:argList[0]].retain;
+		NSObject.load;
+		process=NSProcessInfo.processInfo.arguments[0];
 		
 		if([processDenylist containsObject:process])
 		{
@@ -90,7 +88,7 @@ __attribute__((constructor)) void load(int argCount,char** argList)
 		}
 	
 		earlyBoot=getpid()<200;
-		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"]||[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"];
+		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
 		
 		if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
 		{
