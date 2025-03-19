@@ -90,10 +90,11 @@ __attribute__((constructor)) void load(int argCount,char** argList)
 		earlyBoot=getpid()<200;
 		isWindowServer=[process isEqualToString:@"/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/Resources/WindowServer"];
 		
-		if(earlyBoot&&[process isEqualToString:@"/usr/sbin/kextcache"])
+		if(isWindowServer)
 		{
-			trace(@"Zoe <3");
-			trace(@"\e[32mASentientBot, EduCovas, ASentientHedgehog");
+			int handle=open("/dev/console",O_WRONLY);
+			dprintf(handle,"\e[35mZoe <3\n\e[32mASentientBot, EduCovas, ASentientHedgehog\e[0m\n");
+			close(handle);
 		}
 	
 		traceLog=true;
