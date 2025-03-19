@@ -706,6 +706,26 @@ void menuBarSetup()
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBarServerReduceTransparencyCallback,CFSTR("AXInterfaceIncreaseContrastStatusDidChange"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(),NULL,menuBarServerAppearanceCallback,CFSTR("AppleInterfaceThemeChangedNotification"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 		
+		dispatch_async(dispatch_queue_create(NULL,NULL),^()
+		{
+			BOOL oldManualValue=menuBarManualDark();
+			BOOL oldAutoSetting=menuBarAutoDarkEnabled();
+			while(true)
+			{
+				[NSThread sleepForTimeInterval:1];
+				
+				BOOL newManualValue=menuBarManualDark();
+				BOOL newAutoSetting=menuBarAutoDarkEnabled();
+				if(newManualValue!=oldManualValue||newAutoSetting!=oldAutoSetting)
+				{
+					oldManualValue=newManualValue;
+					oldAutoSetting=newAutoSetting;
+					
+					[NSDistributedNotificationCenter.defaultCenter postNotificationName:MENUBAR_DARK_NOTE object:nil userInfo:nil deliverImmediately:true];
+				}
+			}
+		});
+		
 		return;
 	}
 	
